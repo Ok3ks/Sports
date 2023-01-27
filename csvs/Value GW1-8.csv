@@ -1,0 +1,614 @@
+,first_name,second_name,team,element_type,selected_by_percent,now_cost,minutes,threat,value_season,now_cost,total_points,position,value
+0,Bernd,Leno,Arsenal,1,1.2,48,270,0.0,0.8,48,4,Goalkeeper,0.8
+1,Rúnar Alex,Rúnarsson,Arsenal,1,0.9,40,0,0.0,0.0,40,0,Goalkeeper,0.0
+2,Willian,Borges Da Silva,Arsenal,3,0.1,63,0,0.0,0.0,63,0,Midfielder,0.0
+3,Pierre-Emerick,Aubameyang,Arsenal,4,2.2,99,428,253.0,2.2,99,22,Forward,2.2
+4,Cédric,Soares,Arsenal,2,0.2,43,188,1.0,0.2,43,1,Defender,0.2
+5,Alexandre,Lacazette,Arsenal,4,1.0,83,49,0.0,0.2,83,2,Forward,0.2
+6,Granit,Xhaka,Arsenal,3,0.4,49,295,9.0,0.8,49,4,Midfielder,0.8
+7,Pablo,Marí,Arsenal,2,0.1,43,180,11.0,0.2,43,1,Defender,0.2
+8,Héctor,Bellerín,Arsenal,2,0.3,48,0,0.0,0.0,48,0,Defender,0.0
+9,Calum,Chambers,Arsenal,2,0.2,43,170,12.0,0.2,43,1,Defender,0.2
+10,Sead,Kolasinac,Arsenal,2,0.1,43,90,0.0,-0.2,43,-1,Defender,-0.2
+11,Mohamed Naser,El Sayed Elneny,Arsenal,3,0.4,45,45,0.0,0.2,45,1,Midfielder,0.2
+12,Ainsley,Maitland-Niles,Arsenal,3,0.1,53,119,8.0,1.3,53,7,Midfielder,1.3
+13,Rob,Holding,Arsenal,2,0.7,43,180,6.0,0.0,43,0,Defender,0.0
+14,Thomas,Partey,Arsenal,3,0.2,50,282,35.0,1.4,50,7,Midfielder,1.4
+15,Kieran,Tierney,Arsenal,2,6.9,49,592,71.0,4.7,49,23,Defender,4.7
+16,Nicolas,Pépé,Arsenal,3,1.1,71,387,195.0,2.0,71,14,Midfielder,2.0
+17,Lucas,Torreira,Arsenal,3,0.2,45,0,0.0,0.0,45,0,Midfielder,0.0
+18,Edward,Nketiah,Arsenal,4,0.1,54,0,0.0,0.0,54,0,Forward,0.0
+19,Emile,Smith Rowe,Arsenal,3,5.6,54,535,142.0,4.6,54,25,Midfielder,4.6
+20,Bukayo,Saka,Arsenal,3,11.3,63,491,210.0,4.6,63,29,Midfielder,4.6
+21,Gabriel,Magalhães,Arsenal,2,0.7,50,360,18.0,4.6,50,23,Defender,4.6
+22,Konstantinos,Mavropanos,Arsenal,2,0.0,45,0,0.0,0.0,45,0,Defender,0.0
+23,Mattéo,Guendouzi,Arsenal,3,0.0,45,0,0.0,0.0,45,0,Midfielder,0.0
+24,Gabriel Teodoro,Martinelli Silva,Arsenal,3,0.2,52,148,13.0,0.8,52,4,Midfielder,0.8
+25,William,Saliba,Arsenal,2,0.0,45,0,0.0,0.0,45,0,Defender,0.0
+26,Ben,White,Arsenal,2,12.4,44,450,4.0,5.0,44,22,Defender,5.0
+27,Nuno,Varela Tavares,Arsenal,2,0.2,43,47,6.0,0.7,43,3,Defender,0.7
+28,Albert,Sambi Lokonga,Arsenal,3,0.2,49,368,18.0,2.0,49,10,Midfielder,2.0
+29,Folarin,Balogun,Arsenal,4,0.4,49,69,17.0,0.4,49,2,Forward,0.4
+30,Reiss,Nelson,Arsenal,3,0.0,50,19,20.0,0.2,50,1,Midfielder,0.2
+31,Karl,Hein,Arsenal,1,0.6,40,0,0.0,0.0,40,0,Goalkeeper,0.0
+32,Martin,Ødegaard,Arsenal,3,2.8,55,402,25.0,3.6,55,20,Midfielder,3.6
+33,Aaron,Ramsdale,Arsenal,1,4.6,46,360,0.0,5.2,46,24,Goalkeeper,5.2
+34,Arthur,Okonkwo,Arsenal,1,0.1,40,0,0.0,0.0,40,0,Goalkeeper,0.0
+35,Takehiro,Tomiyasu,Arsenal,2,2.9,46,331,31.0,4.3,46,20,Defender,4.3
+36,Jed,Steer,Aston Villa,1,3.6,40,90,0.0,0.2,40,1,Goalkeeper,0.2
+37,Conor,Hourihane,Aston Villa,3,0.0,49,0,0.0,0.0,49,0,Midfielder,0.0
+38,Emiliano,Martínez,Aston Villa,1,14.3,55,540,0.0,5.5,55,30,Goalkeeper,5.5
+39,Björn,Engels,Aston Villa,2,0.0,45,0,0.0,0.0,45,0,Defender,0.0
+40,Bertrand,Traoré,Aston Villa,3,0.4,58,53,54.0,1.2,58,7,Midfielder,1.2
+41,Morgan,Sanson,Aston Villa,3,0.0,50,0,0.0,0.0,50,0,Midfielder,0.0
+42,John,McGinn,Aston Villa,3,0.7,58,489,50.0,2.8,58,16,Midfielder,2.8
+43,Kortney,Hause,Aston Villa,2,0.3,44,171,41.0,3.9,44,17,Defender,3.9
+44,Mahmoud Ahmed,Ibrahim Hassan,Aston Villa,3,0.0,54,0,0.0,0.0,54,0,Midfielder,0.0
+45,Tyrone,Mings,Aston Villa,2,7.6,50,540,120.0,5.8,50,29,Defender,5.8
+46,Matt,Targett,Aston Villa,2,2.8,48,465,31.0,3.3,48,16,Defender,3.3
+47,Ollie,Watkins,Aston Villa,4,1.6,73,371,239.0,1.8,73,13,Forward,1.8
+48,Marvelous,Nakamba,Aston Villa,3,0.2,45,177,0.0,1.1,45,5,Midfielder,1.1
+49,Anwar,El Ghazi,Aston Villa,3,0.6,58,239,33.0,1.9,58,11,Midfielder,1.9
+50,Emiliano,Buendía Stati,Aston Villa,3,1.3,64,279,23.0,2.5,64,16,Midfielder,2.5
+51,Matthew,Cash,Aston Villa,2,3.8,51,625,88.0,5.9,51,30,Defender,5.9
+52,Ezri,Konsa Ngoyo,Aston Villa,2,0.7,49,628,82.0,4.7,49,23,Defender,4.7
+53,Frédéric,Guilbert,Aston Villa,2,0.0,45,0,0.0,0.0,45,0,Defender,0.0
+54,Wesley,Moraes,Aston Villa,4,0.1,54,1,0.0,0.2,54,1,Forward,0.2
+55,Mbwana Ally,Samatta,Aston Villa,4,0.0,55,0,0.0,0.0,55,0,Forward,0.0
+56,Keinan,Davis,Aston Villa,4,1.4,44,0,0.0,0.0,44,0,Forward,0.0
+57,Douglas Luiz,Soares de Paulo,Aston Villa,3,3.6,46,527,23.0,4.6,46,21,Midfielder,4.6
+58,Jacob,Ramsey,Aston Villa,3,0.5,45,433,89.0,2.4,45,11,Midfielder,2.4
+59,Ashley,Young,Aston Villa,2,0.6,49,266,6.0,2.0,49,10,Defender,2.0
+60,Axel,Tuanzebe,Aston Villa,2,0.5,45,272,39.0,2.2,45,10,Defender,2.2
+61,Danny,Ings,Aston Villa,4,16.5,79,593,165.0,3.8,79,30,Forward,3.8
+62,Leon,Bailey,Aston Villa,3,0.6,64,84,40.0,2.2,64,14,Midfielder,2.2
+63,Aaron,Ramsey,Aston Villa,3,0.2,45,0,0.0,0.0,45,0,Midfielder,0.0
+64,Jaden,Philogene-Bidace,Aston Villa,3,0.0,50,4,0.0,0.2,50,1,Midfielder,0.2
+65,Carney,Chukwuemeka,Aston Villa,3,0.0,45,62,0.0,0.4,45,2,Midfielder,0.4
+66,Cameron,Archer,Aston Villa,4,1.2,45,5,0.0,0.4,45,2,Forward,0.4
+67,Viljami,Sinisalo,Aston Villa,1,0.1,40,0,0.0,0.0,40,0,Goalkeeper,0.0
+68,Lamare,Bogarde,Aston Villa,2,0.0,40,0,0.0,0.0,40,0,Defender,0.0
+69,Pontus,Jansson,Brentford,2,8.5,46,621,32.0,8.3,46,38,Defender,8.3
+70,Christian,Nørgaard,Brentford,3,1.0,50,617,46.0,3.8,50,19,Midfielder,3.8
+71,Ivan,Toney,Brentford,4,15.0,63,630,189.0,4.9,63,31,Forward,4.9
+72,Tariqe,Fosu-Henry,Brentford,3,0.0,52,0,0.0,0.0,52,0,Midfielder,0.0
+73,David,Raya Martin,Brentford,1,10.0,46,630,0.0,6.5,46,30,Goalkeeper,6.5
+74,Sergi,Canós,Brentford,3,2.1,55,577,104.0,4.9,55,27,Midfielder,4.9
+75,Pelenda Joshua,Dasilva,Brentford,3,0.0,54,0,0.0,0.0,54,0,Midfielder,0.0
+76,Rico,Henry,Brentford,2,1.1,45,614,11.0,5.3,45,24,Defender,5.3
+77,Vitaly,Janelt,Brentford,3,0.3,50,511,90.0,4.6,50,23,Midfielder,4.6
+78,Saman,Ghoddos,Brentford,3,0.0,53,85,36.0,0.6,53,3,Midfielder,0.6
+79,Mathias,Jensen,Brentford,3,0.0,49,93,18.0,0.8,49,4,Midfielder,0.8
+80,Charlie,Goode,Brentford,2,2.1,39,0,0.0,0.0,39,0,Defender,0.0
+81,Marcus,Forss,Brentford,4,0.1,53,4,0.0,0.2,53,1,Forward,0.2
+82,Mads,Roerslev Rasmussen,Brentford,2,0.1,43,44,0.0,0.5,43,2,Defender,0.5
+83,Mads,Bech Sørensen,Brentford,2,0.0,44,19,0.0,0.2,44,1,Defender,0.2
+84,Ethan,Pinnock,Brentford,2,6.3,46,582,62.0,8.3,46,38,Defender,8.3
+85,Ellery,Balcombe,Brentford,1,0.0,40,0,0.0,0.0,40,0,Goalkeeper,0.0
+86,Jan,Zamburek,Brentford,3,0.8,45,0,0.0,0.0,45,0,Midfielder,0.0
+87,Patrik,Gunnarsson,Brentford,1,0.9,40,0,0.0,0.0,40,0,Goalkeeper,0.0
+88,Halil,Dervişoğlu,Brentford,4,0.0,54,0,0.0,0.0,54,0,Forward,0.0
+89,Bryan,Mbeumo,Brentford,3,1.4,55,591,184.0,4.9,55,27,Midfielder,4.9
+90,Mads,Bidstrup,Brentford,3,0.1,45,21,0.0,0.7,45,3,Midfielder,0.7
+91,Frank,Onyeka,Brentford,3,0.1,49,333,57.0,2.2,49,11,Midfielder,2.2
+92,Kristoffer,Ajer,Brentford,2,1.2,45,520,28.0,5.1,45,23,Defender,5.1
+93,Dominic,Thompson,Brentford,2,0.0,44,0,0.0,0.0,44,0,Defender,0.0
+94,Shandon,Baptiste,Brentford,3,0.0,50,188,26.0,1.2,50,6,Midfielder,1.2
+95,Yoane,Wissa,Brentford,3,0.1,59,57,72.0,2.7,59,16,Midfielder,2.7
+96,Álvaro,Fernández,Brentford,1,0.1,45,0,0.0,0.0,45,0,Goalkeeper,0.0
+97,Finley,Stevens,Brentford,2,0.3,40,0,0.0,0.0,40,0,Defender,0.0
+98,Mathias,Jorgensen,Brentford,2,0.0,45,145,0.0,0.4,45,2,Defender,0.4
+99,Adam,Lallana,Brighton,3,0.2,54,542,53.0,2.6,54,14,Midfielder,2.6
+100,Jason,Steele,Brighton,1,3.2,40,0,0.0,0.0,40,0,Goalkeeper,0.0
+101,Pascal,Groß,Brighton,3,0.4,60,443,72.0,3.2,60,19,Midfielder,3.2
+102,Shane,Duffy,Brighton,2,23.8,43,630,168.0,8.1,43,35,Defender,8.1
+103,Davy,Pröpper,Brighton,3,0.0,45,0,0.0,0.0,45,0,Midfielder,0.0
+104,Dan,Burn,Brighton,2,0.0,44,155,6.0,1.8,44,8,Defender,1.8
+105,Lewis,Dunk,Brighton,2,4.4,50,630,45.0,5.8,50,29,Defender,5.8
+106,Solomon,March,Brighton,3,0.1,53,255,57.0,1.5,53,8,Midfielder,1.5
+107,Adam,Webster,Brighton,2,0.2,44,306,0.0,2.0,44,9,Defender,2.0
+108,Joël,Veltman,Brighton,2,1.3,44,405,5.0,4.5,44,20,Defender,4.5
+109,Neal,Maupay,Brighton,4,3.7,65,585,180.0,4.9,65,32,Forward,4.9
+110,Leandro,Trossard,Brighton,3,1.3,64,596,200.0,4.2,64,27,Midfielder,4.2
+111,Mathew,Ryan,Brighton,1,0.0,45,0,0.0,0.0,45,0,Goalkeeper,0.0
+112,Alireza,Jahanbakhsh,Brighton,3,0.0,55,0,0.0,0.0,55,0,Midfielder,0.0
+113,Bernardo,Fernandes Da Silva Junior,Brighton,2,0.0,40,0,0.0,0.0,40,0,Defender,0.0
+114,Robert,Sánchez,Brighton,1,24.1,46,630,0.0,5.4,46,25,Goalkeeper,5.4
+115,Yves,Bissouma,Brighton,3,13.4,46,438,27.0,3.5,46,16,Midfielder,3.5
+116,Tariq,Lamptey,Brighton,2,0.4,44,0,0.0,0.0,44,0,Defender,0.0
+117,Aaron,Connolly,Brighton,4,0.1,53,59,6.0,0.4,53,2,Forward,0.4
+118,Steven,Alzate,Brighton,3,0.0,49,90,2.0,0.6,49,3,Midfielder,0.6
+119,Alexis,Mac Allister,Brighton,3,0.5,55,187,86.0,3.3,55,18,Midfielder,3.3
+120,Jakub,Moder,Brighton,3,0.8,45,266,56.0,2.9,45,13,Midfielder,2.9
+121,Danny,Welbeck,Brighton,4,0.2,60,238,64.0,2.3,60,14,Forward,2.3
+122,Enock,Mwepu,Brighton,3,0.0,59,91,7.0,0.3,59,2,Midfielder,0.3
+123,Kjell,Scherpen,Brighton,1,0.0,45,0,0.0,0.0,45,0,Goalkeeper,0.0
+124,Florin,Andone,Brighton,4,0.1,50,0,0.0,0.0,50,0,Forward,0.0
+125,Andi,Zeqiri,Brighton,4,0.4,45,0,0.0,0.0,45,0,Forward,0.0
+126,Michal,Karbownik,Brighton,2,0.0,40,0,0.0,0.0,40,0,Defender,0.0
+127,Taylor,Richards,Brighton,3,0.0,45,17,8.0,0.2,45,1,Midfielder,0.2
+128,Moisés,Caicedo,Brighton,3,0.0,45,0,0.0,0.0,45,0,Midfielder,0.0
+129,Haydon,Roberts,Brighton,2,0.2,40,0,0.0,0.0,40,0,Defender,0.0
+130,Marc,Cucurella,Brighton,2,0.8,50,351,4.0,3.8,50,19,Defender,3.8
+131,Jürgen,Locadia,Brighton,4,0.5,45,0,0.0,0.0,45,0,Forward,0.0
+132,Jeremy,Sarmiento,Brighton,3,0.0,45,0,0.0,0.0,45,0,Midfielder,0.0
+133,James,Tarkowski,Burnley,2,1.4,50,630,87.0,3.4,50,17,Defender,3.4
+134,Phil,Bardsley,Burnley,2,0.7,40,0,0.0,0.0,40,0,Defender,0.0
+135,Erik,Pieters,Burnley,2,0.1,43,11,2.0,0.2,43,1,Defender,0.2
+136,Jack,Cork,Burnley,3,0.2,45,174,13.0,0.9,45,4,Midfielder,0.9
+137,Dale,Stephens,Burnley,3,0.0,45,0,0.0,0.0,45,0,Midfielder,0.0
+138,Kevin,Long,Burnley,2,0.1,40,0,0.0,0.0,40,0,Defender,0.0
+139,Jay,Rodriguez,Burnley,4,0.5,53,151,92.0,0.9,53,5,Forward,0.9
+140,Ashley,Barnes,Burnley,4,1.3,54,344,66.0,1.5,54,8,Forward,1.5
+141,Ben,Mee,Burnley,2,1.0,49,540,72.0,2.7,49,13,Defender,2.7
+142,Ashley,Westwood,Burnley,3,0.4,54,540,59.0,3.5,54,19,Midfielder,3.5
+143,Johann Berg,Gudmundsson,Burnley,3,0.1,55,436,35.0,2.4,55,13,Midfielder,2.4
+144,Chris,Wood,Burnley,4,1.6,68,589,215.0,2.9,68,20,Forward,2.9
+145,Matthew,Lowton,Burnley,2,1.7,44,630,30.0,3.9,44,17,Defender,3.9
+146,Matej,Vydra,Burnley,4,0.3,53,171,68.0,1.9,53,10,Forward,1.9
+147,Nick,Pope,Burnley,1,2.9,54,630,0.0,3.3,54,18,Goalkeeper,3.3
+148,Charlie,Taylor,Burnley,2,0.4,44,630,12.0,3.9,44,17,Defender,3.9
+149,Will,Norris,Burnley,1,0.1,44,0,0.0,0.0,44,0,Goalkeeper,0.0
+150,Josh,Brownhill,Burnley,3,3.0,44,551,79.0,2.5,44,11,Midfielder,2.5
+151,Josh,Benson,Burnley,3,0.0,45,0,0.0,0.0,45,0,Midfielder,0.0
+152,Bailey,Peacock-Farrell,Burnley,1,0.0,45,0,0.0,0.0,45,0,Goalkeeper,0.0
+153,Dwight,McNeil,Burnley,3,0.2,59,614,86.0,2.7,59,16,Midfielder,2.7
+154,Nathan,Collins,Burnley,2,0.1,43,90,38.0,1.4,43,6,Defender,1.4
+155,Wayne,Hennessey,Burnley,1,0.2,45,0,0.0,0.0,45,0,Goalkeeper,0.0
+156,Lewis,Richardson,Burnley,4,1.3,45,0,0.0,0.0,45,0,Forward,0.0
+157,Bobby,Thomas,Burnley,2,0.3,40,0,0.0,0.0,40,0,Defender,0.0
+158,Owen,Dodgson,Burnley,2,0.1,40,0,0.0,0.0,40,0,Defender,0.0
+159,Aaron,Lennon,Burnley,3,0.0,50,103,30.0,0.6,50,3,Midfielder,0.6
+160,Maxwel,Cornet,Burnley,3,0.0,60,78,42.0,1.0,60,6,Midfielder,1.0
+161,Connor,Roberts,Burnley,2,0.0,45,0,0.0,0.0,45,0,Defender,0.0
+162,César,Azpilicueta,Chelsea,2,6.1,60,542,39.0,6.0,60,36,Defender,6.0
+163,Olivier,Giroud,Chelsea,4,0.0,65,0,0.0,0.0,65,0,Forward,0.0
+164,Thiago,Emiliano da Silva,Chelsea,2,4.3,54,376,56.0,4.6,54,25,Defender,4.6
+165,Marcos,Alonso,Chelsea,2,25.8,60,535,136.0,6.5,60,39,Defender,6.5
+166,Jorge Luiz,Frello Filho,Chelsea,3,3.7,59,493,4.0,2.5,59,15,Midfielder,2.5
+167,Ross,Barkley,Chelsea,3,0.1,53,7,2.0,0.2,53,1,Midfielder,0.2
+168,Mateo,Kovacic,Chelsea,3,8.4,52,548,87.0,6.3,52,33,Midfielder,6.3
+169,Michy,Batshuayi,Chelsea,4,0.1,55,0,0.0,0.0,55,0,Forward,0.0
+170,Antonio,Rüdiger,Chelsea,2,21.1,58,630,57.0,6.2,58,36,Defender,6.2
+171,Kepa,Arrizabalaga,Chelsea,1,0.3,49,90,0.0,1.2,49,6,Goalkeeper,1.2
+172,N'Golo,Kanté,Chelsea,3,2.6,49,167,11.0,1.8,49,9,Midfielder,1.8
+173,Hakim,Ziyech,Chelsea,3,0.3,73,98,32.0,0.5,73,4,Midfielder,0.5
+174,Ruben,Loftus-Cheek,Chelsea,3,0.1,54,96,9.0,1.3,54,7,Midfielder,1.3
+175,Andreas,Christensen,Chelsea,2,3.8,50,450,1.0,4.4,50,22,Defender,4.4
+176,Timo,Werner,Chelsea,4,1.6,86,299,207.0,1.9,86,16,Forward,1.9
+177,Benjamin,Chilwell,Chelsea,2,3.7,56,90,75.0,1.4,56,8,Defender,1.4
+178,Tammy,Abraham,Chelsea,4,0.2,65,0,0.0,0.0,65,0,Forward,0.0
+179,Christian,Pulisic,Chelsea,3,0.5,79,81,42.0,1.0,79,8,Midfielder,1.0
+180,Mason,Mount,Chelsea,3,8.8,74,331,130.0,2.2,74,16,Midfielder,2.2
+181,Ethan,Ampadu,Chelsea,2,0.0,45,0,0.0,0.0,45,0,Defender,0.0
+182,Callum,Hudson-Odoi,Chelsea,3,0.1,53,145,36.0,0.9,53,5,Midfielder,0.9
+183,Kai,Havertz,Chelsea,3,4.3,82,304,154.0,2.2,82,18,Midfielder,2.2
+184,Reece,James,Chelsea,2,5.0,55,188,67.0,3.8,55,21,Defender,3.8
+185,Edouard,Mendy,Chelsea,1,13.0,60,540,0.0,5.0,60,30,Goalkeeper,5.0
+186,Malang,Sarr,Chelsea,2,0.1,49,0,0.0,0.0,49,0,Defender,0.0
+187,Trevoh,Chalobah,Chelsea,2,2.1,48,273,44.0,6.7,48,32,Defender,6.7
+188,Romelu,Lukaku,Chelsea,4,37.2,117,540,285.0,2.5,117,29,Forward,2.5
+189,Emerson,Palmieri dos Santos,Chelsea,2,0.0,45,4,2.0,0.2,45,1,Defender,0.2
+190,Saúl,Ñíguez,Chelsea,3,0.2,53,45,0.0,0.2,53,1,Midfielder,0.2
+191,Marcus,Bettinelli,Chelsea,1,0.0,40,0,0.0,0.0,40,0,Goalkeeper,0.0
+192,Conor,Gallagher,Crystal Palace,3,8.1,57,520,240.0,6.0,57,34,Midfielder,6.0
+193,Vicente,Guaita,Crystal Palace,1,6.7,45,630,0.0,5.8,45,26,Goalkeeper,5.8
+194,James,Tomkins,Crystal Palace,2,0.1,44,0,0.0,0.0,44,0,Defender,0.0
+195,James,McArthur,Crystal Palace,3,3.8,46,601,47.0,3.9,46,18,Midfielder,3.9
+196,Christian,Benteke,Crystal Palace,4,0.8,63,383,74.0,2.1,63,13,Forward,2.1
+197,Cheikhou,Kouyaté,Crystal Palace,2,0.8,45,435,6.0,3.8,45,17,Defender,3.8
+198,Martin,Kelly,Crystal Palace,2,1.0,39,0,0.0,0.0,39,0,Defender,0.0
+199,Luka,Milivojevic,Crystal Palace,3,0.0,54,184,9.0,1.1,54,6,Midfielder,1.1
+200,Jordan,Ayew,Crystal Palace,4,0.5,59,514,137.0,2.0,59,12,Forward,2.0
+201,Wilfried,Zaha,Crystal Palace,3,7.0,69,630,164.0,4.5,69,31,Midfielder,4.5
+202,Jeffrey,Schlupp,Crystal Palace,3,0.0,54,148,51.0,2.2,54,12,Midfielder,2.2
+203,Jack,Butland,Crystal Palace,1,0.4,44,0,0.0,0.0,44,0,Goalkeeper,0.0
+204,Jairo,Riedewald,Crystal Palace,3,0.0,48,101,2.0,0.6,48,3,Midfielder,0.6
+205,Jarosław,Jach,Crystal Palace,2,0.0,44,0,0.0,0.0,44,0,Defender,0.0
+206,Jean-Philippe,Mateta,Crystal Palace,4,0.1,53,56,0.0,0.2,53,1,Forward,0.2
+207,Eberechi,Eze,Crystal Palace,3,0.0,59,0,0.0,0.0,59,0,Midfielder,0.0
+208,Nathan,Ferguson,Crystal Palace,2,0.0,45,0,0.0,0.0,45,0,Defender,0.0
+209,Tyrick,Mitchell,Crystal Palace,2,0.7,45,630,8.0,4.0,45,18,Defender,4.0
+210,Will,Hughes,Crystal Palace,3,0.0,48,0,0.0,0.0,48,0,Midfielder,0.0
+211,Michael,Olise,Crystal Palace,3,0.0,54,49,47.0,1.7,54,9,Midfielder,1.7
+212,Joel,Ward,Crystal Palace,2,0.3,45,630,39.0,3.6,45,16,Defender,3.6
+213,Marc,Guéhi,Crystal Palace,2,0.4,45,630,29.0,4.0,45,18,Defender,4.0
+214,Joachim,Andersen,Crystal Palace,2,0.5,45,573,14.0,3.8,45,17,Defender,3.8
+215,Nathaniel,Clyne,Crystal Palace,2,0.1,44,0,0.0,0.0,44,0,Defender,0.0
+216,Reece,Hannam,Crystal Palace,2,0.1,40,0,0.0,0.0,40,0,Defender,0.0
+217,Jesurun,Rak-Sakyi,Crystal Palace,3,0.0,45,13,0.0,0.2,45,1,Midfielder,0.2
+218,Robert,Street,Crystal Palace,4,1.4,45,0,0.0,0.0,45,0,Forward,0.0
+219,Scott,Banks,Crystal Palace,3,0.0,45,0,0.0,0.0,45,0,Midfielder,0.0
+220,Remi,Matthews,Crystal Palace,1,0.2,40,0,0.0,0.0,40,0,Goalkeeper,0.0
+221,Odsonne,Edouard,Crystal Palace,4,2.7,65,186,102.0,2.6,65,17,Forward,2.6
+222,Fabian,Delph,Everton,3,0.4,44,7,0.0,0.2,44,1,Midfielder,0.2
+223,Gylfi,Sigurdsson,Everton,3,0.9,68,0,0.0,0.0,68,0,Midfielder,0.0
+224,Seamus,Coleman,Everton,2,0.4,49,360,11.0,2.9,49,14,Defender,2.9
+225,James,Rodríguez,Everton,3,0.6,69,0,0.0,0.0,69,0,Midfielder,0.0
+226,Bernard,Anício Caldeira Duarte,Everton,3,0.0,55,0,0.0,0.0,55,0,Midfielder,0.0
+227,Lucas,Digne,Everton,2,8.5,53,630,41.0,3.0,53,16,Defender,3.0
+228,Michael,Keane,Everton,2,2.9,50,630,70.0,5.8,50,29,Defender,5.8
+229,Jordan,Pickford,Everton,1,5.2,50,540,0.0,4.2,50,21,Goalkeeper,4.2
+230,Allan,Marques Loureiro,Everton,3,7.0,46,612,11.0,5.2,46,24,Midfielder,5.2
+231,André Filipe,Tavares Gomes,Everton,3,0.1,49,65,50.0,0.6,49,3,Midfielder,0.6
+232,Abdoulaye,Doucouré,Everton,3,6.4,56,630,168.0,7.7,56,43,Midfielder,7.7
+233,Alex,Iwobi,Everton,3,0.2,59,284,62.0,2.2,59,13,Midfielder,2.2
+234,Yerry,Mina,Everton,2,0.5,49,457,27.0,2.4,49,12,Defender,2.4
+235,Tom,Davies,Everton,3,0.1,49,34,18.0,0.6,49,3,Midfielder,0.6
+236,Dominic,Calvert-Lewin,Everton,4,3.7,80,248,178.0,2.9,80,23,Forward,2.9
+237,Mason,Holgate,Everton,2,0.6,43,180,0.0,1.9,43,8,Defender,1.9
+238,Ben,Godfrey,Everton,2,0.5,48,319,49.0,2.1,48,10,Defender,2.1
+239,Richarlison,de Andrade,Everton,4,4.3,74,348,113.0,2.2,74,16,Forward,2.2
+240,João,Virgínia,Everton,1,1.3,40,0,0.0,0.0,40,0,Goalkeeper,0.0
+241,Asmir,Begović,Everton,1,3.5,40,90,0.0,0.2,40,1,Goalkeeper,0.2
+242,Andros,Townsend,Everton,3,6.5,56,519,130.0,7.7,56,43,Midfielder,7.7
+243,Demarai,Gray,Everton,3,19.1,58,593,194.0,6.2,58,36,Midfielder,6.2
+244,Jonjoe,Kenny,Everton,2,0.1,45,10,0.0,0.2,45,1,Defender,0.2
+245,Anthony,Gordon,Everton,3,0.1,45,104,2.0,0.9,45,4,Midfielder,0.9
+246,Jean-Philippe,Gbamin,Everton,3,0.0,45,0,0.0,0.0,45,0,Midfielder,0.0
+247,Jarrad,Branthwaite,Everton,2,0.2,40,0,0.0,0.0,40,0,Defender,0.0
+248,Nathan,Broadhead,Everton,4,0.0,45,0,0.0,0.0,45,0,Forward,0.0
+249,Moise,Kean,Everton,4,0.0,60,1,0.0,0.2,60,1,Forward,0.2
+250,Niels,Nkounkou,Everton,2,0.0,40,0,0.0,0.0,40,0,Defender,0.0
+251,Andy,Lonergan,Everton,1,0.1,40,0,0.0,0.0,40,0,Goalkeeper,0.0
+252,Salomón,Rondón,Everton,4,0.2,60,251,69.0,1.2,60,7,Forward,1.2
+253,Ellis,Simms,Everton,4,0.1,45,0,0.0,0.0,45,0,Forward,0.0
+254,Lewis,Dobbin,Everton,4,0.3,45,2,0.0,0.4,45,2,Forward,0.4
+255,Charlie,Whitaker,Everton,3,0.0,45,0,0.0,0.0,45,0,Midfielder,0.0
+256,Kasper,Schmeichel,Leicester,1,18.3,51,630,0.0,4.1,51,21,Goalkeeper,4.1
+257,Jonny,Evans,Leicester,2,0.1,54,29,2.0,0.2,54,1,Defender,0.2
+258,Marc,Albrighton,Leicester,3,0.2,54,190,19.0,1.9,54,10,Midfielder,1.9
+259,Nampalys,Mendy,Leicester,3,1.8,44,0,0.0,0.0,44,0,Midfielder,0.0
+260,Danny,Ward,Leicester,1,5.0,40,0,0.0,0.0,40,0,Goalkeeper,0.0
+261,Jamie,Vardy,Leicester,4,14.1,105,620,319.0,4.6,105,48,Forward,4.6
+262,Dennis,Praet,Leicester,3,0.0,49,0,0.0,0.0,49,0,Midfielder,0.0
+263,Ricardo Domingos,Barbosa Pereira,Leicester,2,3.3,55,325,14.0,2.9,55,16,Defender,2.9
+264,Daniel,Amartey,Leicester,2,11.8,40,270,0.0,2.0,40,8,Defender,2.0
+265,Timothy,Castagne,Leicester,2,0.6,53,326,6.0,1.3,53,7,Defender,1.3
+266,Youri,Tielemans,Leicester,3,4.3,64,630,116.0,4.2,64,27,Midfielder,4.2
+267,Ayoze,Pérez,Leicester,3,0.1,58,100,10.0,0.2,58,1,Midfielder,0.2
+268,James,Maddison,Leicester,3,4.1,67,375,60.0,1.8,67,12,Midfielder,1.8
+269,Kelechi,Iheanacho,Leicester,4,2.4,70,180,62.0,2.6,70,18,Forward,2.6
+270,Hamza,Choudhury,Leicester,3,0.1,45,59,0.0,0.2,45,1,Midfielder,0.2
+271,Harvey,Barnes,Leicester,3,3.8,67,542,211.0,2.4,67,16,Midfielder,2.4
+272,Wilfred,Ndidi,Leicester,3,1.2,49,540,25.0,2.4,49,12,Midfielder,2.4
+273,Çaglar,Söyüncü,Leicester,2,2.3,49,630,4.0,2.4,49,12,Defender,2.4
+274,James,Justin,Leicester,2,0.0,49,0,0.0,0.0,49,0,Defender,0.0
+275,Luke,Thomas,Leicester,2,0.7,45,270,0.0,2.0,45,9,Defender,2.0
+276,Wesley,Fofana,Leicester,2,0.3,44,0,0.0,0.0,44,0,Defender,0.0
+277,Jannik,Vestergaard,Leicester,2,0.9,49,358,15.0,1.8,49,9,Defender,1.8
+278,Patson,Daka,Leicester,4,0.4,71,26,0.0,0.1,71,1,Forward,0.1
+279,Boubakary,Soumaré,Leicester,3,0.1,48,202,18.0,1.5,48,7,Midfielder,1.5
+280,Ryan,Bertrand,Leicester,2,0.6,49,337,8.0,0.8,49,4,Defender,0.8
+281,Kiernan,Dewsbury-Hall,Leicester,3,0.0,45,4,2.0,0.2,45,1,Midfielder,0.2
+282,Eldin,Jakupovic,Leicester,1,0.1,40,0,0.0,0.0,40,0,Goalkeeper,0.0
+283,Ademola,Lookman,Leicester,3,0.1,60,218,112.0,1.2,60,7,Midfielder,1.2
+284,Pablo,Hernández Domínguez,Leeds,3,0.0,55,0,0.0,0.0,55,0,Midfielder,0.0
+285,Francisco,Casilla Cortés,Leeds,1,0.0,45,0,0.0,0.0,45,0,Goalkeeper,0.0
+286,Liam,Cooper,Leeds,2,0.5,45,630,14.0,3.1,45,14,Defender,3.1
+287,Luke,Ayling,Leeds,2,6.5,44,448,25.0,2.7,44,12,Defender,2.7
+288,Mateusz,Klich,Leeds,3,0.7,55,419,160.0,3.8,55,21,Midfielder,3.8
+289,Rodrigo,Moreno,Leeds,4,1.1,63,432,109.0,1.3,63,8,Forward,1.3
+290,Stuart,Dallas,Leeds,3,6.6,53,617,91.0,3.4,53,18,Midfielder,3.4
+291,Patrick,Bamford,Leeds,4,5.5,78,436,240.0,2.7,78,21,Forward,2.7
+292,Diego,Llorente,Leeds,2,0.2,45,187,33.0,3.8,45,17,Defender,3.8
+293,Kalvin,Phillips,Leeds,3,1.8,49,540,17.0,2.4,49,12,Midfielder,2.4
+294,Hélder Wander,Sousa de Azevedo e Costa,Leeds,3,0.1,54,21,1.0,0.2,54,1,Midfielder,0.2
+295,Tyler,Roberts,Leeds,3,0.1,49,167,62.0,1.2,49,6,Midfielder,1.2
+296,Robin,Koch,Leeds,2,0.1,44,90,0.0,0.0,44,0,Defender,0.0
+297,Ian Carlo,Poveda-Ocampo,Leeds,3,0.0,45,0,0.0,0.0,45,0,Midfielder,0.0
+298,Raphael,Dias Belloli,Leeds,3,20.2,66,584,201.0,4.7,66,31,Midfielder,4.7
+299,Jamie,Shackleton,Leeds,3,0.2,45,236,46.0,2.4,45,11,Midfielder,2.4
+300,Pascal,Struijk,Leeds,2,0.2,44,297,8.0,0.0,44,0,Defender,0.0
+301,Illan,Meslier,Leeds,1,2.9,50,630,0.0,3.8,50,19,Goalkeeper,3.8
+302,Jack,Harrison,Leeds,3,1.4,58,360,36.0,1.6,58,9,Midfielder,1.6
+303,Daniel,James,Leeds,3,0.5,60,343,143.0,1.7,60,10,Midfielder,1.7
+304,Héctor Junior,Firpo Adames,Leeds,2,0.5,48,464,41.0,1.7,48,8,Defender,1.7
+305,Kristoffer,Klaesson,Leeds,1,0.1,44,0,0.0,0.0,44,0,Goalkeeper,0.0
+306,Sam,Greenwood,Leeds,4,2.1,45,0,0.0,0.0,45,0,Forward,0.0
+307,Crysencio,Summerville,Leeds,3,0.1,45,24,4.0,0.4,45,2,Midfielder,0.4
+308,Adam,Forshaw,Leeds,3,0.0,45,0,0.0,0.0,45,0,Midfielder,0.0
+309,Cody,Drameh,Leeds,2,0.1,40,0,0.0,0.0,40,0,Defender,0.0
+310,Charlie,Cresswell,Leeds,2,0.4,40,90,0.0,0.2,40,1,Defender,0.2
+311,Liam,McCarron,Leeds,3,0.0,45,0,0.0,0.0,45,0,Midfielder,0.0
+312,Joe,Gelhardt,Leeds,4,0.3,45,0,0.0,0.0,45,0,Forward,0.0
+313,Nohan,Kenneh,Leeds,3,0.0,45,0,0.0,0.0,45,0,Midfielder,0.0
+314,Stuart,McKinstry,Leeds,3,0.1,44,0,0.0,0.0,44,0,Midfielder,0.0
+315,Leo Fuhr,Hjelde,Leeds,2,0.0,40,0,0.0,0.0,40,0,Defender,0.0
+316,James,Milner,Liverpool,3,0.1,49,257,28.0,1.2,49,6,Midfielder,1.2
+317,Jordan,Henderson,Liverpool,3,1.0,50,457,46.0,3.4,50,17,Midfielder,3.4
+318,Adrián,San Miguel del Castillo,Liverpool,1,0.2,44,0,0.0,0.0,44,0,Goalkeeper,0.0
+319,Joel,Matip,Liverpool,2,3.4,50,540,122.0,4.4,50,22,Defender,4.4
+320,Thiago,Alcántara do Nascimento,Liverpool,3,0.5,53,176,61.0,2.3,53,12,Midfielder,2.3
+321,Xherdan,Shaqiri,Liverpool,3,0.0,59,0,0.0,0.0,59,0,Midfielder,0.0
+322,Alex,Oxlade-Chamberlain,Liverpool,3,0.1,58,68,10.0,0.7,58,4,Midfielder,0.7
+323,Roberto,Firmino,Liverpool,4,2.0,88,124,42.0,1.2,88,11,Forward,1.2
+324,Virgil,van Dijk,Liverpool,2,17.1,66,630,105.0,5.3,66,35,Defender,5.3
+325,Sadio,Mané,Liverpool,3,2.8,119,630,450.0,3.4,119,41,Midfielder,3.4
+326,Alisson,Ramses Becker,Liverpool,1,8.8,60,630,0.0,5.8,60,35,Goalkeeper,5.8
+327,Fabio Henrique,Tavares,Liverpool,3,1.0,54,479,136.0,3.5,54,19,Midfielder,3.5
+328,Mohamed,Salah,Liverpool,3,61.1,127,630,492.0,5.5,127,70,Midfielder,5.5
+329,Andrew,Robertson,Liverpool,2,2.0,70,355,28.0,1.9,70,13,Defender,1.9
+330,Divock,Origi,Liverpool,4,1.1,49,2,0.0,0.2,49,1,Forward,0.2
+331,Takumi,Minamino,Liverpool,3,0.1,52,0,0.0,0.0,52,0,Midfielder,0.0
+332,Trent,Alexander-Arnold,Liverpool,2,22.2,75,450,107.0,4.7,75,35,Defender,4.7
+333,Joseph,Gomez,Liverpool,2,0.5,48,13,0.0,0.4,48,2,Defender,0.4
+334,Naby,Keita,Liverpool,3,0.2,50,191,21.0,2.6,50,13,Midfielder,2.6
+335,Diogo,Jota,Liverpool,3,17.4,76,500,278.0,4.2,76,32,Midfielder,4.2
+336,Nathaniel,Phillips,Liverpool,2,0.2,43,0,0.0,0.0,43,0,Defender,0.0
+337,Caoimhin,Kelleher,Liverpool,1,0.1,44,0,0.0,0.0,44,0,Goalkeeper,0.0
+338,Ibrahima,Konaté,Liverpool,2,1.2,52,90,0.0,1.2,52,6,Defender,1.2
+339,Curtis,Jones,Liverpool,3,0.3,50,171,44.0,3.2,50,16,Midfielder,3.2
+340,Konstantinos,Tsimikas,Liverpool,2,17.1,40,274,63.0,5.8,40,23,Defender,5.8
+341,Neco,Williams,Liverpool,2,0.8,39,0,0.0,0.0,39,0,Defender,0.0
+342,Rhys,Williams,Liverpool,2,0.0,44,0,0.0,0.0,44,0,Defender,0.0
+343,Ben,Davies,Liverpool,2,0.2,40,0,0.0,0.0,40,0,Defender,0.0
+344,Harvey,Elliott,Liverpool,3,0.1,54,249,81.0,1.7,54,9,Midfielder,1.7
+345,Ben,Woodburn,Liverpool,3,0.0,45,0,0.0,0.0,45,0,Midfielder,0.0
+346,Jack,Grealish,Man City,3,17.3,79,585,260.0,3.3,79,26,Midfielder,3.3
+347,Kyle,Walker,Man City,2,6.9,55,495,48.0,4.9,55,27,Defender,4.9
+348,Ilkay,Gündogan,Man City,3,2.5,72,428,186.0,2.6,72,19,Midfielder,2.6
+349,Kevin,De Bruyne,Man City,3,2.0,119,206,121.0,1.1,119,13,Midfielder,1.1
+350,John,Stones,Man City,2,3.1,53,0,0.0,0.0,53,0,Defender,0.0
+351,Benjamin,Mendy,Man City,2,0.4,53,78,2.0,0.6,53,3,Defender,0.6
+352,Riyad,Mahrez,Man City,3,2.4,87,154,88.0,1.6,87,14,Midfielder,1.6
+353,Raheem,Sterling,Man City,3,1.4,107,273,214.0,1.4,107,15,Midfielder,1.4
+354,João Pedro Cavaco,Cancelo,Man City,2,17.7,62,630,85.0,7.1,62,44,Defender,7.1
+355,Ederson,Santana de Moraes,Man City,1,10.3,60,630,0.0,5.8,60,35,Goalkeeper,5.8
+356,Nathan,Aké,Man City,2,0.5,49,180,6.0,1.6,49,8,Defender,1.6
+357,Aymeric,Laporte,Man City,2,3.6,55,450,102.0,5.6,55,31,Defender,5.6
+358,Zack,Steffen,Man City,1,0.2,45,0,0.0,0.0,45,0,Goalkeeper,0.0
+359,Bernardo Mota,Veiga de Carvalho e Silva,Man City,3,1.9,69,488,125.0,3.5,69,24,Midfielder,3.5
+360,Rúben Santos,Gato Alves Dias,Man City,2,28.3,61,630,54.0,6.4,61,39,Defender,6.4
+361,Gabriel Fernando,de Jesus,Man City,4,7.4,86,499,224.0,4.8,86,41,Forward,4.8
+362,Oleksandr,Zinchenko,Man City,2,0.7,53,56,8.0,0.4,53,2,Defender,0.4
+363,Phil,Foden,Man City,3,1.8,79,194,87.0,1.4,79,11,Midfielder,1.4
+364,Rodrigo,Hernandez,Man City,3,0.6,55,450,32.0,3.1,55,17,Midfielder,3.1
+365,Ferran,Torres,Man City,3,7.9,69,303,204.0,3.8,69,26,Midfielder,3.8
+366,Fernando,Luiz Rosa,Man City,3,0.4,49,163,22.0,1.4,49,7,Midfielder,1.4
+367,Cole,Palmer,Man City,3,0.1,45,21,6.0,0.2,45,1,Midfielder,0.2
+368,Samuel,Edozie,Man City,3,0.0,49,0,0.0,0.0,49,0,Midfielder,0.0
+369,Tommy,Doyle,Man City,3,0.0,45,0,0.0,0.0,45,0,Midfielder,0.0
+370,Scott,Carson,Man City,1,0.4,40,0,0.0,0.0,40,0,Goalkeeper,0.0
+371,Luke,Mbete,Man City,2,0.0,40,0,0.0,0.0,40,0,Defender,0.0
+372,Joshua,Wilson-Esbrand,Man City,2,0.0,40,0,0.0,0.0,40,0,Defender,0.0
+373,Romeo,Lavia,Man City,3,0.0,45,0,0.0,0.0,45,0,Midfielder,0.0
+374,Edinson,Cavani,Man Utd,4,1.9,84,101,37.0,0.4,84,3,Forward,0.4
+375,David,de Gea,Man Utd,1,6.5,51,630,0.0,5.5,51,28,Goalkeeper,5.5
+376,Nemanja,Matic,Man Utd,3,0.3,45,198,28.0,2.0,45,9,Midfielder,2.0
+377,Paul,Pogba,Man Utd,3,20.7,77,526,182.0,4.7,77,36,Midfielder,4.7
+378,Harry,Maguire,Man Utd,2,6.4,54,516,77.0,3.9,54,21,Defender,3.9
+379,Frederico,Rodrigues de Paula Santos,Man Utd,3,0.5,49,501,27.0,2.9,49,14,Midfielder,2.9
+380,Luke,Shaw,Man Utd,2,28.1,54,573,23.0,3.7,54,20,Defender,3.7
+381,Jesse,Lingard,Man Utd,3,1.3,69,45,38.0,2.0,69,14,Midfielder,2.0
+382,Bruno Miguel,Borges Fernandes,Man Utd,3,26.2,118,624,229.0,3.2,118,38,Midfielder,3.2
+383,Anthony,Martial,Man Utd,4,0.6,76,152,83.0,1.4,76,11,Forward,1.4
+384,Alex Nicolao,Telles,Man Utd,2,0.1,50,0,0.0,0.0,50,0,Defender,0.0
+385,Dean,Henderson,Man Utd,1,0.5,48,0,0.0,0.0,48,0,Goalkeeper,0.0
+386,Marcus,Rashford,Man Utd,3,0.2,94,0,0.0,0.0,94,0,Midfielder,0.0
+387,Donny,van de Beek,Man Utd,3,0.1,57,5,0.0,0.2,57,1,Midfielder,0.2
+388,Victor,Lindelöf,Man Utd,2,0.5,48,293,0.0,2.1,48,10,Defender,2.1
+389,Scott,McTominay,Man Utd,3,0.2,54,343,60.0,1.9,54,10,Midfielder,1.9
+390,Eric,Bailly,Man Utd,2,0.1,49,0,0.0,0.0,49,0,Defender,0.0
+391,Aaron,Wan-Bissaka,Man Utd,2,6.0,54,630,33.0,3.7,54,20,Defender,3.7
+392,Mason,Greenwood,Man Utd,3,14.8,76,605,257.0,4.7,76,36,Midfielder,4.7
+393,Juan,Mata,Man Utd,3,0.1,48,0,0.0,0.0,48,0,Midfielder,0.0
+394,Jadon,Sancho,Man Utd,3,2.0,90,232,63.0,1.0,90,9,Midfielder,1.0
+395,Tom,Heaton,Man Utd,1,0.5,40,0,0.0,0.0,40,0,Goalkeeper,0.0
+396,José Diogo,Dalot Teixeira,Man Utd,2,0.1,44,57,4.0,0.2,44,1,Defender,0.2
+397,Andreas,Pereira,Man Utd,3,0.0,50,0,0.0,0.0,50,0,Midfielder,0.0
+398,Anthony,Elanga,Man Utd,3,0.0,48,0,0.0,0.0,48,0,Midfielder,0.0
+399,Raphaël,Varane,Man Utd,2,4.4,55,450,18.0,3.6,55,20,Defender,3.6
+400,Cristiano Ronaldo,dos Santos Aveiro,Man Utd,4,45.9,126,303,274.0,1.7,126,22,Forward,1.7
+401,Joseph,Willock,Newcastle,3,0.7,59,464,66.0,1.9,59,11,Midfielder,1.9
+402,Jonjo,Shelvey,Newcastle,3,0.0,53,69,0.0,0.2,53,1,Midfielder,0.2
+403,Matt,Ritchie,Newcastle,2,0.3,50,630,48.0,1.6,50,8,Defender,1.6
+404,Ciaran,Clark,Newcastle,2,0.1,44,443,56.0,1.1,44,5,Defender,1.1
+405,Karl,Darlow,Newcastle,1,0.4,45,270,0.0,2.4,45,11,Goalkeeper,2.4
+406,Martin,Dubravka,Newcastle,1,0.1,44,0,0.0,0.0,44,0,Goalkeeper,0.0
+407,Callum,Wilson,Newcastle,4,0.9,73,242,122.0,2.2,73,16,Forward,2.2
+408,Jeff,Hendrick,Newcastle,3,0.0,48,59,9.0,1.5,48,7,Midfielder,1.5
+409,Ryan,Fraser,Newcastle,3,0.1,54,55,31.0,1.3,54,7,Midfielder,1.3
+410,Jamaal,Lascelles,Newcastle,2,0.2,44,360,33.0,0.7,44,3,Defender,0.7
+411,Dwight,Gayle,Newcastle,4,0.2,53,20,4.0,0.4,53,2,Forward,0.4
+412,Paul,Dummett,Newcastle,2,0.0,45,0,0.0,0.0,45,0,Defender,0.0
+413,Javier,Manquillo,Newcastle,2,9.1,40,315,19.0,3.2,40,13,Defender,3.2
+414,Emil,Krafth,Newcastle,2,0.0,44,93,4.0,0.2,44,1,Defender,0.2
+415,Jacob,Murphy,Newcastle,3,0.7,50,315,65.0,3.4,50,17,Midfielder,3.4
+416,Fabian,Schär,Newcastle,2,0.2,43,180,0.0,0.0,43,0,Defender,0.0
+417,Isaac,Hayden,Newcastle,3,0.1,45,495,12.0,2.2,45,10,Midfielder,2.2
+418,Allan,Saint-Maximin,Newcastle,4,16.6,68,630,238.0,5.4,68,37,Forward,5.4
+419,Miguel,Almirón,Newcastle,3,0.4,54,575,54.0,2.4,54,13,Midfielder,2.4
+420,Sean,Longstaff,Newcastle,3,0.8,45,501,46.0,4.0,45,18,Midfielder,4.0
+421,Joelinton Cássio,Apolinário de Lira,Newcastle,4,0.4,58,398,137.0,2.4,58,14,Forward,2.4
+422,Jamal,Lewis,Newcastle,2,0.1,43,6,0.0,0.2,43,1,Defender,0.2
+423,Matthew,Longstaff,Newcastle,3,0.1,45,0,0.0,0.0,45,0,Midfielder,0.0
+424,Federico,Fernández,Newcastle,2,0.2,44,437,51.0,1.1,44,5,Defender,1.1
+425,Freddie,Woodman,Newcastle,1,0.5,45,360,0.0,2.0,45,9,Goalkeeper,2.0
+426,Mark,Gillespie,Newcastle,1,0.3,40,0,0.0,0.0,40,0,Goalkeeper,0.0
+427,Joe,White,Newcastle,3,0.1,45,0,0.0,0.0,45,0,Midfielder,0.0
+428,Elliot,Anderson,Newcastle,3,0.0,45,0,0.0,0.0,45,0,Midfielder,0.0
+429,Billy,Gilmour,Norwich,3,6.1,45,348,10.0,2.0,45,9,Midfielder,2.0
+430,Brandon,Williams,Norwich,2,6.5,40,355,22.0,0.8,40,3,Defender,0.8
+431,Michael,McGovern,Norwich,1,0.7,40,0,0.0,0.0,40,0,Goalkeeper,0.0
+432,Tim,Krul,Norwich,1,1.3,45,630,0.0,3.6,45,16,Goalkeeper,3.6
+433,Teemu,Pukki,Norwich,4,5.0,59,573,206.0,3.9,59,23,Forward,3.9
+434,Marco,Stiepermann,Norwich,3,0.0,50,0,0.0,0.0,50,0,Midfielder,0.0
+435,Lukas,Rupp,Norwich,3,0.1,45,241,32.0,1.6,45,7,Midfielder,1.6
+436,Kenny,McLean,Norwich,3,0.0,49,495,90.0,2.4,49,12,Midfielder,2.4
+437,Grant,Hanley,Norwich,2,0.1,44,630,56.0,2.7,44,12,Defender,2.7
+438,Onel,Hernández,Norwich,3,0.0,49,0,0.0,0.0,49,0,Midfielder,0.0
+439,Sam,Byram,Norwich,2,0.0,44,0,0.0,0.0,44,0,Defender,0.0
+440,Jordan,Hugill,Norwich,4,0.0,54,0,0.0,0.0,54,0,Forward,0.0
+441,Kieran,Dowell,Norwich,3,0.0,53,65,14.0,0.8,53,4,Midfielder,0.8
+442,Christoph,Zimmermann,Norwich,2,0.1,44,0,0.0,0.0,44,0,Defender,0.0
+443,Todd,Cantwell,Norwich,3,0.3,53,313,8.0,1.1,53,6,Midfielder,1.1
+444,Max,Aarons,Norwich,2,1.4,44,630,58.0,2.7,44,12,Defender,2.7
+445,Jacob,Sørensen,Norwich,2,0.1,44,0,0.0,0.0,44,0,Defender,0.0
+446,Przemyslaw,Placheta,Norwich,3,0.0,49,0,0.0,0.0,49,0,Midfielder,0.0
+447,Adam,Idah,Norwich,4,0.4,49,37,39.0,1.0,49,5,Forward,1.0
+448,Josh,Martin,Norwich,3,0.0,50,0,0.0,0.0,50,0,Midfielder,0.0
+449,Andrew,Omobamidele,Norwich,2,4.2,39,90,0.0,0.5,39,2,Defender,0.5
+450,Angus,Gunn,Norwich,1,1.6,40,0,0.0,0.0,40,0,Goalkeeper,0.0
+451,Milot,Rashica,Norwich,3,0.1,53,395,60.0,2.1,53,11,Midfielder,2.1
+452,Ben,Gibson,Norwich,2,0.1,44,450,68.0,2.0,44,9,Defender,2.0
+453,Dimitris,Giannoulis,Norwich,2,0.1,44,229,22.0,1.8,44,8,Defender,1.8
+454,Pierre,Lees-Melou,Norwich,3,0.1,50,511,36.0,2.8,50,14,Midfielder,2.8
+455,Bali,Mumba,Norwich,2,0.3,40,45,0.0,0.0,40,0,Defender,0.0
+456,Joshua,Sargent,Norwich,4,0.1,54,291,64.0,1.7,54,9,Forward,1.7
+457,Christos,Tzolis,Norwich,3,0.1,50,109,14.0,0.8,50,4,Midfielder,0.8
+458,Ozan,Kabak,Norwich,2,0.1,45,248,0.0,1.8,45,8,Defender,1.8
+459,Mathias,Normann,Norwich,3,0.1,45,227,49.0,2.0,45,9,Midfielder,2.0
+460,Theo,Walcott,Southampton,3,0.1,58,169,22.0,0.7,58,4,Midfielder,0.7
+461,Fraser,Forster,Southampton,1,0.8,44,0,0.0,0.0,44,0,Goalkeeper,0.0
+462,Alex,McCarthy,Southampton,1,2.1,45,630,0.0,5.1,45,23,Goalkeeper,5.1
+463,Oriol,Romeu Vidal,Southampton,3,0.6,45,578,33.0,2.7,45,12,Midfielder,2.7
+464,Nathan,Redmond,Southampton,3,0.1,59,368,60.0,2.0,59,12,Midfielder,2.0
+465,Jack,Stephens,Southampton,2,0.1,44,396,4.0,2.0,44,9,Defender,2.0
+466,Stuart,Armstrong,Southampton,3,0.1,58,0,0.0,0.0,58,0,Midfielder,0.0
+467,James,Ward-Prowse,Southampton,3,2.7,64,616,79.0,3.8,64,24,Midfielder,3.8
+468,Kyle,Walker-Peters,Southampton,2,0.5,48,354,51.0,1.9,48,9,Defender,1.9
+469,Jan,Bednarek,Southampton,2,0.7,44,315,4.0,3.0,44,13,Defender,3.0
+470,Daniel,N'Lundulu,Southampton,4,0.0,45,0,0.0,0.0,45,0,Forward,0.0
+471,Che,Adams,Southampton,4,1.0,68,380,99.0,2.4,68,16,Forward,2.4
+472,Nathan,Tella,Southampton,3,0.1,48,82,10.0,0.6,48,3,Midfielder,0.6
+473,William,Smallbone,Southampton,3,0.0,45,0,0.0,0.0,45,0,Midfielder,0.0
+474,Michael,Obafemi,Southampton,4,4.5,45,0,0.0,0.0,45,0,Forward,0.0
+475,Ibrahima,Diallo,Southampton,3,0.1,45,114,27.0,1.1,45,5,Midfielder,1.1
+476,Moussa,Djenepo,Southampton,3,0.1,54,349,105.0,1.3,54,7,Midfielder,1.3
+477,Mohammed,Salisu,Southampton,2,0.2,45,593,41.0,3.3,45,15,Defender,3.3
+478,Romain,Perraud,Southampton,2,0.1,49,254,2.0,2.0,49,10,Defender,2.0
+479,Tino,Livramento,Southampton,2,13.2,42,625,32.0,5.0,42,21,Defender,5.0
+480,Mohamed,Elyounoussi,Southampton,3,0.2,55,363,216.0,3.1,55,17,Midfielder,3.1
+481,Armando,Broja,Southampton,4,0.5,50,83,47.0,0.8,50,4,Forward,0.8
+482,Shane,Long,Southampton,4,0.1,54,16,18.0,0.2,54,1,Forward,0.2
+483,Adam,Armstrong,Southampton,4,2.6,60,613,247.0,3.5,60,21,Forward,3.5
+484,Yan,Valery,Southampton,2,0.5,40,0,0.0,0.0,40,0,Defender,0.0
+485,Lyanco Evangelista,Silveira Neves Vojnovic,Southampton,2,0.0,45,0,0.0,0.0,45,0,Defender,0.0
+486,Joe,Hart,Spurs,1,0.0,45,0,0.0,0.0,45,0,Goalkeeper,0.0
+487,Hugo,Lloris,Spurs,1,9.5,55,630,0.0,6.4,55,35,Goalkeeper,6.4
+488,Toby,Alderweireld,Spurs,2,0.0,50,0,0.0,0.0,50,0,Defender,0.0
+489,Erik,Lamela,Spurs,3,0.0,60,0,0.0,0.0,60,0,Midfielder,0.0
+490,Harry,Kane,Spurs,4,5.0,121,468,167.0,0.7,121,9,Forward,0.7
+491,Serge,Aurier,Spurs,2,0.2,49,0,0.0,0.0,49,0,Defender,0.0
+492,Heung-Min,Son,Spurs,3,13.1,100,518,246.0,4.2,100,42,Midfielder,4.2
+493,Matt,Doherty,Spurs,2,0.3,47,7,0.0,0.2,47,1,Defender,0.2
+494,Eric,Dier,Spurs,2,5.8,46,551,48.0,5.7,46,26,Defender,5.7
+495,Lucas,Rodrigues Moura da Silva,Spurs,3,0.6,64,446,100.0,1.7,64,11,Midfielder,1.7
+496,Bamidele,Alli,Spurs,3,2.0,65,495,52.0,2.9,65,19,Midfielder,2.9
+497,Ben,Davies,Spurs,2,0.2,44,30,0.0,0.0,44,0,Defender,0.0
+498,Pierre-Emile,Højbjerg,Spurs,3,2.1,49,629,50.0,4.9,49,24,Midfielder,4.9
+499,Harry,Winks,Spurs,3,1.3,45,60,0.0,0.4,45,2,Midfielder,0.4
+500,Davinson,Sánchez,Spurs,2,1.7,45,367,17.0,4.7,45,21,Defender,4.7
+501,Ryan,Sessegnon,Spurs,2,0.1,43,0,0.0,0.0,43,0,Defender,0.0
+502,Steven,Bergwijn,Spurs,3,0.4,59,233,97.0,2.5,59,15,Midfielder,2.5
+503,Sergio,Reguilón,Spurs,2,10.6,51,630,20.0,5.9,51,30,Defender,5.9
+504,Japhet,Tanganga,Spurs,2,2.0,46,364,50.0,3.0,46,14,Defender,3.0
+505,Giovani,Lo Celso,Spurs,3,0.1,59,111,34.0,0.8,59,5,Midfielder,0.8
+506,Oliver,Skipp,Spurs,3,1.3,45,523,2.0,2.4,45,11,Midfielder,2.4
+507,Joe,Rodon,Spurs,2,0.1,44,78,0.0,0.2,44,1,Defender,0.2
+508,Tanguy,Ndombele,Spurs,3,0.2,58,205,20.0,1.0,58,6,Midfielder,1.0
+509,Pierluigi,Gollini,Spurs,1,0.2,44,0,0.0,0.0,44,0,Goalkeeper,0.0
+510,Bryan,Gil Salvatierra,Spurs,3,0.1,58,51,0.0,0.7,58,4,Midfielder,0.7
+511,Cristian,Romero,Spurs,2,0.3,49,173,4.0,0.6,49,3,Defender,0.6
+512,Dane,Scarlett,Spurs,4,3.3,45,0,0.0,0.0,45,0,Forward,0.0
+513,Emerson Aparecido,Leite de Souza Junior,Spurs,2,0.2,50,315,24.0,1.0,50,5,Defender,1.0
+514,Dilan,Markanday,Spurs,3,0.0,45,0,0.0,0.0,45,0,Midfielder,0.0
+515,Tobi,Omole,Spurs,2,0.1,40,0,0.0,0.0,40,0,Defender,0.0
+516,Moussa,Sissoko,Watford,3,3.0,45,430,29.0,2.0,45,9,Midfielder,2.0
+517,Ben,Foster,Watford,1,21.4,40,270,0.0,2.0,40,8,Goalkeeper,2.0
+518,Danny,Rose,Watford,2,0.3,43,360,3.0,1.2,43,5,Defender,1.2
+519,Dan,Gosling,Watford,3,0.0,48,21,0.0,0.2,48,1,Midfielder,0.2
+520,Craig,Cathcart,Watford,2,0.1,44,384,8.0,1.1,44,5,Defender,1.1
+521,Troy,Deeney,Watford,4,0.5,54,23,14.0,0.4,54,2,Forward,0.4
+522,Tom,Cleverley,Watford,3,0.1,50,313,37.0,2.2,50,11,Midfielder,2.2
+523,Francisco,Femenía Far,Watford,2,0.1,44,214,2.0,1.6,44,7,Defender,1.6
+524,Andre,Gray,Watford,4,0.1,54,0,0.0,0.0,54,0,Forward,0.0
+525,Christian,Kabasele,Watford,2,0.1,44,202,4.0,0.7,44,3,Defender,0.7
+526,Nathaniel,Chalobah,Watford,3,0.0,50,0,0.0,0.0,50,0,Midfielder,0.0
+527,William,Troost-Ekong,Watford,2,0.1,45,630,11.0,2.2,45,10,Defender,2.2
+528,Stipe,Perica,Watford,4,1.1,45,0,0.0,0.0,45,0,Forward,0.0
+529,Daniel,Bachmann,Watford,1,1.7,44,360,0.0,1.8,44,8,Goalkeeper,1.8
+530,Adam,Masina,Watford,2,0.1,43,270,0.0,0.9,43,4,Defender,0.9
+531,Ken,Sema,Watford,3,0.0,53,242,26.0,1.1,53,6,Midfielder,1.1
+532,Philip,Zinckernagel,Watford,3,0.0,55,0,0.0,0.0,55,0,Midfielder,0.0
+533,Isaac,Success Ajayi,Watford,4,0.1,50,0,0.0,0.0,50,0,Forward,0.0
+534,Ayotomiwa,Dele-Bashiru,Watford,3,0.0,45,0,0.0,0.0,45,0,Midfielder,0.0
+535,Ashley,Fletcher,Watford,4,0.2,49,0,0.0,0.0,49,0,Forward,0.0
+536,Francisco,Sierralta,Watford,2,0.1,43,247,0.0,0.7,43,3,Defender,0.7
+537,Domingos,Quina,Watford,3,0.0,45,0,0.0,0.0,45,0,Midfielder,0.0
+538,Marc,Navarro,Watford,2,0.3,40,0,0.0,0.0,40,0,Defender,0.0
+539,Ismaila,Sarr,Watford,3,18.1,63,630,304.0,6.3,63,40,Midfielder,6.3
+540,Jeremy,Ngakia,Watford,2,0.0,44,183,3.0,0.9,44,4,Defender,0.9
+541,Ben,Wilmot,Watford,2,0.0,45,0,0.0,0.0,45,0,Defender,0.0
+542,Joseph,Hungbo,Watford,3,0.0,45,0,0.0,0.0,45,0,Midfielder,0.0
+543,Imrân,Louza,Watford,3,0.0,53,45,2.0,0.2,53,1,Midfielder,0.2
+544,João Pedro,Junqueira de Jesus,Watford,4,0.1,54,57,10.0,0.4,54,2,Forward,0.4
+545,Kwadwo,Baah,Watford,3,0.1,45,0,0.0,0.0,45,0,Midfielder,0.0
+546,Emmanuel,Dennis,Watford,4,10.6,53,571,273.0,4.5,53,24,Forward,4.5
+547,Matthew,Pollock,Watford,2,0.4,40,0,0.0,0.0,40,0,Defender,0.0
+548,Oghenekaro Peter,Etebo,Watford,3,0.2,45,369,10.0,1.6,45,7,Midfielder,1.6
+549,Joshua,King,Watford,4,0.9,55,366,89.0,3.6,55,20,Forward,3.6
+550,Adedapo,Awokoya-Mebude,Watford,4,0.1,45,0,0.0,0.0,45,0,Forward,0.0
+551,Juan Camilo,Hernández Suárez,Watford,4,1.7,50,131,39.0,1.8,50,9,Forward,1.8
+552,Juraj,Kucka,Watford,3,0.0,55,491,45.0,2.2,55,12,Midfielder,2.2
+553,Ozan,Tufan,Watford,3,0.0,50,103,11.0,0.4,50,2,Midfielder,0.4
+554,Robert,Elliot,Watford,1,0.8,40,0,0.0,0.0,40,0,Goalkeeper,0.0
+555,Kurt,Zouma,West Ham,2,1.2,54,270,9.0,0.6,54,3,Defender,0.6
+556,Mark,Noble,West Ham,3,0.6,45,3,17.0,0.0,45,0,Midfielder,0.0
+557,Darren,Randolph,West Ham,1,0.1,44,0,0.0,0.0,44,0,Goalkeeper,0.0
+558,Lukasz,Fabianski,West Ham,1,2.0,50,630,0.0,3.6,50,18,Goalkeeper,3.6
+559,Angelo,Ogbonna,West Ham,2,0.3,50,630,14.0,3.4,50,17,Defender,3.4
+560,Winston,Reid,West Ham,2,1.2,40,0,0.0,0.0,40,0,Defender,0.0
+561,Aaron,Cresswell,West Ham,2,15.1,55,630,46.0,4.7,55,26,Defender,4.7
+562,Andriy,Yarmolenko,West Ham,3,0.1,53,35,9.0,1.1,53,6,Midfielder,1.1
+563,Michail,Antonio,West Ham,4,45.6,80,538,425.0,6.1,80,49,Forward,6.1
+564,Craig,Dawson,West Ham,2,0.3,50,361,100.0,2.2,50,11,Defender,2.2
+565,Ryan,Fredericks,West Ham,2,0.1,44,2,0.0,0.2,44,1,Defender,0.2
+566,Manuel,Lanzini,West Ham,3,0.1,58,13,0.0,0.3,58,2,Midfielder,0.3
+567,Arthur,Masuaku,West Ham,2,0.0,44,0,0.0,0.0,44,0,Defender,0.0
+568,Vladimir,Coufal,West Ham,2,7.1,49,630,44.0,3.5,49,17,Defender,3.5
+569,Saïd,Benrahma,West Ham,3,37.0,66,593,216.0,6.7,66,44,Midfielder,6.7
+570,Jarrod,Bowen,West Ham,3,0.9,63,609,225.0,4.1,63,26,Midfielder,4.1
+571,Declan,Rice,West Ham,3,4.7,50,630,39.0,4.0,50,20,Midfielder,4.0
+572,Tomas,Soucek,West Ham,3,6.0,59,630,198.0,4.6,59,27,Midfielder,4.6
+573,Pablo,Fornals,West Ham,3,2.8,60,613,146.0,4.7,60,28,Midfielder,4.7
+574,Issa,Diop,West Ham,2,0.3,43,0,0.0,0.0,43,0,Defender,0.0
+575,Ben,Johnson,West Ham,2,1.9,39,1,0.0,0.3,39,1,Defender,0.3
+576,Alphonse,Areola,West Ham,1,0.8,48,0,0.0,0.0,48,0,Goalkeeper,0.0
+577,Frederik,Alves,West Ham,2,0.2,40,0,0.0,0.0,40,0,Defender,0.0
+578,Conor,Coventry,West Ham,3,0.1,45,0,0.0,0.0,45,0,Midfielder,0.0
+579,Jamal,Baptiste,West Ham,2,0.3,40,0,0.0,0.0,40,0,Defender,0.0
+580,Nikola,Vlasic,West Ham,3,0.1,59,106,10.0,0.7,59,4,Midfielder,0.7
+581,Alex,Kral,West Ham,3,0.1,45,0,0.0,0.0,45,0,Midfielder,0.0
+582,João Filipe Iria,Santos Moutinho,Wolves,3,0.7,50,586,16.0,3.4,50,17,Midfielder,3.4
+583,Rui Pedro,dos Santos Patrício,Wolves,1,0.0,50,0,0.0,0.0,50,0,Goalkeeper,0.0
+584,Willy,Boly,Wolves,2,0.1,49,0,0.0,0.0,49,0,Defender,0.0
+585,Conor,Coady,Wolves,2,6.4,45,626,10.0,4.4,45,20,Defender,4.4
+586,Raúl,Jiménez,Wolves,4,6.3,75,630,245.0,3.5,75,26,Forward,3.5
+587,Romain,Saïss,Wolves,2,1.0,50,578,84.0,3.8,50,19,Defender,3.8
+588,Fernando,Marçal,Wolves,2,8.0,46,611,44.0,6.1,46,28,Defender,6.1
+589,Jonathan,Castro Otto,Wolves,2,0.0,45,0,0.0,0.0,45,0,Defender,0.0
+590,Leander,Dendoncker,Wolves,3,0.1,48,136,22.0,1.2,48,6,Midfielder,1.2
+591,Adama,Traoré,Wolves,3,3.1,60,456,208.0,2.2,60,13,Midfielder,2.2
+592,Rúben Diogo,da Silva Neves,Wolves,3,1.1,54,542,43.0,2.2,54,12,Midfielder,2.2
+593,Nélson,Cabral Semedo,Wolves,2,3.6,49,527,96.0,3.9,49,19,Defender,3.9
+594,Daniel,Castelo Podence,Wolves,3,0.1,55,117,6.0,1.1,55,6,Midfielder,1.1
+595,Max,Kilman,Wolves,2,0.4,45,630,55.0,4.4,45,20,Defender,4.4
+596,Morgan,Gibbs-White,Wolves,3,0.2,45,7,24.0,0.2,45,1,Midfielder,0.2
+597,Pedro,Lomba Neto,Wolves,3,0.0,64,0,0.0,0.0,64,0,Midfielder,0.0
+598,Owen,Otasowie,Wolves,3,0.1,45,0,0.0,0.0,45,0,Midfielder,0.0
+599,Ki-Jana,Hoever,Wolves,2,2.1,40,93,6.0,0.5,40,2,Defender,0.5
+600,Andreas,Söndergaard,Wolves,1,1.0,40,0,0.0,0.0,40,0,Goalkeeper,0.0
+601,Fabio,Silva,Wolves,4,0.4,57,18,19.0,0.7,57,4,Forward,0.7
+602,Yerson,Mosquera Valdelamar,Wolves,2,0.0,45,0,0.0,0.0,45,0,Defender,0.0
+603,John,Ruddy,Wolves,1,0.2,44,0,0.0,0.0,44,0,Goalkeeper,0.0
+604,Francisco,Machado Mota de Castro Trincão,Wolves,3,0.7,59,474,178.0,2.4,59,14,Midfielder,2.4
+605,Rayan,Ait Nouri,Wolves,2,0.2,43,6,8.0,0.2,43,1,Defender,0.2
+606,José,Malheiro de Sá,Wolves,1,2.6,50,630,0.0,6.0,50,30,Goalkeeper,6.0
+607,Patrick,Cutrone,Wolves,4,0.1,50,0,0.0,0.0,50,0,Forward,0.0
+608,Luke,Cundle,Wolves,3,0.1,45,0,0.0,0.0,45,0,Midfielder,0.0
+609,Chem,Campbell,Wolves,3,0.3,45,0,0.0,0.0,45,0,Midfielder,0.0
+610,Christian,Marques,Wolves,2,0.3,40,0,0.0,0.0,40,0,Defender,0.0
+611,Hee-Chan,Hwang,Wolves,4,3.9,56,249,127.0,4.3,56,24,Forward,4.3
+612,Louie,Moulden,Wolves,1,0.1,40,0,0.0,0.0,40,0,Goalkeeper,0.0
