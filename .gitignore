@@ -1,4 +1,3 @@
-\temp_env
-\fpl_venv
+\env
 *.txt
 \json_data
