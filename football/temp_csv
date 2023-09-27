@@ -1,0 +1,15 @@
+,home,away,Key,odds,event
+0,Panetolikos Agrinio,OFI Crete,soccer_greece_super_league,2.11,Over2.5
+1,Panetolikos Agrinio,OFI Crete,soccer_greece_super_league,1.71,Under2.5
+2,AE Kifisia FC,PAS Lamia 1964,soccer_greece_super_league,2.34,Over2.5
+3,AE Kifisia FC,PAS Lamia 1964,soccer_greece_super_league,1.58,Under2.5
+4,HJK Helsinki,FC Honka Espoo,soccer_finland_veikkausliiga,1.8,Over2.25
+5,HJK Helsinki,FC Honka Espoo,soccer_finland_veikkausliiga,1.95,Under2.25
+6,Ilves Tampere,IFK Mariehamn,soccer_finland_veikkausliiga,1.8,Over2.5
+7,Ilves Tampere,IFK Mariehamn,soccer_finland_veikkausliiga,1.95,Under2.5
+8,Uruguay,Namibia,rugbyunion_world_cup,1.87,Over51.5
+9,Uruguay,Namibia,rugbyunion_world_cup,1.87,Under51.5
+10,Cagliari,AC Milan,soccer_italy_serie_a,1.99,Over2.5
+11,Cagliari,AC Milan,soccer_italy_serie_a,1.8,Under2.5
+12,Hellas Verona FC,Atalanta BC,soccer_italy_serie_a,1.87,Over2.5
+13,Hellas Verona FC,Atalanta BC,soccer_italy_serie_a,1.83,Under2.5
