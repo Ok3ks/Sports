@@ -5,3 +5,12 @@ Provision with gcp but use that to learn terraform.
 Read docs and finetune portfolio with usecases
 
 Take time out to learn Django well and FastAPI
+
+- weekly (update of players in downtown.)
+- update of epl-players
+- retrieval of weekly stats 
+    : weekly lineup of each participant
+    
+    : epl-player per week participation
+
+    #all_df, old_player entries json
