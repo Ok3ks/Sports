@@ -1,10 +1,89 @@
 import requests
 import time
+import pandas as pd
+import json
+import numpy as np
 
 transfer_url = 'https://fantasy.premierleague.com/api/entry/{}/transfers/'
 league_url = "https://fantasy.premierleague.com/api/leagues-classic/{}/standings/?page_standings={}"
 fpl_player = "https://fantasy.premierleague.com/api/entry/{}/event/{}/picks/"
+gw_url = "https://fantasy.premierleague.com/api/event/{}/live/"
 
+
+with open('json/epl_players.json') as ins_3:
+    epl_players = json.load(ins_3)
+
+def weekly_score(gw):
+
+    r = requests.get(gw_url.format(gw))
+    r = r.json()
+
+    temp = {item['id'] :item['stats'] for item in r['elements']}
+    df = pd.DataFrame(temp)
+    df = df.T
+
+    df.columns = ['minutes',
+        'goals_scored',
+        'assists',
+        'clean_sheets',
+        'goals_conceded',
+        'own_goals',
+        'penalties_saved',
+        'penalties_missed',
+        'yellow_cards',
+        'red_cards',
+        'saves',
+        'bonus',
+        'bps',
+        'influence',
+        'creativity',
+        'threat',
+        'ict_index',
+        'starts',
+        'expected_goals',
+        'expected_assists',
+        'expected_goal_involvements',
+        'expected_goals_conceded',
+        'total_points',
+        'in_dreamteam']
+
+    df.reset_index(level= 0, names = 'id', inplace = True)
+    df['event'] = gw
+
+    return df
+
+def get_points(id, gw,df): #extract from DB
+    """Obtains player points using ID"""
+
+    if id == "NaN":
+        print("{id} not found in db for week {gw}")
+        pass
+    else:
+        assert gw in df['event'], 'All_df is not updated'
+        temp_df = df[df['event'] == gw] #gw
+        point = temp_df[temp_df['id'] == int(id)]['total_points'].values.tolist()
+        #player = id_2_player.get(i)         #change to database
+        return int(point[0]) 
+
+def basic_stats(df):
+
+    """Measures of Central Tendency for Total points"""
+    average = np.mean(df['total_points'])
+    IQR = np.percentile(df['total_points'], 75) - np.percentile(df['total_points'], 25)
+    Q3 = np.percentile(df['total_points'], 75)
+    Q1 = np.percentile(df['total_points', 25])
+
+    return average,Q3,Q1,IQR
+
+def get_player(i):
+    """Obtains player name from id"""
+    out = []
+    if isinstance(i, list):
+        for item in i:
+            out.append(epl_players.get(str(item)))
+        return out
+    else:
+        return epl_players.get(str(i))
 
 def get_gw_transfers(alist,gw:int, all = False):
     """Input is a list of entry_id. Gw is the gameweek number
