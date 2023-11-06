@@ -1,14 +1,26 @@
 from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
-
 from sqlalchemy.orm import sessionmaker,DeclarativeBase
 from flask_sqlalchemy import SQLAlchemy
+
+from sqlite3 import Error
+import sqlite3
+
+from dataclasses import dataclass
 
 class Base(DeclarativeBase):
     pass
 
 db = SQLAlchemy(model_class = Base)
-from dataclasses import dataclass
+
+def create_connection(db_file):
+    conn = None
+    try:
+        conn = sqlite3.connect(db_file)
+        return conn
+    except Error as e:
+        print(e)
+    return conn
 
 @dataclass
 class PlayerSeasonHistory(db.Model):
@@ -41,16 +53,6 @@ class PlayerSeasonHistory(db.Model):
     expected_goals_conceded: Mapped[int] = mapped_column(Integer)
     total_points: Mapped[int] = mapped_column(Integer)
     in_dreamteam: Mapped[int] = mapped_column(Integer)
-                          
-#class Team(db.Model):
-    #making analytics by soccer teams
-    #may require fixtures too
-
-
-#@dataclass
-#class Week(db.Model):
-    #""" Extract entries per week and store mainly referenced
-    #weekly attributes."""
 
 
 @dataclass
@@ -58,7 +60,20 @@ class Participants(db.Model):
     entry_id: Mapped[int] = mapped_column(Integer, primary_key = True)
     team_name: Mapped[str] = mapped_column(String, unique=True)
     player_name: Mapped[str] = mapped_column(String)
+    gw_total = Mapped[int] = mapped_column(Integer)
 
+#@dataclass
+#class EplPlayers(db.Model):
+    #entry_name: Mapped[str]= entry_name
+                          
+#class Team(db.Model):
+    #making analytics by soccer teams
+    #may require fixtures too
+
+#@dataclass
+#class Week(db.Model):
+    #""" Extract entries per week and store mainly referenced
+    #weekly attributes."""
 
 #@dataclass
 #class League(db.Model):
@@ -69,5 +84,4 @@ class Participants(db.Model):
 
 #db.session.add(obj)
 #db.session.delete(obj)
-
 #db.session.execute()

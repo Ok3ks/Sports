@@ -69,77 +69,85 @@ no_chips = f[f['active_chip'].isna()]
 no_chips = no_chips.sort_values(by = 'delta', ascending=False)
 
 ###Print to terminal -- Work on next
-best_transf_in = get_player(no_chips[no_chips['delta'] == max(no_chips['delta'])]['element_out'].values[0][0])
-best_transf_out = get_player(no_chips[no_chips['delta'] == max(no_chips['delta'])]['element_in'].values[0][0])
-best_transf_points = max(no_chips['delta'])
+#best_transf_in = get_player(no_chips[no_chips['delta'] == max(no_chips['delta'])]['element_out'].values[0][0])
+best_transf_in = no_chips[no_chips['delta'] == max(no_chips['delta'])]['element_out'].values[0][0]
+#best_transf_out = get_player(no_chips[no_chips['delta'] == max(no_chips['delta'])]['element_in'].values[0][0])
+best_transf_out = no_chips[no_chips['delta'] == max(no_chips['delta'])]['element_in'].values[0][0]
+#best_transf_points = max(no_chips['delta'])
 
-worst_transf_in = get_player(no_chips[no_chips['delta'] == min(no_chips['delta'])]['element_out'].values[0][0])
-worst_transf_out = get_player(no_chips[no_chips['delta'] == min(no_chips['delta'])]['element_in'].values[0][0])
+#worst_transf_in = get_player(no_chips[no_chips['delta'] == min(no_chips['delta'])]['element_out'].values[0][0])
+worst_transf_in = no_chips[no_chips['delta'] == min(no_chips['delta'])]['element_out'].values[0][0]
+#worst_transf_out = get_player(no_chips[no_chips['delta'] == min(no_chips['delta'])]['element_in'].values[0][0])
+worst_transf_out = no_chips[no_chips['delta'] == min(no_chips['delta'])]['element_out'].values[0][0]
+#worst_transf_points = min(no_chips['delta'])
 worst_transf_points = min(no_chips['delta'])
+
+print("--")
+print(best_transf_in, best_transf_out)
 
 #write to json
 ##compute then display
-print("{} Made at least one transfer".format(len(f))) #use percentage to report
-print("{} participants took a hit".format(len(f[f['transfers'] > 1])))
-print(f"\nBest transfer decision of the week ")
-print("\t")
+#print("{} Made at least one transfer".format(len(f))) #use percentage to report
+#print("{} participants took a hit".format(len(f[f['transfers'] > 1])))
+#print(f"\nBest transfer decision of the week ")
+#print("\t")
 
-for i in range(3):
-    player_in = get_player(no_chips.iloc[i,:]['element_in']) #
-    player_out = get_player(no_chips.iloc[i,:]['element_out'])
-    points_gained = no_chips.iloc[i,:]['delta']
-    player_id = no_chips.iloc[i,:]['entry_id']
+#for i in range(3):
+    #player_in = get_player(no_chips.iloc[i,:]['element_in']) #
+    #player_out = get_player(no_chips.iloc[i,:]['element_out'])
+    #points_gained = no_chips.iloc[i,:]['delta']
+    #player_id = no_chips.iloc[i,:]['entry_id']
 
-    print(f"Team name {participants_json[player_id]}\n")
-    print(f"Players In: {','.join(player_in)}\n Players Out: {','.join(player_out)} \n Points gained: {points_gained} ..")
-    print("\n")
+    #print(f"Team name {participants_json[player_id]}\n")
+    #print(f"Players In: {','.join(player_in)}\n Players Out: {','.join(player_out)} \n Points gained: {points_gained} ..")
+    #print("\n")
 
-print(f"\nWorst transfer decision of the week ")
-print("\t")
+#print(f"\nWorst transfer decision of the week ")
+#print("\t")
 
-for i in range(1,3):
-    player_in = get_player(no_chips.iloc[-i,:]['element_in'])
-    player_out = get_player(no_chips.iloc[-i,:]['element_out'])
-    points_lost = no_chips.iloc[-1,:]['delta']
-    player_id = no_chips.iloc[-i,:]['entry_id']
+#for i in range(1,3):
+    #player_in = get_player(no_chips.iloc[-i,:]['element_in'])
+    #player_out = get_player(no_chips.iloc[-i,:]['element_out'])
+    #points_lost = no_chips.iloc[-1,:]['delta']
+    #player_id = no_chips.iloc[-i,:]['entry_id']
     
-    print(f"Team name : {participants_json[player_id]}\n")
-    print(f"Players In: {','.join(player_in)}\n Players Out: {','.join(player_out)} \n Points lost: {points_lost}")
-    print("\n")
+    #print(f"Team name : {participants_json[player_id]}\n")
+    #print(f"Players In: {','.join(player_in)}\n Players Out: {','.join(player_out)} \n Points lost: {points_lost}")
+    #print("\n")
 
-print("\nMost transferred in players are :")
-for atuple in most_transf_in:
-    print("\t{}, transferred in {} times".format(get_player(atuple[1][0]), atuple[0]))
+#print("\nMost transferred in players are :")
+#for atuple in most_transf_in:
+    #print("\t{}, transferred in {} times".format(get_player(atuple[1][0]), atuple[0]))
 
-print("\nLeast transferred in players are :")
-for atuple in least_transf_in:
-    print("\t{}, transferred in {} times".format(get_player(atuple[1][0]), atuple[0]))
+#print("\nLeast transferred in players are :")
+#for atuple in least_transf_in:
+    #print("\t{}, transferred in {} times".format(get_player(atuple[1][0]), atuple[0]))
 
-print("\nMost transferred out players are :")
-for atuple in most_transf_out:
-    print("\t{}, transferred in {} times".format(get_player(atuple[1][0]), atuple[0]))
+#print("\nMost transferred out players are :") 
+#for atuple in most_transf_out:
+    #print("\t{}, transferred in {} times".format(get_player(atuple[1][0]), atuple[0]))
 
-print("\nLeast transferred out players are :")
-for atuple in least_transf_out:
-    print("\t{}, transferred in {} times".format(get_player(atuple[1][0]), atuple[0]))
+#print("\nLeast transferred out players are :")
+#for atuple in least_transf_out:
+    #print("\t{}, transferred in {} times".format(get_player(atuple[1][0]), atuple[0]))
 
-print("\nCaptain stats of the week")
-for key,value in captain.items():
-    print("\t{}, was captained {} times. Total Points = {}".format(get_player(int(key)), value, get_points(key, gw,df)*2))
+#print("\nCaptain stats of the week")
+#for key,value in captain.items():
+    #print("\t{}, was captained {} times. Total Points = {}".format(get_player(int(key)), value, get_points(key, gw,df)*2))
 
-print("\nChip Usage")
-for key,value in chips.items():
-    print("\t{}, was activated by {} people.".format(key, value)) #how many people left
+#print("\nChip Usage")
+#for key,value in chips.items():
+    #print("\t{}, was activated by {} people.".format(key, value)) #how many people left
 
-print("\n")
-for i,j in zip(exceptional['entry_id'], exceptional['total_points']):
-    player_name = participants_json.get(i)
-    print(f"Player {player_name} scored {j} points, {j - league_average} above the league average")
+#print("\n")
+#for i,j in zip(exceptional['entry_id'], exceptional['total_points']):
+    #player_name = participants_json.get(i)
+    #print(f"Player {player_name} scored {j} points, {j - league_average} above the league average")
 
-print("\n")
-for i,j in zip(abysmal['entry_id'], abysmal['total_points']):
-    player_name = participants_json.get(i)
-    print(f"Player {player_name} scored {j} points, {j - league_average} below the league average")
+#print("\n")
+#for i,j in zip(abysmal['entry_id'], abysmal['total_points']):
+    #player_name = participants_json.get(i)
+    #print(f"Player {player_name} scored {j} points, {j - league_average} below the league average")
 
 #functionality to sort by total points and design appropriately
 

@@ -5,3 +5,4 @@ HISTORY_URL = "https://fantasy.premierleague.com/api/entry/{}/history/" #{} = PL
 H2H_LEAGUE = "https://fantasy.premierleague.com/api/leagues-h2h-matches/league/{}/"
 LEAGUE_URL = "https://fantasy.premierleague.com/api/leagues-classic/{}/standings/?page_standings={}"
 FPL_PLAYER = "https://fantasy.premierleague.com/api/entry/{}/event/{}/picks/"
+FPL_URL = "https://fantasy.premierleague.com/api/bootstrap-static/"

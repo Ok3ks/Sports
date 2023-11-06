@@ -8,8 +8,8 @@ from urls import GW_URL,FIXTURE_URL,TRANSFER_URL, HISTORY_URL
 from urls import H2H_LEAGUE, LEAGUE_URL, FPL_PLAYER
 from functools import lru_cache
 
-with open('json/epl_players.json') as ins_3:
-    epl_players = json.load(ins_3)
+#with open('json/epl_players.json') as ins_3:
+    #epl_players = json.load(ins_3)
 
 def get_gw_transfers(alist,gw:int, all = False):
     """Input is a list of entry_id. Gw is the gameweek number
@@ -17,7 +17,6 @@ def get_gw_transfers(alist,gw:int, all = False):
     row =  {}
     for entry_id in alist:
         r = requests.get(TRANSFER_URL.format(entry_id))
-
         if r.status_code == 200:
             obj = r.json()
             for item in obj:
@@ -147,10 +146,10 @@ class Gameweek():
 #Create Player class for name, position, team
 class Player():
     #Use DB for this - fairly constant, but start with json
-
     def __init__(self,player_id, epl_players:dict):
         self.player_id = player_id
         self.epl_players = epl_players
+
 
     def get_player_name(self):
         """Obtains player name from id"""
@@ -181,7 +180,9 @@ class Player():
             #return out
         #else:
             #return epl_players.get(str(self.player_id))
-        pass
+        #pass
+
+#Create Database file and extend each functionality
 
 class League():
     def __init__(self, league_id):
@@ -220,9 +221,9 @@ class League():
 
 #Participant class
 
-class Participant():
-    def __init__(self,entry_id, player_name, entry_name, gw_total):
-        self.entry_id = entry_id
-        self.player_name = player_name
-        self.entry_name = entry_name
-        self.gw_total = gw_total
+#class Participant():
+    #def __init__(self,entry_id, player_name, entry_name, gw_total):
+        #self.entry_id = entry_id
+        #self.player_name = player_name
+        #self.entry_name = entry_name
+        #self.gw_total = gw_total
