@@ -8,8 +8,18 @@ from urls import GW_URL,FIXTURE_URL,TRANSFER_URL, HISTORY_URL
 from urls import H2H_LEAGUE, LEAGUE_URL, FPL_PLAYER
 from functools import lru_cache
 
-#with open('json/epl_players.json') as ins_3:
-    #epl_players = json.load(ins_3)
+with open('/Users/max/Desktop/Sports/app/json/epl_players.json') as ins_3:
+    epl_players = json.load(ins_3)
+
+def get_player(player_id):
+        """Obtains player name from id"""
+        out = []
+        if isinstance(player_id, list):
+            for item in player_id:
+                out.append(epl_players.get(str(item)))
+            return out
+        else:
+            return epl_players.get(str(player_id))
 
 def get_gw_transfers(alist,gw:int, all = False):
     """Input is a list of entry_id. Gw is the gameweek number
