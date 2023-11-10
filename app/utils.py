@@ -145,6 +145,8 @@ class Gameweek():
             assert int(id) in self.df['id'].astype(int), 'All_df is not updated'
             point = self.df[self.df['id'] == int(id)]['total_points'].values.tolist()
             return int(point[0]) 
+        
+
 
     def basic_stats(self):
         """Measures of Central Tendency for Total points"""
@@ -229,6 +231,20 @@ class League():
             self.transfers = get_gw_transfers(self.entry_ids,gw)
         return self.transfers
 
+    def weekly_score_transformation(self,gw):
+
+        """Transforms weekly score into Dataframe"""
+
+        one_df = pd.DataFrame(self.participant_entries)
+        o_df = one_df[~one_df['players'].isna()]
+
+        o_df['points_breakdown'] = o_df['players'].map(lambda x: [df.get_points(y) for y in x.split(",")])
+        o_df['captain_points'] = o_df['captain'].map(lambda x: df.get_points(x) * 2)
+        o_df['vice_captain_points'] = o_df['vice_captain'].map(lambda x: df.get_points(x))
+        o_df['rank'] = o_df['total_points'].rank(ascending=False)
+        o_df['rank'] = o_df['rank'].map(int)
+
+        return o_df
 #Participant class
 
 #class Participant():

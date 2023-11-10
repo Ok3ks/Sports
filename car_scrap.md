@@ -26,3 +26,9 @@ Xpath, CSS selectors
 - IP Rotation
 - Rate Limiting
 - Scraping Etiquette
+
+
+#To do FPL - Clean up report.py, make it into functions and cache API calls
+#Put a front end up on it
+#Setup for any league code
+#Add plugin to it
