@@ -4,6 +4,8 @@ import pandas as pd
 import json
 import numpy as np
 
+import os
+
 from urls import GW_URL,FIXTURE_URL,TRANSFER_URL, HISTORY_URL
 from urls import H2H_LEAGUE, LEAGUE_URL, FPL_PLAYER
 from functools import lru_cache
@@ -11,6 +13,15 @@ from functools import lru_cache
 with open('/Users/max/Desktop/Sports/app/json/epl_players.json') as ins_3:
     epl_players = json.load(ins_3)
 
+
+def to_json(x, fp):
+
+    with open(fp, 'w') as outs:
+        json.dump(x, outs)
+
+    print(f"{x.keys()} stored in Json successfully")
+
+#Replace with DB 
 def get_player(player_id):
         """Obtains player name from id"""
         out = []
@@ -138,15 +149,13 @@ class Gameweek():
 
     def get_points(self, id): #extract from DB
         """Obtains player points using ID"""
-        if id == "NaN":
-            print("{id} not found in db for week {gw}")
-            pass
-        else:
+        try:
             assert int(id) in self.df['id'].astype(int), 'All_df is not updated'
             point = self.df[self.df['id'] == int(id)]['total_points'].values.tolist()
-            return int(point[0]) 
+        except KeyError:
+            print("Invalid ID")
+        return int(point[0]) 
         
-
 
     def basic_stats(self):
         """Measures of Central Tendency for Total points"""
@@ -230,21 +239,7 @@ class League():
             self.obtain_league_participants()
             self.transfers = get_gw_transfers(self.entry_ids,gw)
         return self.transfers
-
-    def weekly_score_transformation(self,gw):
-
-        """Transforms weekly score into Dataframe"""
-
-        one_df = pd.DataFrame(self.participant_entries)
-        o_df = one_df[~one_df['players'].isna()]
-
-        o_df['points_breakdown'] = o_df['players'].map(lambda x: [df.get_points(y) for y in x.split(",")])
-        o_df['captain_points'] = o_df['captain'].map(lambda x: df.get_points(x) * 2)
-        o_df['vice_captain_points'] = o_df['vice_captain'].map(lambda x: df.get_points(x))
-        o_df['rank'] = o_df['total_points'].rank(ascending=False)
-        o_df['rank'] = o_df['rank'].map(int)
-
-        return o_df
+    
 #Participant class
 
 #class Participant():
