@@ -13,8 +13,13 @@ from functools import lru_cache
 with open('/Users/max/Desktop/Sports/app/json/epl_players.json') as ins_3:
     epl_players = json.load(ins_3)
 
+#def get_player(id, session = session):
+    
+    #stmt = select(Player).where(Player.player_id == int(id))
+    #obj = session.scalars(stmt).one()
+    #return obj
 
-def to_json(x, fp):
+def to_json(x:dict, fp):
 
     with open(fp, 'w') as outs:
         json.dump(x, outs)
@@ -164,46 +169,7 @@ class Gameweek():
         Q1 = np.percentile(self.df['total_points'], 25)
         return Q1,average,Q3
 
-#Create Player class for name, position, team
-class Player():
-    #Use DB for this - fairly constant, but start with json
-    def __init__(self,player_id, epl_players:dict):
-        self.player_id = player_id
-        self.epl_players = epl_players
 
-
-    def get_player_name(self):
-        """Obtains player name from id"""
-        out = []
-        if isinstance(self.player_id, list):
-            for item in self.player_id:
-                out.append(epl_players.get(str(item)))
-            return out
-        else:
-            return epl_players.get(str(self.player_id))
-        
-    def get_player_position(self):
-        pass
-
-    def get_player_team(self):
-        pass
-
-    def get_player_fixture(self):
-        pass
-
-    #def get_player_attr(self):
-        """Outputs Needed attributes at once"""
-        #if isinstance(self.player_id, list):
-            #for item in self.player_id:
-                #attribute_tuple = (get_player_name(item), get_player_position(item), 
-                                  #get_player_team(item))
-                #out.append(attribute_tuple)
-            #return out
-        #else:
-            #return epl_players.get(str(self.player_id))
-        #pass
-
-#Create Database file and extend each functionality
 
 class League():
     def __init__(self, league_id):

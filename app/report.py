@@ -1,5 +1,6 @@
 from utils import League, Player, Gameweek,get_player, to_json
 from utils import get_participant_entry, get_gw_transfers
+
 import pandas as pd
 
 from functools import lru_cache
@@ -12,8 +13,6 @@ LEAGUE_ID = 1088941
 
 #Downtown-85647
 #Uptown-1088941
-
-#classWeeklyReport
 
 class LeagueWeeklyReport(League):
 
@@ -58,6 +57,8 @@ class LeagueWeeklyReport(League):
         self.f = self.o_df.merge(self.f, on='entry_id', how='right')
         return self.f
     
+    #get team names
+
     def add_auto_sub(self):
         
         self.f['auto_sub_in_player'] = self.f['auto_subs'].map(lambda x: x['in'])
@@ -71,6 +72,7 @@ class LeagueWeeklyReport(League):
         self.chips = self.o_df['active_chip'].value_counts().to_dict()
         self.no_chips = self.f[self.f['active_chip'].isna()]
 
+        #buggy
         def outliers():
             Q1,league_average,Q3 = self.gameweek.basic_stats()
             IQR = Q3 - Q1
@@ -148,14 +150,13 @@ class LeagueWeeklyReport(League):
 
             self.f['points_on_bench'] = self.no_chips['points_on_bench'].astype(int)
             self.f = self.f.sort_values(by = 'points_on_bench', ascending= False)
-
             most_points = []
             for i in range(3):
                 player_on_bench = self.f.iloc[i,:]['bench'].split(",")
                 points_on_bench = int(self.f.iloc[i,:]['points_on_bench'])
                 player_id = str(self.f.iloc[i,:]['entry_id'])
                 most_points.append((player_id, player_on_bench, points_on_bench))
-            return {"most_points" :most_points}
+            return {"most_points_on_bench" :most_points}
 
         output = {"captain":self.captain, "chips": self.chips }
         output.update(outliers())

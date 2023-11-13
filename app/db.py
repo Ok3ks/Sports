@@ -3,8 +3,29 @@ import pandas as pd
 import sqlite3
 from sqlite3 import Error
 
+from sqlalchemy import Integer, String, create_engine, select
+from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Session,DeclarativeBase
+
 import requests
 from urls import FPL_URL
+
+#clean up
+
+class Base(DeclarativeBase):
+    pass
+
+class Player(Base):
+    __tablename__ = "EPL_PLAYERS_2023_1ST_HALF"
+
+    player_id: Mapped[int] = mapped_column(Integer,primary_key = True)
+    team: Mapped[str] = mapped_column(String)
+    position: Mapped[str] = mapped_column(String)
+    player_name: Mapped[str] = mapped_column(String)
+
+    def __repr__(self) -> str:
+        return f"Player(player_id={self.player_id}, team={self.team}, position ={self.position}, /player_name={self.player_name})"
+
 
 #Add functions to classes
 def create_connection(db_file):
@@ -20,18 +41,24 @@ def create_connection(db_file):
 def create_table(conn):
     try:
         create_table_sql="""CREATE TABLE IF NOT EXISTS EPL_PLAYERS_2023_1ST_HALF (
-                            player_id   INTEGER PRIMARY KEY,
+                            player_id INTEGER PRIMARY KEY,
                             position VARCHAR (2000),
-                            team     VARCHAR (255),
-                            player_name  VARCHAR (200)
+                            team VARCHAR (255),
+                            player_name VARCHAR (200)
                         );
                         """
+        #this created tables with column names 0,1,2. had to use ALTER TABLE
         c = conn.cursor()
         c.execute(create_table_sql)
         print("Table Created")
     except Error as e:
         print(e)
     return conn
+
+def dummy_insert(conn):
+    data = [("Salah", "Midfield", "Liverpool", "2")]
+    data = pd.DataFrame(data)
+    insert(conn)
 
 def insert(conn, data):
     try:
@@ -43,11 +70,6 @@ def insert(conn, data):
         print(e)
     else:
         print("Pass a dataframe as data")
-
-def dummy_insert(conn):
-    data = [("Salah", "Midfield", "Liverpool", "2")]
-    data = pd.DataFrame(data)
-    insert(conn)
 
 def insert_from_json(conn, path):
     file = pd.read_json(path)
@@ -74,7 +96,7 @@ def update_db_player_info(conn):
 
 if __name__ == "__main__":
     #pass -db filepath into argparts
-    connection = create_connection("/Users/max/Desktop/sqlite-tools-osx-x64-3440000/FPL") #Constant
+    connection = create_connection("fpl") #Add database directory as constant
     create_table(connection)
     update_db_player_info(connection)
     #dummy_insert(connection)
