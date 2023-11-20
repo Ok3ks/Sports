@@ -1,7 +1,10 @@
 #from utils import Gameweek, Player, League
 import pandas as pd
 import sqlite3
-from sqlite3 import Error
+from sqlite3 import Error, OperationalError
+
+from os.path import realpath,join
+from paths import APP_DIR
 
 from sqlalchemy import Integer, String, create_engine, select
 from sqlalchemy.orm import Mapped, mapped_column
@@ -25,7 +28,6 @@ class Player(Base):
 
     def __repr__(self) -> str:
         return f"Player(player_id={self.player_id}, team={self.team}, position ={self.position}, /player_name={self.player_name})"
-
 
 #Add functions to classes
 def create_connection(db_file):
@@ -55,8 +57,16 @@ def create_table(conn):
         print(e)
     return conn
 
+def rename_columns(conn, mapping:dict):
+    mapping = [(str(key),value,) for key,value in mapping.items()]
+    c = conn.cursor()
+    print(mapping)
+    for item in mapping:
+        rename_table_sql = f"ALTER TABLE EPL_PLAYERS_2023_1ST_HALF RENAME COLUMN '{item[0]}' TO '{item[1]}'"
+        c.execute(rename_table_sql)
+
 def dummy_insert(conn):
-    data = [("Salah", "Midfield", "Liverpool", "2")]
+    data = [("Salah", "Midfield", "Liverpool" "2")]
     data = pd.DataFrame(data)
     insert(conn)
 
@@ -96,9 +106,13 @@ def update_db_player_info(conn):
 
 if __name__ == "__main__":
     #pass -db filepath into argparts
-    connection = create_connection("fpl") #Add database directory as constant
+    connection = create_connection(realpath(join(APP_DIR,"fpl"))) #Add database directory as constant
     create_table(connection)
     update_db_player_info(connection)
+    try:
+        rename_columns(connection, {"0": "player_id", "1":'team', "2": "position", "3": "player_name"})
+    except OperationalError:
+        pass
     #dummy_insert(connection)
 
 #def select_fillings_by_form_type(conn, form_type):

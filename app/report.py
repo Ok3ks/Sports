@@ -1,19 +1,14 @@
-from utils import League, Player, Gameweek,get_player, to_json
-from utils import get_participant_entry, get_gw_transfers
-
-import pandas as pd
-
-from functools import lru_cache
-import os 
-
+from utils import League, Player, Gameweek, to_json
 from paths import WEEKLY_REPORT_DIR
+from functools import lru_cache
+
+import os 
+import pandas as pd
 
 gw = 11
 LEAGUE_ID = 1088941
 
-#Downtown-85647
-#Uptown-1088941
-
+#Refactor to composition instead of inheritance
 class LeagueWeeklyReport(League):
 
     def __init__(self, gw: int, league_id:int):
@@ -57,8 +52,6 @@ class LeagueWeeklyReport(League):
         self.f = self.o_df.merge(self.f, on='entry_id', how='right')
         return self.f
     
-    #get team names
-
     def add_auto_sub(self):
         
         self.f['auto_sub_in_player'] = self.f['auto_subs'].map(lambda x: x['in'])
@@ -94,7 +87,7 @@ class LeagueWeeklyReport(League):
         def out_transfer_stats():
             counts = self.f['element_out'].value_counts().reset_index().to_dict('list')
             most_transf_out = [(counts['element_out'][i], counts['index'][i]) for i in range(3)]
-            least_transf_out = [(counts['element_out'][-i], counts['index'][-i]) for i in range(1,4)]
+            least_transf_out = [(counts['element_out'][-i] , counts['index'][-i]) for i in range(1,4)]
             return {"most_transferred_out": most_transf_out, "least_transferred_out": least_transf_out}
 
         def in_transfer_stats():
@@ -115,9 +108,9 @@ class LeagueWeeklyReport(League):
                 player_in = self.no_chips.iloc[-i,:]['element_in']
                 player_out = self.no_chips.iloc[-i,:]['element_out']
                 points_lost = int(self.no_chips.iloc[-1,:]['delta'])
-                player_id = str(self.no_chips.iloc[-i,:]['entry_id'])
+                participant_id = str(self.no_chips.iloc[-i,:]['entry_id'])
                 
-                worst_transfer_in.append((player_id, player_in, player_out, points_lost))
+                worst_transfer_in.append((participant_id, player_in, player_out, points_lost))
             return {"worst_transfer_in": worst_transfer_in}
 
         def best_transfer_in():
@@ -128,22 +121,22 @@ class LeagueWeeklyReport(League):
                 player_in = self.no_chips.iloc[-i,:]['element_in']
                 player_out = self.no_chips.iloc[-i,:]['element_out']
                 points_gained = int(self.no_chips.iloc[-1,:]['delta'])
-                player_id = str(self.no_chips.iloc[-i,:]['entry_id'])
+                participant_id = str(self.no_chips.iloc[-i,:]['entry_id'])
                 
-                best_transfer_in.append((player_id, player_in, player_out, points_gained))
+                best_transfer_in.append((participant_id, player_in, player_out, points_gained))
             return {"best_transfer_in": best_transfer_in}
         
         def jammy_points():
-            """ """
+            """ Points obtained from the bench """
             jammy_points = []
             self.f= self.f.sort_values(by='auto_sub_in_points', ascending=False)
             for i in range(3):
                 auto_sub_in = self.f.iloc[i,:]['auto_sub_in_player']
                 auto_sub_out = self.f.iloc[i,:]['auto_sub_out_player']
                 auto_sub_points = int(self.f.iloc[i,:]['auto_sub_in_points'])
-                player_id = str(self.f.iloc[i,:]['entry_id'])
+                participant_id = str(self.f.iloc[i,:]['entry_id'])
 
-                jammy_points.append((player_id, auto_sub_in, auto_sub_out, auto_sub_points, ))
+                jammy_points.append((participant_id, auto_sub_in, auto_sub_out, auto_sub_points, ))
             return {"jammy_points": jammy_points}
         
         def most_points_on_bench():
@@ -154,8 +147,8 @@ class LeagueWeeklyReport(League):
             for i in range(3):
                 player_on_bench = self.f.iloc[i,:]['bench'].split(",")
                 points_on_bench = int(self.f.iloc[i,:]['points_on_bench'])
-                player_id = str(self.f.iloc[i,:]['entry_id'])
-                most_points.append((player_id, player_on_bench, points_on_bench))
+                participant_id = str(self.f.iloc[i,:]['entry_id'])
+                most_points.append((participant_id, player_on_bench, points_on_bench),)
             return {"most_points_on_bench" :most_points}
 
         output = {"captain":self.captain, "chips": self.chips }
@@ -181,7 +174,7 @@ if __name__ == "__main__":
 
     parser.add_argument('-g', '--gameweek_id', type= int, help = "Gameweek you are trying to get a report of")
     parser.add_argument('-l', '--league_id', type= int, help = "League_ID you are interested in")
-
+    
     args = parser.parse_args()
 
     test = LeagueWeeklyReport(args.gameweek_id, args.league_id)

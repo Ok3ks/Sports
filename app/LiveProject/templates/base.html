@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Portfolio</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link your CSS file here -->
+    <style>
+        /* Basic styling for demo purposes */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        nav ul li {
+            margin: 0 10px;
+        }
+
+        section {
+            padding: 50px 20px;
+            text-align: center;
+        }
+
+        .project {
+            margin-bottom: 20px;
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#portfolio">Portfolio</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="home">
+        <div>
+            <h1>Your Name</h1>
+            <p>Front-End Developer</p>
+            <!-- You can add a brief intro or any other introductory content here -->
+        </div>
+    </section>
+
+    <section id="about">
+        <div>
+            <h2>About Me</h2>
+            <p>Write something about yourself here.</p>
+            <!-- You can add your skills, experiences, education, etc. -->
+        </div>
+    </section>
+
+    <section id="portfolio">
+        <div style="display: flex; justify-content: center; flex-wrap: wrap;">
+            <div class="project">
+                <img src="project1.jpg" alt="Project 1" style="width: 300px; height: 200px;">
+                <h3>Project 1</h3>
+                <p>Description of Project 1</p>
+            </div>
+            <div class="project">
+                <img src="project2.jpg" alt="Project 2" style="width: 300px; height: 200px;">
+                <h3>Project 2</h3>
+                <p>Description of Project 2</p>
+            </div>
+            <!-- Add more projects as needed -->
+        </div>
+    </section>
+
+    <section id="contact">
+        <div>
+            <h2>Contact Me</h2>
+            <!-- Add a contact form, social media links, or contact information here -->
+            <p>Email: example@example.com</p>
+            <p>Phone: +1234567890</p>
+        </div>
+    </section>
+
+    <!-- You can include JavaScript files or scripts at the end if needed -->
+
+</body>
+
+    <section id = "footer">
+        {% include "footer.html" %}
+    </section>
+    
+</html>

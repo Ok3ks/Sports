@@ -4,20 +4,38 @@ import pandas as pd
 import json
 import numpy as np
 
-import os
+from os.path import join, realpath
+
+from sqlalchemy import Integer, String, create_engine, select
+from sqlalchemy.orm import Session
+
 
 from urls import GW_URL,FIXTURE_URL,TRANSFER_URL, HISTORY_URL
 from urls import H2H_LEAGUE, LEAGUE_URL, FPL_PLAYER
 from functools import lru_cache
 
-with open('/Users/max/Desktop/Sports/app/json/epl_players.json') as ins_3:
-    epl_players = json.load(ins_3)
+from paths import APP_DIR
+from db import Player
 
-#def get_player(id, session = session):
-    
-    #stmt = select(Player).where(Player.player_id == int(id))
-    #obj = session.scalars(stmt).one()
-    #return obj
+pat = realpath(join(APP_DIR, 'fpl'))
+print(pat)
+engine = create_engine(f"sqlite:///{pat}/")
+print(engine)
+session = Session(engine)
+obj = session.execute(select(Player).where(Player.player_name == "Ryan Gravenberch"))
+print(obj.all())
+
+def get_player(id, session = session):
+    out = []
+    if isinstance(id, list):
+        for item in id:
+            stmt = select(Player).where(Player.player_id == int(item))
+            obj = session.scalars(stmt).one()
+            out.append(obj)
+    else:
+        stmt = select(Player).where(Player.player_id == int(id))
+        out = session.scalars(stmt).one()
+    return out
 
 def to_json(x:dict, fp):
 
@@ -26,16 +44,19 @@ def to_json(x:dict, fp):
 
     print(f"{x.keys()} stored in Json successfully")
 
+#with open('/Users/max/Desktop/Sports/app/json/epl_players.json') as ins_3:
+    #epl_players = json.load(ins_3)
+
 #Replace with DB 
-def get_player(player_id):
-        """Obtains player name from id"""
-        out = []
-        if isinstance(player_id, list):
-            for item in player_id:
-                out.append(epl_players.get(str(item)))
-            return out
-        else:
-            return epl_players.get(str(player_id))
+#def get_player(player_id):
+        #"""Obtains player name from id"""
+        #out = []
+        #if isinstance(player_id, list):
+            #for item in player_id:
+                #out.append(epl_players.get(str(item)))
+            #return out
+        #else:
+            #return epl_players.get(str(player_id))
 
 def get_gw_transfers(alist,gw:int, all = False):
     """Input is a list of entry_id. Gw is the gameweek number
@@ -111,6 +132,7 @@ def get_participant_entry(entry_id, gw):
     #time.sleep(3)
     return team_list
 
+#Refresh and add to DB
 class Gameweek(): 
     
     def __init__(self, gw:int):
@@ -161,15 +183,12 @@ class Gameweek():
             print("Invalid ID")
         return int(point[0]) 
         
-
     def basic_stats(self):
         """Measures of Central Tendency for Total points"""
         average = np.mean(self.df['total_points'])
         Q3 = np.percentile(self.df['total_points'], 75)
         Q1 = np.percentile(self.df['total_points'], 25)
         return Q1,average,Q3
-
-
 
 class League():
     def __init__(self, league_id):

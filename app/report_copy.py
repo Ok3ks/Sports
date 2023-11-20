@@ -13,7 +13,6 @@ LEAGUE_ID = 85647
  #cache functions and save compute
 
 
-
 with open('/Users/max/Desktop/Sports/app/json/downtown_players.json') as ins_3:
     participants_json = json.load(ins_3)
 league = League(LEAGUE_ID)
