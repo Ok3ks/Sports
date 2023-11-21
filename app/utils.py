@@ -10,20 +10,21 @@ from sqlalchemy import Integer, String, create_engine, select
 from sqlalchemy.orm import Session
 
 
-from urls import GW_URL,FIXTURE_URL,TRANSFER_URL, HISTORY_URL
-from urls import H2H_LEAGUE, LEAGUE_URL, FPL_PLAYER
+from app.src.urls import GW_URL,FIXTURE_URL,TRANSFER_URL, HISTORY_URL
+from app.src.urls import H2H_LEAGUE, LEAGUE_URL, FPL_PLAYER
 from functools import lru_cache
 
 from paths import APP_DIR
 from db import Player
+from update_gameweek_score import create_connection
 
 pat = realpath(join(APP_DIR, 'fpl'))
 print(pat)
 engine = create_engine(f"sqlite:///{pat}/")
 print(engine)
 session = Session(engine)
-obj = session.execute(select(Player).where(Player.player_name == "Ryan Gravenberch"))
-print(obj.all())
+
+conn = create_connection(realpath(join(APP_DIR,"fpl")))
 
 def get_player(id, session = session):
     out = []
@@ -37,26 +38,21 @@ def get_player(id, session = session):
         out = session.scalars(stmt).one()
     return out
 
+def get_player_stats_from_db(id, gw,conn):
+    #GameweekSc
+    query = f"SELECT * FROM Gameweek_{gw} WHERE player_id = {id}"
+    c = conn.cursor()
+    c.execute(query)
+    print(c.fetchall())
+
+#get_player_stats_from_db(60, 3, conn)
+
 def to_json(x:dict, fp):
 
     with open(fp, 'w') as outs:
         json.dump(x, outs)
 
     print(f"{x.keys()} stored in Json successfully")
-
-#with open('/Users/max/Desktop/Sports/app/json/epl_players.json') as ins_3:
-    #epl_players = json.load(ins_3)
-
-#Replace with DB 
-#def get_player(player_id):
-        #"""Obtains player name from id"""
-        #out = []
-        #if isinstance(player_id, list):
-            #for item in player_id:
-                #out.append(epl_players.get(str(item)))
-            #return out
-        #else:
-            #return epl_players.get(str(player_id))
 
 def get_gw_transfers(alist,gw:int, all = False):
     """Input is a list of entry_id. Gw is the gameweek number
@@ -138,6 +134,7 @@ class Gameweek():
     def __init__(self, gw:int):
         self.gw = gw
 
+
     def weekly_score(self):
         r = requests.get(GW_URL.format(self.gw))
         r = r.json()
@@ -173,6 +170,8 @@ class Gameweek():
         self.df.reset_index(level= 0, names = 'id', inplace = True)
         self.df['event'] = self.gw
         return self.df
+    
+
 
     def get_points(self, id): #extract from DB
         """Obtains player points using ID"""

@@ -20,6 +20,7 @@ from report_app import views
 
 urlpatterns = [
     #path('admin/', admin.site.urls),
-    path('', views.reportView.as_view())
+    #path('league/', views.reportView.as_view())
+    path('',views.reportView.as_view())
 ]
 

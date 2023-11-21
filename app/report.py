@@ -1,12 +1,10 @@
 from utils import League, Player, Gameweek, to_json
-from paths import WEEKLY_REPORT_DIR
+from src.paths import WEEKLY_REPORT_DIR
 from functools import lru_cache
 
 import os 
 import pandas as pd
 
-gw = 11
-LEAGUE_ID = 1088941
 
 #Refactor to composition instead of inheritance
 class LeagueWeeklyReport(League):
@@ -44,7 +42,7 @@ class LeagueWeeklyReport(League):
         self.f['transfers'] = self.f['element_out'].map(lambda x: len(x))
         self.f['delta'] = self.f['transfer_points_in'] - self.f['transfer_points_out']
 
-        self.o_df['entry'] = self.o_df['entry'].astype(int)
+        self.s['entry'] = self.o_df['entry'].astype(int)
         self.o_df.rename(columns={'entry':'entry_id'}, inplace= True)
 
         self.f.reset_index(inplace= True)

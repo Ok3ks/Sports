@@ -27,7 +27,7 @@ class Player(Base):
     player_name: Mapped[str] = mapped_column(String)
 
     def __repr__(self) -> str:
-        return f"Player(player_id={self.player_id}, team={self.team}, position ={self.position}, /player_name={self.player_name})"
+        return f"Player(player_id={self.player_id}, team={self.team}, position ={self.position}, player_name={self.player_name})"
 
 #Add functions to classes
 def create_connection(db_file):
@@ -98,7 +98,9 @@ def update_db_player_info(conn):
     pos_code_to_pos = {item['id'] : item['singular_name'] for item in home['element_types']}
 
     data = [(item['id'], team_code_to_name[item['team_code']], pos_code_to_pos[item['element_type']], item['first_name'] + " " + item['second_name'],) for item in home['elements']]
+    data.columns = ['player_id','team', 'position', 'player_name']
     data = pd.DataFrame(data)
+
 
     insert(conn, data)
     print(f"{len(data)} has been added to the SQLite table")
@@ -113,11 +115,3 @@ if __name__ == "__main__":
         rename_columns(connection, {"0": "player_id", "1":'team', "2": "position", "3": "player_name"})
     except OperationalError:
         pass
-    #dummy_insert(connection)
-
-#def select_fillings_by_form_type(conn, form_type):
-    #cur = conn.cursor()
-    #rs=cur.execute("SELECT * FROM fillings_2021 where form_type='"+form_type+"'")
-    #cols=list(map(lambda x:x[0],rs.description))
-    #df = pd.DataFrame(rs.fetchall(),columns=cols)
-    #return df
