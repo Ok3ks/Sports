@@ -1,6 +1,6 @@
 import json
-from utils import get_player
-from utils import get_participant_entry, get_gw_transfers
+from app.src.utils import get_player
+from app.src.utils import get_participant_entry, get_gw_transfers
 
 with open('reports/weekly_report/1088941_12.json', 'r') as ins:
     obj = json.load(ins)

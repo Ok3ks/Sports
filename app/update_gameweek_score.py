@@ -4,18 +4,19 @@ import sqlite3
 from sqlite3 import Error, OperationalError
 
 from os.path import realpath,join
-from paths import APP_DIR
+from app.src.paths import APP_DIR
 from sqlalchemy import Integer,create_engine, select, String
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import Session,DeclarativeBase
 
 import requests
-from urls import GW_URL
+from app.src.urls import GW_URL
 
 #clean up
 class Base(DeclarativeBase):
     pass
 
+#unused
 class GameweekScores(Base):
     
     __tablename__ = "Gameweek" #issues with dynamically changing gameweek name

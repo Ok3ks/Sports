@@ -14,36 +14,10 @@ from app.src.urls import GW_URL,FIXTURE_URL,TRANSFER_URL, HISTORY_URL
 from app.src.urls import H2H_LEAGUE, LEAGUE_URL, FPL_PLAYER
 from functools import lru_cache
 
-from paths import APP_DIR
-from db import Player
-from update_gameweek_score import create_connection
+from app.src.paths import APP_DIR
+from app.src.db import Player
+from app.update_gameweek_score import create_connection
 
-pat = realpath(join(APP_DIR, 'fpl'))
-print(pat)
-engine = create_engine(f"sqlite:///{pat}/")
-print(engine)
-session = Session(engine)
-
-conn = create_connection(realpath(join(APP_DIR,"fpl")))
-
-def get_player(id, session = session):
-    out = []
-    if isinstance(id, list):
-        for item in id:
-            stmt = select(Player).where(Player.player_id == int(item))
-            obj = session.scalars(stmt).one()
-            out.append(obj)
-    else:
-        stmt = select(Player).where(Player.player_id == int(id))
-        out = session.scalars(stmt).one()
-    return out
-
-def get_player_stats_from_db(id, gw,conn):
-    #GameweekSc
-    query = f"SELECT * FROM Gameweek_{gw} WHERE player_id = {id}"
-    c = conn.cursor()
-    c.execute(query)
-    print(c.fetchall())
 
 #get_player_stats_from_db(60, 3, conn)
 
@@ -52,7 +26,14 @@ def to_json(x:dict, fp):
     with open(fp, 'w') as outs:
         json.dump(x, outs)
 
-    print(f"{x.keys()} stored in Json successfully")
+    print(f"{x.keys()} stored in Json successfully. Find here {fp}")
+
+def get_basic_stats(total_points:list):
+    """Measures of Central Tendency for Total points"""
+    average = np.mean(total_points)
+    Q3 = np.percentile(total_points, 75)
+    Q1 = np.percentile(total_points, 25)
+    return Q1,average,Q3
 
 def get_gw_transfers(alist,gw:int, all = False):
     """Input is a list of entry_id. Gw is the gameweek number
@@ -182,12 +163,7 @@ class Gameweek():
             print("Invalid ID")
         return int(point[0]) 
         
-    def basic_stats(self):
-        """Measures of Central Tendency for Total points"""
-        average = np.mean(self.df['total_points'])
-        Q3 = np.percentile(self.df['total_points'], 75)
-        Q1 = np.percentile(self.df['total_points'], 25)
-        return Q1,average,Q3
+
 
 class League():
     def __init__(self, league_id):
@@ -210,6 +186,17 @@ class League():
             time.sleep(2)
         return self.participants
     
+    def get_participant_name(self):
+        """ Creates participant id to name hash table """
+        assert len(self.participants) > 0, 'No participants, call obtain_league_participants() first'
+        output = {str(participant['entry']) : participant['entry_name'] for participant in self.participants}
+        return output
+    
+
+    #return highest climb of the week 
+    #return descent of the week 
+    #plot of league positions over the weeks
+    
     def get_all_participant_entries(self,gw):
         self.obtain_league_participants()
         self.participant_entries = [get_participant_entry(participant['entry'],gw) for participant in self.participants]
@@ -224,11 +211,8 @@ class League():
             self.transfers = get_gw_transfers(self.entry_ids,gw)
         return self.transfers
     
-#Participant class
 
-#class Participant():
-    #def __init__(self,entry_id, player_name, entry_name, gw_total):
-        #self.entry_id = entry_id
-        #self.player_name = player_name
-        #self.entry_name = entry_name
-        #self.gw_total = gw_total
+if __name__ == "__main__":
+    league = League(1088941)
+    league.obtain_league_participants()
+    print(league.participants)

@@ -293,6 +293,19 @@ def test_league_endpoint():
     assert type(r['standings']['results']) == list
     assert type(r['new_entries']['results']) == list 
 
+    participant_info = r['standings']['results'][0]
+
+    assert 'id' in participant_info
+    assert 'event_total' in participant_info
+    assert 'player_name' in participant_info
+    assert 'rank' in participant_info
+    assert 'last_rank' in participant_info
+    assert 'rank_sort' in participant_info
+    assert 'total' in participant_info
+    assert 'entry' in participant_info
+    assert 'entry_name' in participant_info
+
+
 def test_fpl_player_endpoint():
     
     player_id = 293449

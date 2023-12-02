@@ -4,14 +4,54 @@ import sqlite3
 from sqlite3 import Error, OperationalError
 
 from os.path import realpath,join
-from paths import APP_DIR
+from app.src.paths import APP_DIR
 
 from sqlalchemy import Integer, String, create_engine, select
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import Session,DeclarativeBase
 
 import requests
-from urls import FPL_URL
+from app.src.urls import FPL_URL
+
+def create_connection(db_file):
+    conn = None
+    try:
+        conn = sqlite3.connect(db_file)
+        print("Connection has been created successfully")
+        return conn
+    except Error as e:
+        print(e)
+    return conn
+
+pat = realpath(join(APP_DIR, 'fpl'))
+print(pat)
+engine = create_engine(f"sqlite:///{pat}/")
+print(engine)
+session = Session(engine)
+
+conn = create_connection(realpath(join(APP_DIR,"fpl")))
+
+def get_player(id, session = session):
+    out = []
+    if isinstance(id, list):
+        for item in id:
+            stmt = select(Player).where(Player.player_id == int(item))
+            obj = session.scalars(stmt).one()
+            print(obj)
+            out.append(obj.player_name)
+    else:
+        stmt = select(Player).where(Player.player_id == int(id))
+        out = session.scalars(stmt).one()
+        out = out.player_name
+        #print(obj.player_name)
+    return out
+
+def get_player_stats_from_db(id, gw,conn):
+    #GameweekSc
+    query = f"SELECT * FROM Gameweek_{gw} WHERE player_id = {id}"
+    c = conn.cursor()
+    c.execute(query)
+    print(c.fetchall())
 
 #clean up
 
@@ -30,15 +70,7 @@ class Player(Base):
         return f"Player(player_id={self.player_id}, team={self.team}, position ={self.position}, player_name={self.player_name})"
 
 #Add functions to classes
-def create_connection(db_file):
-    conn = None
-    try:
-        conn = sqlite3.connect(db_file)
-        print("Connection has been created successfully")
-        return conn
-    except Error as e:
-        print(e)
-    return conn
+
 
 def create_table(conn):
     try:

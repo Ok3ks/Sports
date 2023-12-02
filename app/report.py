@@ -1,10 +1,12 @@
-from utils import League, Player, Gameweek, to_json
+from app.src.utils import League, Player, Gameweek, to_json
 from src.paths import WEEKLY_REPORT_DIR
 from functools import lru_cache
 
 import os 
 import pandas as pd
+from src.utils import get_basic_stats
 
+from src.db import get_player, get_player_stats_from_db
 
 #Refactor to composition instead of inheritance
 class LeagueWeeklyReport(League):
@@ -42,7 +44,7 @@ class LeagueWeeklyReport(League):
         self.f['transfers'] = self.f['element_out'].map(lambda x: len(x))
         self.f['delta'] = self.f['transfer_points_in'] - self.f['transfer_points_out']
 
-        self.s['entry'] = self.o_df['entry'].astype(int)
+        self.f['entry'] = self.o_df['entry'].astype(int)
         self.o_df.rename(columns={'entry':'entry_id'}, inplace= True)
 
         self.f.reset_index(inplace= True)
@@ -60,12 +62,15 @@ class LeagueWeeklyReport(League):
     def create_report(self,fp):
 
         self.captain = self.o_df['captain'].value_counts().to_dict()
+        self.captain = {get_player(id = key):value for key,value in self.captain.items()}
         self.chips = self.o_df['active_chip'].value_counts().to_dict()
         self.no_chips = self.f[self.f['active_chip'].isna()]
+        self.participants= self.get_participant_name()
+        print(self.participants)
 
         #buggy
         def outliers():
-            Q1,league_average,Q3 = self.gameweek.basic_stats()
+            Q1,league_average,Q3 = get_basic_stats(self.o_df['total_points'])
             IQR = Q3 - Q1
 
             exceptional_df = self.o_df[self.o_df['total_points'] > Q3 +1.5*IQR]
@@ -75,53 +80,54 @@ class LeagueWeeklyReport(League):
             abysmal = []
 
             for i,j in zip(exceptional_df['entry_id'], exceptional_df['total_points']):
-                exceptional.append((i,j))
+                exceptional.append((self.participants[str(i)],j))
 
             for i,j in zip(abysmal_df['entry_id'], abysmal_df['total_points']):
-                abysmal.append((i,j))
+                abysmal.append((self.participants[str(i)],j))
 
             return {"exceptional": exceptional ,"abysmal": abysmal, "league_average": league_average}
 #       
         def out_transfer_stats():
             counts = self.f['element_out'].value_counts().reset_index().to_dict('list')
-            most_transf_out = [(counts['element_out'][i], counts['index'][i]) for i in range(3)]
-            least_transf_out = [(counts['element_out'][-i] , counts['index'][-i]) for i in range(1,4)]
+            most_transf_out = [(counts['element_out'][i], get_player(counts['index'][i])) for i in range(3)]
+            least_transf_out = [(counts['element_out'][-i] , get_player(counts['index'][-i])) for i in range(1,4)]
             return {"most_transferred_out": most_transf_out, "least_transferred_out": least_transf_out}
 
         def in_transfer_stats():
             """Output = {"most_transferred_in" : [], "least_transferred_in": []}"""
 
             counts = self.f['element_in'].value_counts().reset_index().to_dict('list')
-            most_transf_in = [(counts['element_in'][i], counts['index'][i]) for i in range(3)]
-            least_transf_in = [(counts['element_in'][-i], counts['index'][-i]) for i in range(1,4)] #because -0 == 0
+            most_transf_in = [(counts['element_in'][i], get_player(counts['index'][i])) for i in range(3)]
+            least_transf_in = [(counts['element_in'][-i] , get_player(counts['index'][-i])) for i in range(1,4)] #because -0 == 0
             return {"most_transferred_in" :most_transf_in, "least_transferred_in": least_transf_in}
 #
-        self.no_chips = self.no_chips.sort_values(by = 'delta', ascending=False)
 
         def worst_transfer_in():
             """Output = {"worst_transfer_in":[()]}"""
             worst_transfer_in = []
 
+            self.no_chips = self.no_chips.sort_values(by = 'delta', ascending=False)
             for i in range(1,3):
                 player_in = self.no_chips.iloc[-i,:]['element_in']
                 player_out = self.no_chips.iloc[-i,:]['element_out']
-                points_lost = int(self.no_chips.iloc[-1,:]['delta'])
+                points_lost = int(self.no_chips.iloc[-i,:]['delta'])
                 participant_id = str(self.no_chips.iloc[-i,:]['entry_id'])
                 
-                worst_transfer_in.append((participant_id, player_in, player_out, points_lost))
+                worst_transfer_in.append((self.participants[participant_id], get_player(id =player_in), get_player(id =player_out), points_lost))
             return {"worst_transfer_in": worst_transfer_in}
 
         def best_transfer_in():
             """Output = {"best_transfer_in":[()]}"""
             best_transfer_in = []
 
+            self.no_chips = self.no_chips.sort_values(by = 'delta', ascending=False)
             for i in range(1,3):
-                player_in = self.no_chips.iloc[-i,:]['element_in']
-                player_out = self.no_chips.iloc[-i,:]['element_out']
-                points_gained = int(self.no_chips.iloc[-1,:]['delta'])
-                participant_id = str(self.no_chips.iloc[-i,:]['entry_id'])
+                player_in = self.no_chips.iloc[i,:]['element_in']
+                player_out = self.no_chips.iloc[i,:]['element_out']
+                points_gained = int(self.no_chips.iloc[i,:]['delta'])
+                participant_id = str(self.no_chips.iloc[i,:]['entry_id'])
                 
-                best_transfer_in.append((participant_id, player_in, player_out, points_gained))
+                best_transfer_in.append((self.participants[participant_id], get_player(id =player_in), get_player(id =player_out), points_gained))
             return {"best_transfer_in": best_transfer_in}
         
         def jammy_points():
@@ -134,7 +140,7 @@ class LeagueWeeklyReport(League):
                 auto_sub_points = int(self.f.iloc[i,:]['auto_sub_in_points'])
                 participant_id = str(self.f.iloc[i,:]['entry_id'])
 
-                jammy_points.append((participant_id, auto_sub_in, auto_sub_out, auto_sub_points, ))
+                jammy_points.append((self.participants[participant_id], get_player(id =auto_sub_in), get_player(id =auto_sub_out), auto_sub_points))
             return {"jammy_points": jammy_points}
         
         def most_points_on_bench():
@@ -146,7 +152,7 @@ class LeagueWeeklyReport(League):
                 player_on_bench = self.f.iloc[i,:]['bench'].split(",")
                 points_on_bench = int(self.f.iloc[i,:]['points_on_bench'])
                 participant_id = str(self.f.iloc[i,:]['entry_id'])
-                most_points.append((participant_id, player_on_bench, points_on_bench),)
+                most_points.append((self.participants[participant_id], player_on_bench, points_on_bench),)
             return {"most_points_on_bench" :most_points}
 
         output = {"captain":self.captain, "chips": self.chips }
@@ -154,6 +160,7 @@ class LeagueWeeklyReport(League):
   
         output.update(out_transfer_stats())
         output.update(in_transfer_stats())
+
 
         output.update(best_transfer_in())
         output.update(worst_transfer_in())
@@ -176,6 +183,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     test = LeagueWeeklyReport(args.gameweek_id, args.league_id)
+
     test.weekly_score_transformation()
     test.merge_league_weekly_transfer()
     test.add_auto_sub()

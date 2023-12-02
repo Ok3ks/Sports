@@ -1,6 +1,6 @@
 #cache functions and save compute
-from utils import League, Gameweek, get_player
-from utils import get_participant_entry, get_gw_transfers
+from app.src.utils import League, Gameweek, get_player
+from app.src.utils import get_participant_entry, get_gw_transfers
 import pandas as pd
 import numpy as np
 import json
@@ -10,7 +10,7 @@ LEAGUE_ID = 85647
 
 #Downtown-85647
 #Uptown-1088941
- #cache functions and save compute
+#cache functions and save compute
 
 
 with open('/Users/max/Desktop/Sports/app/json/downtown_players.json') as ins_3:
