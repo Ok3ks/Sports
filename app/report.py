@@ -13,6 +13,7 @@ class LeagueWeeklyReport(League):
 
     def __init__(self, gw: int, league_id:int):
         super().__init__(league_id)
+        self.gw = gw
         self.gameweek = Gameweek(gw)
 
     @lru_cache
@@ -21,26 +22,28 @@ class LeagueWeeklyReport(League):
         
         self.gameweek.weekly_score()
         
-        one_df = pd.DataFrame(self.get_all_participant_entries(self.gameweek.gw))
+        one_df = pd.DataFrame(self.get_all_participant_entries(self.gw))
         self.o_df = one_df[~one_df['players'].isna()]
 
-        self.o_df['points_breakdown'] = self.o_df['players'].map(lambda x: [self.gameweek.get_points(y) for y in x.split(",")])
-        self.o_df['captain_points'] = self.o_df['captain'].map(lambda x: self.gameweek.get_points(x) * 2)
-        self.o_df['vice_captain_points'] = self.o_df['vice_captain'].map(lambda x: self.gameweek.get_points(x))
+        
+        self.o_df['points_breakdown'] = self.o_df['players'].map(lambda x: [get_player_stats_from_db(y, self.gw)[0] for y in x.split(",")])
+        self.o_df['captain_points'] = self.o_df['captain'].map(lambda x: get_player_stats_from_db(x, self.gw)[0] * 2)
+        self.o_df['vice_captain_points'] = self.o_df['vice_captain'].map(lambda x: get_player_stats_from_db(x, self.gw)[0])
         
         self.o_df['rank'] = self.o_df['total_points'].rank(ascending=False)
         self.o_df['rank'] = self.o_df['rank'].map(int)
+        print(self.o_df)
         return self.o_df
 
     @lru_cache
     def merge_league_weekly_transfer(self):
 
         """Merges Weekly score dataframe with transfers dataframe"""
-        self.f = pd.DataFrame(self.get_gw_transfers(self.gameweek.gw))
+        self.f = pd.DataFrame(self.get_gw_transfers(self.gw))
         self.f = self.f.T
 
-        self.f['transfer_points_in'] = self.f['element_in'].map(lambda x: sum([self.gameweek.get_points(y) for y in x]))
-        self.f['transfer_points_out'] = self.f['element_out'].map(lambda x:sum([self.gameweek.get_points(y) for y in x]))
+        self.f['transfer_points_in'] = self.f['element_in'].map(lambda x: sum([get_player_stats_from_db(y, self.gw)[0] for y in x]))
+        self.f['transfer_points_out'] = self.f['element_out'].map(lambda x:sum([get_player_stats_from_db(y, self.gw)[0]for y in x]))
         self.f['transfers'] = self.f['element_out'].map(lambda x: len(x))
         self.f['delta'] = self.f['transfer_points_in'] - self.f['transfer_points_out']
 
@@ -56,19 +59,22 @@ class LeagueWeeklyReport(League):
         
         self.f['auto_sub_in_player'] = self.f['auto_subs'].map(lambda x: x['in'])
         self.f['auto_sub_out_player'] = self.f['auto_subs'].map(lambda x: x['out'])
-        self.f['auto_sub_in_points'] = self.f['auto_sub_in_player'].map(lambda x: sum([self.gameweek.get_points(y) for y in x]))
-        self.f['auto_sub_out_points'] = self.f['auto_sub_in_player'].map(lambda x: sum([self.gameweek.get_points(y) for y in x]))
+        self.f['auto_sub_in_points'] = self.f['auto_sub_in_player'].map(lambda x: sum(get_player_stats_from_db(x, self.gw)[0] for y in x]))
+        self.f['auto_sub_out_points'] = self.f['auto_sub_in_player'].map(lambda x: sum(get_player_stats_from_db(x, self.gw)[0] for y in x]))
         
-    def create_report(self,fp):
+    def create_report(self,fp,gw):
 
         self.captain = self.o_df['captain'].value_counts().to_dict()
-        self.captain = {get_player(id = key):value for key,value in self.captain.items()}
         self.chips = self.o_df['active_chip'].value_counts().to_dict()
         self.no_chips = self.f[self.f['active_chip'].isna()]
         self.participants= self.get_participant_name()
-        print(self.participants)
 
-        #buggy
+        print(self.o_df['rank'])
+
+        def captain(gw):
+            self.captain = {get_player(id = key):(value, get_player_stats_from_db(key, gw)[0] * 2,) for key,value in self.captain.items()}
+            return self.captain
+
         def outliers():
             Q1,league_average,Q3 = get_basic_stats(self.o_df['total_points'])
             IQR = Q3 - Q1
@@ -154,8 +160,10 @@ class LeagueWeeklyReport(League):
                 participant_id = str(self.f.iloc[i,:]['entry_id'])
                 most_points.append((self.participants[participant_id], player_on_bench, points_on_bench),)
             return {"most_points_on_bench" :most_points}
-
-        output = {"captain":self.captain, "chips": self.chips }
+        
+        self.captain = captain(gw)
+        output = {"captain": self.captain, "chips": self.chips }
+        #output = {"chips": self.chips }
         output.update(outliers())
   
         output.update(out_transfer_stats())
@@ -189,4 +197,4 @@ if __name__ == "__main__":
     test.add_auto_sub()
 
     #output_name = os.path.join(REPORT_DIR, str(args.league_id)+'_'+ str(args.gameweek_id))
-    test.create_report(f"{WEEKLY_REPORT_DIR}/{str(args.league_id)}_{str(args.gameweek_id)}.json")  #Move to S3
+    #test.create_report(f"{WEEKLY_REPORT_DIR}/{str(args.league_id)}_{str(args.gameweek_id)}.json", args.gameweek_id)  #Move to S3

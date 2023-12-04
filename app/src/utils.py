@@ -107,62 +107,8 @@ def get_participant_entry(entry_id, gw):
                     else: 
                         team_list['bench'] = team_list['bench'] + ','+ str(item['element'])
     #time.sleep(3)
+
     return team_list
-
-#Refresh and add to DB
-class Gameweek(): 
-    
-    def __init__(self, gw:int):
-        self.gw = gw
-
-
-    def weekly_score(self):
-        r = requests.get(GW_URL.format(self.gw))
-        r = r.json()
-
-        temp = {item['id']:item['stats'] for item in r['elements']}
-        self.df = pd.DataFrame(temp)
-        self.df = self.df.T
-        self.df.columns = ['minutes',
-            'goals_scored',
-            'assists',
-            'clean_sheets',
-            'goals_conceded',
-            'own_goals',
-            'penalties_saved',
-            'penalties_missed',
-            'yellow_cards',
-            'red_cards',
-            'saves',
-            'bonus',
-            'bps',
-            'influence',
-            'creativity',
-            'threat',
-            'ict_index',
-            'starts',
-            'expected_goals',
-            'expected_assists',
-            'expected_goal_involvements',
-            'expected_goals_conceded',
-            'total_points',
-            'in_dreamteam']
-
-        self.df.reset_index(level= 0, names = 'id', inplace = True)
-        self.df['event'] = self.gw
-        return self.df
-    
-
-
-    def get_points(self, id): #extract from DB
-        """Obtains player points using ID"""
-        try:
-            assert int(id) in self.df['id'].astype(int), 'All_df is not updated'
-            point = self.df[self.df['id'] == int(id)]['total_points'].values.tolist()
-        except KeyError:
-            print("Invalid ID")
-        return int(point[0]) 
-        
 
 
 class League():
