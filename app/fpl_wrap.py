@@ -84,15 +84,6 @@ if __name__ == "__main__":
     for i in all_df.columns:
         print(all_df[i].dtypes)
 
-
-    captain_bar_chart = so.Plot(all_df, x = 'captain').add(so.Bars(), so.Count())\
-        .scale(y = so.Continuous().tick(every=1))\
-        .label(y = "Count")
-            
-   
-    os.makedirs(realpath(join(FPL_WRAP_DIR, str(args.player_id))), exist_ok=True)
-    captain_bar_chart.save(realpath(join(FPL_WRAP_DIR, str(args.player_id), 'captain_bar_chart.png')))
-
     r = requests.get(HISTORY_URL.format(args.player_id))
     r = r.json()
 
@@ -104,6 +95,14 @@ if __name__ == "__main__":
     history.rename(columns={'event':'gameweek'}, inplace=True)
     history.set_index("gameweek", inplace=True)
 
+
+    captain_bar_chart = so.Plot(all_df, x = 'captain').add(so.Bars(), so.Count())\
+        .scale(y = so.Continuous().tick(every=1))\
+        .label(y = "Count")
+            
+   
+    os.makedirs(realpath(join(FPL_WRAP_DIR, str(args.player_id))), exist_ok=True)
+    captain_bar_chart.save(realpath(join(FPL_WRAP_DIR, str(args.player_id), 'captain_bar_chart.png')))
 
     points_on_bench =  so.Plot(all_df, y = 'points_on_bench',  x="gw")\
                     .add(so.Lines())\
@@ -121,12 +120,6 @@ if __name__ == "__main__":
         color=so.Continuous().tick(at=history.index))
     line_plot.save(realpath(join(FPL_WRAP_DIR, str(args.player_id), 'line_plot.png')))
 
-    money_in_bank_plot = so.Plot(history, x = 'gameweek',  y="bank")\
-                .add(so.Lines(color= 'C1'))\
-                .scale(x=so.Continuous().tick(every=1),
-        color=so.Continuous().tick(at=history.index))
-    money_in_bank_plot.save(realpath(join(FPL_WRAP_DIR, str(args.player_id), 'money_in_the_bank.png')))    
-
     rank_plot = so.Plot(history, x = 'gameweek',  y="overall_rank")\
                 .add(so.Lines(color= 'C1'))\
                 .scale(x=so.Continuous().tick(every=1),
@@ -135,5 +128,3 @@ if __name__ == "__main__":
         .limit(y = (2_000_000, 0))\
         .label(title= "Overall rank versus gameweek", )
     rank_plot.save(realpath(join(FPL_WRAP_DIR, str(args.player_id), 'rank_plot.png')))  
-
-    length_of_ownership = frequency_counter(grand_dict, key = 'players')

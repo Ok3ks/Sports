@@ -1,45 +1,67 @@
-<p>Captainship statistics is </p>
-    <h4>
-    {% for key in captain.items %}
-        <ul>{{ key.0 }}  was captained {{ key.1 }} times </ul>
+<p>Captainship </p>
+    {% for key in captain %}
+        <ul>{{ key.0}}  was captained by {{ key.1 }} player{{ key.1|pluralize }} scoring <b>{{ key.2 }}</b> points </ul>
     {% endfor %}
-    </h4>
+    
 
     This gameweek, certain players activated their chips: 
     {% for key in chips.items %}
-        <ul>{{ key.0 }}  was activated by {{ key.1 }} players </ul>
+        <ul>{{ key.0 }}  was activated by {{ key.1 }} player{{ key.1|pluralize }}  </ul>
     {% endfor %}
+<div>
+<p>League average is <b>{{ league_average|floatformat:0 }} points</b></p>
 
-League average is {{ league_average }}
-<p>Top performers this gameweek</p>
-    {% for team in exceptional.items %}
-        <ul> {{ team.0 }} scored {{ team.1}} points </li>
-    {%endfor%}
+    <p>Top performers this gameweek:
+        {% for team in exceptional %}
+            <ul> 
+            <li><b>{{ team.0 }}</b> scored {{ team.1}} points </li>
+            </ul>
+        {%endfor%}</p>
 
-Worst performers this gameweek:
-    {% for team in abysmal.items %}
-        <ul>{{ team.0 }} scored {{ team.1 }} points</ul>
-    {% endfor %}
-
-<p>Gameweek transfers with highest net points</p>
+    <p>Worst performers this gameweek:
+        {% for team in abysmal %}
+            <ul>
+            <li>{{ team.0 }} scored <b>{{ team.1 }}</b> points</li>
+            </ul>
+        {% endfor %}</p>
+</div>
+<div>
+Gameweek transfers with highest net points</p>
     {% for team in best_transfer_in %}
-        <ul>Team name - {{ team.0 }}, Players in - {{ team.1 }}, Players out - {{ team.2 }}, Points gained - {{ team.3 }}</ul>
+        <ul>
+        <li>Team name - <b>{{ team.0 }}</b>, Points gained - <b>{{ team.3 }}</b></b>,
+            <p> Players in - {{ team.1 }},</p> 
+            <p>Players out - {{ team.2 }},</p></li>
+        </ul>
     {% endfor %}
+</div>
 
-Gameweek transfers which perhaps should not have happened, at least for this gameweek:
+Gameweek transfers which perhaps should not have happened this gameweek:
     {% for team in worst_transfer_in %}
-        <ul>Team name - {{ team.0 }}, Players in - {{ team.1 }}, Players out - {{ team.2 }}, Points lost - {{ team.3 }}</ul>
-    {%endfor%}
-
-Teams with most points on the bench:
-    {% for team in most_points %}
-        <ul>Team name - {{ team.0 }}, Players - {{ team.1 }}, Points benched - {{ team.2 }}</ul>
+        <ul>
+        <li>Team name - <b>{{ team.0 }}</b>, Points lost <b>{{ team.3 }}</b></b>,
+            <p> Players in - {{ team.1 }},</p> 
+            <p>Players out - {{ team.2 }},</p></li>
+        </ul>
     {%endfor%}
 
 Lucky Auto-sub merchants:
     {% for team in jammy_points %}
-        <ul>Team name - {{ team.0 }}, {{ team.1 }} subbed in for {{ team.2 }}, Points gained - {{ team.3 }}</ul>
+        <ul>
+        <li>Team name - <b>{{ team.0 }}</b> Points gained - <b>{{ team.3 }}</b>
+        <p>Sub out - {{ team.2 }},</p>
+        <p>Sub in = {{ team.1 }}</p></li>
+        </ul>
     {% endfor %}
+
+Teams with most points on the bench:
+    {% for team in most_points_on_bench %}
+        <ul>
+        <li><p>Team name - {{ team.0 }}, Points benched - <b>{{ team.2 }}</b></p>
+        <p>Players - {{ team.1 }}</p></li>
+        </ul>
+    {%endfor%}
+
 
 League's Most transferred in:
     {% for team in most_transferred_in %}

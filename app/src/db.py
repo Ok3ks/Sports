@@ -4,14 +4,14 @@ import sqlite3
 from sqlite3 import Error, OperationalError
 
 from os.path import realpath,join
-from app.src.paths import APP_DIR
+from src.paths import APP_DIR
 
 from sqlalchemy import Integer, String, create_engine, select
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import Session,DeclarativeBase
 
 import requests
-from app.src.urls import FPL_URL
+from src.urls import FPL_URL
 
 def create_connection(db_file):
     conn = None
@@ -37,7 +37,6 @@ def get_player(id, session = session):
         for item in id:
             stmt = select(Player).where(Player.player_id == int(item))
             obj = session.scalars(stmt).one()
-            print(obj)
             out.append(obj.player_name)
     else:
         stmt = select(Player).where(Player.player_id == int(id))
@@ -46,12 +45,14 @@ def get_player(id, session = session):
         #print(obj.player_name)
     return out
 
-def get_player_stats_from_db(id, gw,conn):
+#ORM for each gameweek
+def get_player_stats_from_db(id, gw,conn = conn):
     #GameweekSc
-    query = f"SELECT * FROM Gameweek_{gw} WHERE player_id = {id}"
+    query = f"SELECT total_points FROM Gameweek_{gw} WHERE player_id={id}"
     c = conn.cursor()
     c.execute(query)
-    print(c.fetchall())
+    #print(c.fetchall())
+    return c.fetchone()
 
 #clean up
 
@@ -130,9 +131,8 @@ def update_db_player_info(conn):
     pos_code_to_pos = {item['id'] : item['singular_name'] for item in home['element_types']}
 
     data = [(item['id'], team_code_to_name[item['team_code']], pos_code_to_pos[item['element_type']], item['first_name'] + " " + item['second_name'],) for item in home['elements']]
-    data.columns = ['player_id','team', 'position', 'player_name']
     data = pd.DataFrame(data)
-
+    data.columns = ['player_id','team', 'position', 'player_name']
 
     insert(conn, data)
     print(f"{len(data)} has been added to the SQLite table")

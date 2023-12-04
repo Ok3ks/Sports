@@ -12,7 +12,7 @@ def home(request):
 class reportView(TemplateView):
     template_name = "report.txt"
 
-    def get_context_data(self, file = '/Users/max/Desktop/Sports/app/LiveProject/templates/85647_13.json'): #compartmentalize and build better fronted
+    def get_context_data(self, file = '/Users/max/Desktop/Sports/app/LiveProject/templates/1088941_14.json'): #compartmentalize and build better fronted
         context = super().get_context_data()
         with open (file, 'r') as ins:
             context = json.load(ins)
