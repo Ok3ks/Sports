@@ -18,9 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from report_app import views
 
-urlpatterns = [
-    #path('admin/', admin.site.urls),
-    #path('league/', views.reportView.as_view())
-    path('',views.reportView.as_view())
+urlpatterns = [ #path('admin/', admin.site.urls),
+    path('report/<int:id>', views.reportView.as_view(), name = 'report'),
+    path('',views.display)
 ]
-
