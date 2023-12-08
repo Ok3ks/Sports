@@ -1,1 +1,0 @@
-export RAPID_API_KEY="704d35bb14mshd7e026982fa4bcdp1b26ffjsn10fa9b163c5f"
