@@ -35,6 +35,7 @@ class SpanReport():
         return self.o_df
     
 #now analyse the span like others
+#span report for leagues
 
 if __name__ == "__main__":
     

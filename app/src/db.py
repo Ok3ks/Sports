@@ -54,8 +54,6 @@ def get_player_stats_from_db(id, gw,conn = conn):
     #print(c.fetchall())
     return c.fetchone()
 
-#clean up
-
 class Base(DeclarativeBase):
     pass
 
