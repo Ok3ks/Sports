@@ -259,8 +259,6 @@ def test_league_endpoint():
    
    
     league_keys = r['league']
-    new_entries_keys = r['new_entries']
-    standings_keys = r['standings']
 
     assert 'id' in league_keys  
     assert 'name' in league_keys    
@@ -277,13 +275,15 @@ def test_league_endpoint():
     assert 'rank' in league_keys
 
     assert len(league_keys) == 13, "Keys have changed"
-
+    
+    new_entries_keys = r['new_entries']
     assert 'has_next' in new_entries_keys
     assert 'page' in new_entries_keys
     assert 'results' in new_entries_keys
 
     assert(len(new_entries_keys)) == 3, "Keys have changed"
-
+    
+    standings_keys = r['standings']
     assert 'has_next' in standings_keys
     assert 'page' in standings_keys
     assert 'results' in standings_keys
@@ -309,18 +309,19 @@ def test_league_endpoint():
 def test_fpl_player_endpoint():
     
     player_id = 293449
-    gw = 11
+    gw = 1
 
     r = requests.get(FPL_PLAYER.format(player_id, gw))
-    assert r.status_code == 200, 'Endpoint unavailable, add player_id and gameweek'
+    assert r.status_code == 200, 'Endpoint unavailable, check player_id and gameweek'
+
     r = r.json()    
     assert type(r) == dict
 
     keys = r.keys()
 
-    assert 'active_chip' in keys
-    assert 'automatic_subs' in keys
-    assert 'entry_history' in keys
+    assert 'active_chip' in keys, "Keys have changed"
+    assert 'automatic_subs' in keys, "Keys have changed"
+    assert 'entry_history' in keys, "Keys have changed"
     assert 'picks' in keys
 
     assert len(keys) == 4, "Keys have changed"
@@ -594,4 +595,4 @@ def test_fpl_url_endpoint():
 
 
 if __name__ == "__main__":
-    test_fpl_url_endpoint()
+    test_transfer_endpoint()
