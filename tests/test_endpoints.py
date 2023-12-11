@@ -1,4 +1,4 @@
-from app.src.urls import GW_URL, FIXTURE_URL, TRANSFER_URL, HISTORY_URL, H2H_LEAGUE,LEAGUE_URL, FPL_PLAYER, FPL_URL
+from src.urls import GW_URL, FIXTURE_URL, TRANSFER_URL, HISTORY_URL, H2H_LEAGUE,LEAGUE_URL, FPL_PLAYER, FPL_URL
 
 import pytest
 import requests
@@ -359,8 +359,8 @@ def test_fpl_url_endpoint():
     assert r.status_code == 200, "Endpoint unavailable"
 
     r = r.json()
-
     keys = list(r.keys())
+
     assert 'events' in keys
     assert 'game_settings' in keys
     assert 'phases' in keys
@@ -373,6 +373,7 @@ def test_fpl_url_endpoint():
     assert type(r['events']) == list
     assert type(r['events'][0]) == dict
     event_keys = list(r['events'][0])
+
     assert 'id' in event_keys
     assert 'name' in event_keys
     assert 'deadline_time' in event_keys
@@ -401,26 +402,48 @@ def test_fpl_url_endpoint():
 
     assert type(r['game_settings']) == dict
     game_settings_keys = r['game_settings'].keys()
+    
     assert 'league_join_private_max'  in game_settings_keys
     assert 'league_join_public_max'  in game_settings_keys
     assert 'league_max_size_public_classic'  in game_settings_keys
+
     assert 'league_max_size_public_h2h'  in game_settings_keys
     assert 'league_max_size_private_h2h'  in game_settings_keys
     assert 'league_max_ko_rounds_private_h2h'  in game_settings_keys
     assert 'league_prefix_public'  in game_settings_keys
+
     assert 'league_points_h2h_win'  in game_settings_keys
     assert 'league_points_h2h_lose'  in game_settings_keys
     assert 'league_points_h2h_draw'  in game_settings_keys
     assert 'league_ko_first_instead_of_random'  in game_settings_keys
+
     assert 'cup_start_event_id'  in game_settings_keys
     assert 'cup_stop_event_id'  in game_settings_keys
     assert 'cup_qualifying_method'  in game_settings_keys
     assert 'sys_vice_captain_enabled'  in game_settings_keys
+
+    assert 'squad_total_spend'  in game_settings_keys
+    assert 'squad_team_limit'  in game_settings_keys
+    assert 'squad_squadsize'  in game_settings_keys
+    assert 'squad_squadplay'  in game_settings_keys
+
+    assert 'cup_type'  in game_settings_keys
+    assert 'featured_entries'  in game_settings_keys 
+
+    assert 'stats_form_days'  in game_settings_keys
+    assert 'ui_special_shirt_exclusions'  in game_settings_keys
+    assert 'ui_use_special_shirts'  in game_settings_keys
+    assert 'ui_currency_multiplier'  in game_settings_keys
+
     assert 'transfers_cap'  in game_settings_keys
     assert 'transfers_sell_on_fee'  in game_settings_keys
     assert 'league_h2h_tiebreak_stats'  in game_settings_keys
     assert 'timezone'  in game_settings_keys
-    assert len(r['game_settings']) == 28, 'Keys have changed'
+    
+    print(r['game_settings'])
+
+    assert len(r['game_settings']) == 29, 'Keys have changed'
+    
 
     assert type(r['phases']) == list
     assert type(r['phases'][0]) == dict

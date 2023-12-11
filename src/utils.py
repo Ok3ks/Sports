@@ -10,13 +10,12 @@ from sqlalchemy import Integer, String, create_engine, select
 from sqlalchemy.orm import Session
 
 
-from app.src.urls import GW_URL,FIXTURE_URL,TRANSFER_URL, HISTORY_URL
-from app.src.urls import H2H_LEAGUE, LEAGUE_URL, FPL_PLAYER
+from src.urls import GW_URL,FIXTURE_URL,TRANSFER_URL, HISTORY_URL
+from src.urls import H2H_LEAGUE, LEAGUE_URL, FPL_PLAYER
 from functools import lru_cache
 
-from app.src.paths import APP_DIR
-from app.src.db import Player
-from app.update_gameweek_score import create_connection
+from src.paths import APP_DIR
+from src.db import Player
 
 from typing import List, Union
 

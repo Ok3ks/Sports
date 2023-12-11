@@ -6,7 +6,6 @@ import operator
 import os 
 import pandas as pd
 from src.utils import get_basic_stats
-
 from src.db import get_player, get_player_stats_from_db
 
 #Refactor to composition instead of inheritance

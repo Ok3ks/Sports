@@ -4,13 +4,13 @@ import sqlite3
 from sqlite3 import Error, OperationalError
 
 from os.path import realpath,join
-from app.src.paths import APP_DIR
+from src.paths import APP_DIR
 from sqlalchemy import Integer,create_engine, select, String
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import Session,DeclarativeBase
 
 import requests
-from app.src.urls import GW_URL
+from src.urls import GW_URL
 
 #clean up
 class Base(DeclarativeBase):
