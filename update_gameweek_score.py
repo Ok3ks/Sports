@@ -4,7 +4,7 @@ import sqlite3
 from sqlite3 import Error, OperationalError
 
 from os.path import realpath,join
-from src.paths import APP_DIR
+from src.paths import BASE_DIR
 from sqlalchemy import Integer,create_engine, select, String
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import Session,DeclarativeBase
@@ -158,7 +158,7 @@ if __name__ == "__main__":
 
     parser.add_argument('-g', '--gameweek_id', type= int, help = "Gameweek you are trying to get a report of")
     args = parser.parse_args()
-    connection = create_connection(realpath(join(APP_DIR,"fpl"))) #Add database directory as constant
+    connection = create_connection(realpath(join(BASE_DIR,"fpl"))) #Add database directory as constant
 
     try:
         update_db_gameweek_score(connection, args.gameweek_id)

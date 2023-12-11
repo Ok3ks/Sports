@@ -4,7 +4,7 @@ import sqlite3
 from sqlite3 import Error, OperationalError
 
 from os.path import realpath,join
-from src.paths import APP_DIR
+from src.paths import BASE_DIR
 
 from sqlalchemy import Integer, String, create_engine, select
 from sqlalchemy.orm import Mapped, mapped_column
@@ -23,13 +23,11 @@ def create_connection(db_file):
         print(e)
     return conn
 
-pat = realpath(join(APP_DIR, 'fpl'))
-print(pat)
+pat = realpath(join(BASE_DIR, 'fpl'))
 engine = create_engine(f"sqlite:///{pat}/")
 print(engine)
 session = Session(engine)
-
-conn = create_connection(realpath(join(APP_DIR,"fpl")))
+conn = create_connection(realpath(join(BASE_DIR,"fpl")))
 
 def get_player(id, session = session):
     out = []
@@ -49,6 +47,13 @@ def get_player(id, session = session):
 def get_player_stats_from_db(id, gw,conn = conn):
     #GameweekSc
     query = f"SELECT total_points FROM Gameweek_{gw} WHERE player_id={id}"
+    c = conn.cursor()
+    c.execute(query)
+    #print(c.fetchall())
+    return c.fetchone()
+
+def check_minutes(id, gw, conn = conn):
+    query = f"SELECT minutes FROM Gameweek_{gw} WHERE player_id={id}"
     c = conn.cursor()
     c.execute(query)
     #print(c.fetchall())
@@ -138,7 +143,7 @@ def update_db_player_info(conn):
 
 if __name__ == "__main__":
     #pass -db filepath into argparts
-    connection = create_connection(realpath(join(APP_DIR,"fpl"))) #Add database directory as constant
+    connection = create_connection(realpath(join(BASE_DIR,"fpl"))) #Add database directory as constant
     create_table(connection)
     update_db_player_info(connection)
     try:

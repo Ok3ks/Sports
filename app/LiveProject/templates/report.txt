@@ -3,6 +3,11 @@
         <ul>{{ key.0}}  was captained by {{ key.1 }} player{{ key.1|pluralize }} scoring <b>{{ key.2 }}</b> points </ul>
     {% endfor %}
     
+<p> Promoted Vice Captains </p>
+    {% for key in promoted_vice %}
+        <ul>{{ key.2 }} player{{ key.2|pluralize }} vice captained {{ key.0}} scoring {{ key.1 }} point{{ key.1|pluralize }}</ul>
+    {% endfor %}
+
 
     This gameweek, certain players activated their chips: 
     {% for key in chips.items %}
@@ -57,7 +62,7 @@ Lucky Auto-sub merchants:
 Teams with most points on the bench:
     {% for team in most_points_on_bench %}
         <ul>
-        <li><p>Team name - {{ team.0 }}, Points benched - <b>{{ team.2 }}</b></p>
+        <li><p>Team name - <b>{{ team.0 }}</b>, Points benched - <b>{{ team.2 }}</b></p>
         <p>Players - {{ team.1 }}</p></li>
         </ul>
     {%endfor%}

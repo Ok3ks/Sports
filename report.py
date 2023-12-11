@@ -1,4 +1,4 @@
-from app.src.utils import League, Player, to_json
+from src.utils import League, Player, to_json
 from src.paths import WEEKLY_REPORT_DIR
 from functools import lru_cache
 import operator
@@ -6,7 +6,7 @@ import operator
 import os 
 import pandas as pd
 from src.utils import get_basic_stats
-from src.db import get_player, get_player_stats_from_db
+from src.db import get_player, get_player_stats_from_db,check_minutes
 
 #Refactor to composition instead of inheritance
 class LeagueWeeklyReport(League):
@@ -28,6 +28,7 @@ class LeagueWeeklyReport(League):
         self.o_df['vice_captain_points'] = self.o_df['vice_captain'].map(lambda x: get_player_stats_from_db(x, self.gw)[0])
         
         self.o_df['rank'] = self.o_df['total_points'].rank(ascending=False)
+        self.o_df.rename(columns={'entry':'entry_id'}, inplace= True)
         self.o_df['rank'] = self.o_df['rank'].map(int)
         print(self.o_df)
         return self.o_df
@@ -45,9 +46,6 @@ class LeagueWeeklyReport(League):
         self.f['transfer_points_out'] = self.f['element_out'].map(lambda x:sum([get_player_stats_from_db(y, self.gw)[0]for y in x]))
         self.f['transfers'] = self.f['element_out'].map(lambda x: len(x))
         self.f['delta'] = self.f['transfer_points_in'] - self.f['transfer_points_out']
-
-        self.f['entry'] = self.o_df['entry'].astype(int)
-        self.o_df.rename(columns={'entry':'entry_id'}, inplace= True)
 
         self.f.reset_index(inplace= True)
         self.f.rename(columns= {'index': 'entry_id'}, inplace= True)
@@ -97,10 +95,28 @@ class LeagueWeeklyReport(League):
             self.captain = sorted(self.captain, key = operator.itemgetter(2), reverse=True)
             return self.captain
 
+        def promoted_vice(gw):
+            self.vice_to_cap= {}
+            #{get_player(item):[] for item in set(self.o_df['captain'])}
+            ben = {get_player(item): [] for item in set(self.o_df['vice_captain'])}
+        
+            for row in self.o_df.itertuples():
+                if check_minutes(int(row.captain), gw)[0] == 0:
+                    self.vice_to_cap[get_player(row.vice_captain)] = [get_player(row.captain)]
+                    self.vice_to_cap[get_player(row.vice_captain)].append(get_player_stats_from_db(row.vice_captain, gw)[0]*2)
+                    ben[get_player(row.vice_captain)].append(self.participants_name[str(row.entry_id)])
+
+            for key,values in ben.items():
+                if key in self.vice_to_cap.keys():
+                    self.vice_to_cap[key].append(len(values))
+            
+            self.vice_to_cap = [[key,values[1],values[2]] for key,values in self.vice_to_cap.items()]
+            self.vice_to_cap = sorted(self.vice_to_cap, key =operator.itemgetter(1))
+            return self.vice_to_cap
+        
         def outliers():
             Q1,league_average,Q3 = get_basic_stats(self.o_df['total_points'])
             IQR = Q3 - Q1
-
             exceptional_df = self.o_df[self.o_df['total_points'] > Q3 +1.5*IQR]
             abysmal_df = self.o_df[self.o_df['total_points'] < Q1 - 1.5*IQR]
 
@@ -186,8 +202,10 @@ class LeagueWeeklyReport(League):
             return {"most_points_on_bench" :most_points}
         
         self.captain = captain(gw)
-        output = {"captain": self.captain, "chips": self.chips }
+        self.vice_to_cap = promoted_vice(gw)
+        output = {"captain": self.captain, "promoted_vice": self.vice_to_cap, "chips": self.chips }
         #output = {"chips": self.chips }
+
         output.update(outliers())
         output.update(rise_and_fall())
   
@@ -204,7 +222,6 @@ class LeagueWeeklyReport(League):
         to_json(output, fp)
 
 #Output of report page should be a json for a django template
-
 if __name__ == "__main__":
     
     import argparse
