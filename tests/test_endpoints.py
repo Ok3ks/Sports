@@ -5,10 +5,10 @@ import requests
 
 #from typing import Any, List, Dict
 
-def test_gameweek_endpoint():
+def test_gameweek_endpoint(gw_fixture):
 
     #digit greater than 1 less than 38
-    gameweek_url = GW_URL.format(4)
+    gameweek_url = GW_URL.format(gw_fixture)
     assert gameweek_url == "https://fantasy.premierleague.com/api/event/4/live/"
     
     r = requests.get(gameweek_url)
@@ -21,14 +21,12 @@ def test_gameweek_endpoint():
     assert type(r['elements'][0]) == dict
 
     element_keys = list(r['elements'][0].keys())
-
     assert 'id' in element_keys
     assert 'stats' in element_keys
     assert 'explain' in element_keys 
     del element_keys
 
     stats_keys = r['elements'][0]['stats'].keys()
-    
     assert 'minutes' in stats_keys
     assert 'goals_scored' in stats_keys
     assert 'assists' in stats_keys
@@ -98,11 +96,10 @@ def test_fixture_endpoint():
     assert type(r[0]['stats']) == list
     del fixture_keys
 
-def test_transfer_endpoint():
+def test_transfer_endpoint(player):
     """Tests transfer endpoint given a valid entry_id. 
     Response is a list of transfers for previous gameweeks"""
-    player_id = 98120
-    r = requests.get(TRANSFER_URL.format(player_id))
+    r = requests.get(TRANSFER_URL.format(player))
     print(r.status_code)
     
     assert r.status_code == 200, 'Endpoint unavailable'
@@ -124,12 +121,11 @@ def test_transfer_endpoint():
     assert len(transfer_keys) == 7
 
 
-def test_history_endpoint():
+def test_history_endpoint(player):
 
     """Extracts a players history for prior seasons given an id"""
-    player_id = 98120
 
-    r = requests.get(HISTORY_URL.format(player_id))
+    r = requests.get(HISTORY_URL.format(player))
     assert r.status_code == 200, 'Endpoint unavailable'
     r = r.json()
 
@@ -184,11 +180,10 @@ def test_history_endpoint():
     assert len(chips_keys) == 3, "Number of keys has changed"
     
 
-def test_h2h_league_endpoint():
+def test_h2h_league_endpoint(h2h_league):
     """"""
-    h2h_league_id = 1089000
 
-    r = requests.get(H2H_LEAGUE.format(h2h_league_id))
+    r = requests.get(H2H_LEAGUE.format(h2h_league))
     assert r.status_code == 200
     
     r = r.json()
@@ -235,11 +230,10 @@ def test_h2h_league_endpoint():
 
     assert len(results_keys) == 25, "Number of keys has changed"
 
-def test_league_endpoint():
+def test_league_endpoint(classic_league):
 
-    league_id = 1088941
     page = 1
-    r = requests.get(LEAGUE_URL.format(league_id, page))
+    r = requests.get(LEAGUE_URL.format(classic_league, page))
     
     assert r.status_code == 200
     r = r.json()
@@ -306,12 +300,9 @@ def test_league_endpoint():
     assert 'entry_name' in participant_info
 
 
-def test_fpl_player_endpoint():
-    
-    player_id = 293449
-    gw = 1
+def test_fpl_player_endpoint(player,gw_fixture):
 
-    r = requests.get(FPL_PLAYER.format(player_id, gw))
+    r = requests.get(FPL_PLAYER.format(player, gw_fixture))
     assert r.status_code == 200, 'Endpoint unavailable, check player_id and gameweek'
 
     r = r.json()    
@@ -618,4 +609,4 @@ def test_fpl_url_endpoint():
 
 
 if __name__ == "__main__":
-    test_transfer_endpoint()
+    print("use pytest to run tests")

@@ -18,14 +18,11 @@ from src.paths import APP_DIR
 from src.db import Player
 
 from typing import List, Union
-
 #get_player_stats_from_db(60, 3, conn)
 
 def to_json(x:dict, fp):
-
     with open(fp, 'w') as outs:
         json.dump(x, outs)
-
     print(f"{x.keys()} stored in Json successfully. Find here {fp}")
 
 def get_basic_stats(total_points:List[Union[int,float]]):
@@ -35,48 +32,52 @@ def get_basic_stats(total_points:List[Union[int,float]]):
     Q1 = np.percentile(total_points, 25)
     return Q1,average,Q3
 
+def parse_transfers(item:dict) -> dict:
+    row = {}
 
-def get_gw_transfers(alist:List[int], gw:int, all = False) -> dict : 
+    row[item['entry']] = row.get(item['entry'], {})
+    row[item['entry']]['element_in'] = row[item['entry']].get('element_in', [])
+    row[item['entry']]['element_out'] = row[item['entry']].get('element_out', [])
+    row[item['entry']]['element_in'].append(item['element_in'])
+    row[item['entry']]['element_out'].append(item['element_out'])     
+   
+    return row
+
+def check_gw(gw):
+    if type(gw) == int:
+        assert gw in range(1,39), 'Only 38 gameweeks in a season, Choose value between 1 and 38 or all'
+    else:
+        for i in gw:
+            check_gw(i)
+
+def get_gw_transfers(alist:List[int], gw:Union[int,List[int]], all = False) -> dict : 
     """Input is a list of entry_id. Gw is the gameweek number.
     'all' toggles between extracting all gameweeks or not"""
     
     row =  {}
-    assert gw in range(1,39), 'Only 38 gameweeks in a season, Choose value between 1 and 38 or all'
 
+    check_gw(gw)
+    
     for entry_id in alist:
         r = requests.get(TRANSFER_URL.format(entry_id))
         if r.status_code == 200:
             obj = r.json()
             for item in obj:
                 if all:
-                    row[item['event']] = row.get(item['event'], {})
-                    #row[item['event']]['entry_id'] = item['entry']
-
-                    row[item['event']][item['entry']] = row.get(item['entry'], {})
-
-                    row[item['event']][item['entry']]['element_in'] = row[item['event']][item['entry']].get('element_in', [])
-                    row[item['event']][item['entry']]['element_out'] = row[item['event']][item['entry']].get('element_out', [])
-
-                    row[item['event']][item['entry']]['element_in'].append(item['element_in'])
-                    row[item['event']][item['entry']]['element_out'].append(item['element_out'])
+                    row[item['event']] = parse_transfers(item)
                 else: 
-                    if int(item['event']) == gw:
-                        row[item['entry']] = row.get(item['entry'], {})
-
-                        row[item['entry']]['element_in'] = row[item['entry']].get('element_in', [])
-                        row[item['entry']]['element_out'] = row[item['entry']].get('element_out', [])
-
-                        row[item['entry']]['element_in'].append(item['element_in'])
-                        row[item['entry']]['element_out'].append(item['element_out'])     
+                    if type(gw) == int and int(item['event']) == gw:
+                        row = parse_transfers(item)
+                    elif type(gw) == list:
+                        if int(item['event']) in gw:
+                            row[item['event']] = parse_transfers(item)
         else:
             print("{} does not exist or Transfer URL endpoint unavailable".format(entry_id))
-
     return row
-        
-#span_gw_transfers will be more efficient than using get_gw_transfers multiple times
-#Maybe convert GW into a class to be able to add conditions in its values
 
 def get_participant_entry(entry_id:int, gw:int) -> dict:
+
+    """Calls an Endpoint to retrieve a participants entry"""
 
     assert gw in range(1,39), 'Only 38 gameweeks in a season, Choose value between 1 and 38 or all'
     r = requests.get(FPL_PLAYER.format(entry_id, gw))
@@ -120,6 +121,11 @@ def get_participant_entry(entry_id:int, gw:int) -> dict:
         print("{} does not exist".format(entry_id))
     return team_list
 
+#class gw():
+    #def __init__(self,gameweek:range(1,39)):
+        #self.gw = gameweek
+        #self.prev_gw = max(gameweek - 1, 1)
+        #self.next_gw = min(gameweek + 1, 38)
 
 class League():
     def __init__(self, league_id):
@@ -148,18 +154,18 @@ class League():
                 print("All participants have been extracted")
         return self.participants
     
-    def get_participant_name(self):
+    def get_participant_name(self) -> dict:
         """ Creates participant id to name hash table """
         assert len(self.participants) > 0, 'No participants, call obtain_league_participants() first'
         output = {str(participant['entry']) : participant['entry_name'] for participant in self.participants}
         return output
 
-    def get_all_participant_entries(self,gw):
+    def get_all_participant_entries(self,gw) -> list:
         self.obtain_league_participants()
         self.participant_entries = [get_participant_entry(participant['entry'],gw) for participant in self.participants]
         return self.participant_entries
     
-    def get_gw_transfers(self,gw):
+    def get_gw_transfers(self,gw) -> dict :
         if len(self.participants) > 1:
             self.entry_ids =[participant['entry'] for participant in self.participants]
             self.transfers = get_gw_transfers(self.entry_ids,gw)
