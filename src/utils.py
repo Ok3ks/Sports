@@ -6,19 +6,14 @@ import numpy as np
 
 from os.path import join, realpath
 
-from sqlalchemy import Integer, String, create_engine, select
-from sqlalchemy.orm import Session
 
-
-from src.urls import GW_URL,FIXTURE_URL,TRANSFER_URL, HISTORY_URL
+from src.urls import GW_URL,FIXTURE_URL,TRANSFER_URL, HISTORY_URL, FPL_URL
 from src.urls import H2H_LEAGUE, LEAGUE_URL, FPL_PLAYER
 from functools import lru_cache
 
 from src.paths import APP_DIR
 from src.db import Player
-
 from typing import List, Union
-#get_player_stats_from_db(60, 3, conn)
 
 def to_json(x:dict, fp):
     with open(fp, 'w') as outs:
@@ -126,6 +121,31 @@ def get_participant_entry(entry_id:int, gw:int) -> dict:
         #self.gw = gameweek
         #self.prev_gw = max(gameweek - 1, 1)
         #self.next_gw = min(gameweek + 1, 38)
+#add test
+def get_curr_event():
+    r = requests.get(FPL_URL)
+
+    curr_event = []
+    r = r.json()
+    for event in r['events']:
+        if event['is_current']:
+            curr_event.append(event['id'])
+            curr_event.append((event['finished'], event['data_checked']))
+    return curr_event
+
+#add test
+class Participant():
+    def __init__(self, entry_id, gw = get_curr_event()[0]):
+        self.participant = entry_id
+        self.gw = gw
+
+    def get_all_week_entries(self):
+        self.all_gw_entries = [get_participant_entry(self.participant,gw) for gw in range(1, self.gw+1)]
+        return self.all_gw_entries
+    
+    def get_all_week_transfers(self):
+        self.all_gw_transfers = [get_gw_transfers(self.participant,gw) for gw in range(1, self.gw+1)]
+        return self.all_gw_transfers
 
 class League():
     def __init__(self, league_id):
@@ -165,7 +185,7 @@ class League():
         self.participant_entries = [get_participant_entry(participant['entry'],gw) for participant in self.participants]
         return self.participant_entries
     
-    def get_gw_transfers(self,gw) -> dict :
+    def get_gw_transfers(self,gw) -> dict:
         if len(self.participants) > 1:
             self.entry_ids =[participant['entry'] for participant in self.participants]
             self.transfers = get_gw_transfers(self.entry_ids,gw)
@@ -176,6 +196,7 @@ class League():
     
 
 if __name__ == "__main__":
-    league = League(1088941)
-    league.obtain_league_participants()
-    print(league.participants)
+    print(get_curr_event())
+    #participant = Participant(98120)
+    #league.obtain_league_participants()
+    #print(participant.get_all_week_entries())
