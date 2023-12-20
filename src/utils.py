@@ -13,7 +13,7 @@ from functools import lru_cache
 
 from src.paths import APP_DIR
 from src.db import Player
-from typing import List, Union
+from typing import List, Union, Optional
 
 def to_json(x:dict, fp):
     with open(fp, 'w') as outs:
@@ -121,6 +121,7 @@ def get_participant_entry(entry_id:int, gw:int) -> dict:
         #self.gw = gameweek
         #self.prev_gw = max(gameweek - 1, 1)
         #self.next_gw = min(gameweek + 1, 38)
+
 #add test
 def get_curr_event():
     r = requests.get(FPL_URL)
@@ -139,13 +140,46 @@ class Participant():
         self.participant = entry_id
         self.gw = gw
 
+
+    def get_gw_transfers(self, gw:int, all = False) -> dict : 
+        """Input is a list of entry_id. Gw is the gameweek number.
+        'all' toggles between extracting all gameweeks or not"""
+        
+        row =  {}
+        if not all:
+            check_gw(gw)
+        
+        r = requests.get(TRANSFER_URL.format(self.participant))
+        if r.status_code == 200:
+            obj = r.json()
+            for item in obj:
+                if all:
+                    row[item['event']] = row.get(item['event'], {})
+                    row[item['event']]['element_in'] = row[item['event']].get('element_in', [])
+                    row[item['event']]['element_out'] = row[item['event']].get('element_out', [])
+                    row[item['event']]['element_in'].append(item['element_in'])
+                    row[item['event']]['element_out'].append(item['element_out'])     
+   
+                else: 
+                    if int(item['event']) in gw:
+                        row[item['event']] = row.get(item['event'], {})
+                        row[item['event']]['element_in'] = row[item['event']].get('element_in', [])
+                        row[item['event']]['element_out'] = row[item['event']].get('element_out', [])
+                        row[item['event']]['element_in'].append(item['element_in'])
+                        row[item['event']]['element_out'].append(item['element_out'])
+        else:
+            print("{} does not exist or Transfer URL endpoint unavailable".format(self.participant))
+        return row
+
     def get_all_week_entries(self):
         self.all_gw_entries = [get_participant_entry(self.participant,gw) for gw in range(1, self.gw+1)]
         return self.all_gw_entries
     
+    def get_span_week_transfers(self, span:List[int]):
+        return [self.get_gw_transfers([self.participant],i) for i in span]
+
     def get_all_week_transfers(self):
-        self.all_gw_transfers = [get_gw_transfers(self.participant,gw) for gw in range(1, self.gw+1)]
-        return self.all_gw_transfers
+        return self.get_gw_transfers([self.participant], all=True)
 
 class League():
     def __init__(self, league_id):
@@ -196,7 +230,7 @@ class League():
     
 
 if __name__ == "__main__":
-    print(get_curr_event())
-    #participant = Participant(98120)
+    #print(get_curr_event())
+    participant = Participant(98120)
     #league.obtain_league_participants()
     #print(participant.get_all_week_entries())
