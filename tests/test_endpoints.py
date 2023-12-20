@@ -9,7 +9,7 @@ def test_gameweek_endpoint(gw_fixture):
 
     #digit greater than 1 less than 38
     gameweek_url = GW_URL.format(gw_fixture)
-    assert gameweek_url == "https://fantasy.premierleague.com/api/event/4/live/"
+    assert gameweek_url == "https://fantasy.premierleague.com/api/event/8/live/"
     
     r = requests.get(gameweek_url)
     assert r.status_code == 200, f'{r.status_code} - Url invalid, or unavailable'
@@ -364,6 +364,9 @@ def test_fpl_url_endpoint():
     assert type(r['events']) == list
     assert type(r['events'][0]) == dict
     event_keys = list(r['events'][0])
+    print(r['events'][15])
+
+ 
 
     assert 'id' in event_keys
     assert 'name' in event_keys
@@ -431,7 +434,6 @@ def test_fpl_url_endpoint():
     assert 'league_h2h_tiebreak_stats'  in game_settings_keys
     assert 'timezone'  in game_settings_keys
     
-    print(r['game_settings'])
 
     assert len(r['game_settings']) == 29, 'Keys have changed'
     
@@ -609,4 +611,4 @@ def test_fpl_url_endpoint():
 
 
 if __name__ == "__main__":
-    print("use pytest to run tests")
+    test_fpl_url_endpoint()
