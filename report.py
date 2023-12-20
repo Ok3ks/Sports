@@ -1,4 +1,4 @@
-from src.utils import League, Player, to_json
+from src.utils import League, to_json
 from src.paths import WEEKLY_REPORT_DIR
 from functools import lru_cache
 import operator
@@ -97,7 +97,6 @@ class LeagueWeeklyReport(League):
 
         def promoted_vice(gw):
             self.vice_to_cap= {}
-            #{get_player(item):[] for item in set(self.o_df['captain'])}
             ben = {get_player(item): [] for item in set(self.o_df['vice_captain'])}
         
             for row in self.o_df.itertuples():
