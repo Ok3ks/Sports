@@ -422,7 +422,8 @@ def test_fpl_url_endpoint():
     assert 'squad_squadplay'  in game_settings_keys
 
     assert 'cup_type'  in game_settings_keys
-    assert 'featured_entries'  in game_settings_keys 
+    assert 'featured_entries'  in game_settings_keys
+    assert 'percentile_ranks' in game_settings_keys 
 
     assert 'stats_form_days'  in game_settings_keys
     assert 'ui_special_shirt_exclusions'  in game_settings_keys
@@ -433,9 +434,9 @@ def test_fpl_url_endpoint():
     assert 'transfers_sell_on_fee'  in game_settings_keys
     assert 'league_h2h_tiebreak_stats'  in game_settings_keys
     assert 'timezone'  in game_settings_keys
-    
+    print(game_settings_keys)
 
-    assert len(r['game_settings']) == 29, 'Keys have changed'
+    assert len(r['game_settings']) == 30, 'Keys have changed'
     
 
     assert type(r['phases']) == list
