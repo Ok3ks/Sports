@@ -39,7 +39,6 @@ class LeagueWeeklyReport(League):
         """Merges Weekly score dataframe with transfers dataframe"""
         self.f = pd.DataFrame(self.get_gw_transfers(self.gw))
         self.f = self.f.T
-
         print(self.f)
 
         self.f['transfer_points_in'] = self.f['element_in'].map(lambda x: sum([get_player_stats_from_db(y, self.gw)[0] for y in x]))
@@ -50,6 +49,7 @@ class LeagueWeeklyReport(League):
         self.f.reset_index(inplace= True)
         self.f.rename(columns= {'index': 'entry_id'}, inplace= True)
         self.f = self.o_df.merge(self.f, on='entry_id', how='right')
+        print(self.f['element_out'])
         return self.f
     
     def add_auto_sub(self):
@@ -132,6 +132,8 @@ class LeagueWeeklyReport(League):
 #       
         def out_transfer_stats():
             counts = self.f['element_out'].value_counts().reset_index().to_dict('list')
+            print(counts)
+            #try:
             most_transf_out = [(counts['element_out'][i], get_player(counts['index'][i])) for i in range(3)]
             least_transf_out = [(counts['element_out'][-i] , get_player(counts['index'][-i])) for i in range(1,4)]
             return {"most_transferred_out": most_transf_out, "least_transferred_out": least_transf_out}
