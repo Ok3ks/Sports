@@ -6,7 +6,6 @@ import numpy as np
 
 from os.path import join, realpath
 
-
 from src.urls import GW_URL,FIXTURE_URL,TRANSFER_URL, HISTORY_URL, FPL_URL
 from src.urls import H2H_LEAGUE, LEAGUE_URL, FPL_PLAYER
 from functools import lru_cache
@@ -51,8 +50,9 @@ def get_gw_transfers(alist:List[int], gw:Union[int,List[int]], all = False) -> d
     
     row =  {}
 
-    check_gw(gw)
-    
+    if not all:
+        check_gw(gw)
+        
     for entry_id in alist:
         r = requests.get(TRANSFER_URL.format(entry_id))
         if r.status_code == 200:
@@ -184,14 +184,14 @@ class Participant():
 class League():
     def __init__(self, league_id):
         self.league_id = league_id
-        self.participants = []
+        self.entry_ids = []
 
     def obtain_league_participants(self):
         """This function uses the league url as an endpoint to query for participants of a league at a certain date.
         Should be used to update participants table in DB """
         
-        if self.participants:
-            return self.participants
+        if self.entry_ids:
+            return self.entry_ids
         
         else:
             has_next = True
@@ -201,27 +201,27 @@ class League():
                 obj =r.json()
                 assert r.status_code == 200, 'error connecting to the endpoint'
                 del r
-                self.participants.extend(obj['standings']['results'])
+                self.entry_ids.extend(obj['standings']['results'])
                 has_next = obj['standings']['has_next']
                 PAGE_COUNT += 1
                 time.sleep(2)
                 print("All participants have been extracted")
-        return self.participants
+        return self.entry_ids
     
     def get_participant_name(self) -> dict:
         """ Creates participant id to name hash table """
-        assert len(self.participants) > 0, 'No participants, call obtain_league_participants() first'
-        output = {str(participant['entry']) : participant['entry_name'] for participant in self.participants}
+        assert len(self.entry_ids) > 0, 'No participants, call obtain_league_participants() first'
+        output = {str(participant['entry']) : participant['entry_name'] for participant in self.entry_ids}
         return output
 
     def get_all_participant_entries(self,gw) -> list:
         self.obtain_league_participants()
-        self.participant_entries = [get_participant_entry(participant['entry'],gw) for participant in self.participants]
+        self.participant_entries = [get_participant_entry(participant['entry'],gw) for participant in self.entry_ids]
         return self.participant_entries
     
     def get_gw_transfers(self,gw) -> dict:
-        if len(self.participants) > 1:
-            self.entry_ids =[participant['entry'] for participant in self.participants]
+        if len(self.entry_ids) > 1:
+            self.entry_ids =[participant['entry'] for participant in self.entry_ids]
             self.transfers = get_gw_transfers(self.entry_ids,gw)
         else:
             self.obtain_league_participants()
@@ -231,6 +231,9 @@ class League():
 
 if __name__ == "__main__":
     #print(get_curr_event())
-    participant = Participant(98120)
-    #league.obtain_league_participants()
+    league = League(85647)
+    #participant = Participant(98120)
+    league.obtain_league_participants()
+    print(league.entry_ids)
+    print(league.get_gw_transfers(17))
     #print(participant.get_all_week_entries())
