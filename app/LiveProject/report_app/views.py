@@ -8,6 +8,7 @@ from django.urls import reverse
 import json
 #from app.src.paths import REPORT_DIR,WEEKLY_REPORT_DIR
 from os.path import realpath, join
+from report import LeagueWeeklyReport
 
 # Create your views here.
 def home(request):
@@ -15,21 +16,17 @@ def home(request):
 
 class reportView(TemplateView):
     template_name = "report.txt"
-    def get_context_data(self, **kwargs): #compartmentalize and build better fronted
-        #file = realpath(join(WEEKLY_REPORT_DIR, '{}_{}.json'.format(self.league_id, self.gw)))
-        
-        file = "/Users/max/Desktop/Sports/app/LiveProject/templates/{}.json".format(self.kwargs['id'])
-
-        #S3 each league per bucket
-        #upon submission, redirect to your api for analysis 
-        #then render output later
-        #When they sign up, more db space, more eager loading.
-        #Fplwrap as email, 
+    def get_context_data(self, **kwargs): #compartmentalize and build better frontend
 
         context = super().get_context_data()
-        print(context)
-        with open (file, 'r') as ins:
-            context = json.load(ins)
+
+        #first check redis cache 
+        obj = LeagueWeeklyReport(self.kwargs['gid'],self.kwargs['id'])
+        obj.weekly_score_transformation()
+        obj.merge_league_weekly_transfer()
+        obj.add_auto_sub()
+        context = obj.create_report()
+        #write to cache
         return context
     
 class PlayerReport(FormView):
@@ -61,9 +58,10 @@ def display(request):
             # like send an email.
             # createreport and save json in templates
             id = form.cleaned_data['league_id']
+            gid = form.cleaned_data['gameweek']
             print(id)
             return HttpResponseRedirect(
-                reverse('report', args=[id]))
+                reverse('report', args=[id,gid]))
     else:
         form = leagueForm()
 
