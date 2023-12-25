@@ -2,7 +2,7 @@
 85647 -- Downtown
 1088941 -- Uptown
 
-#terminal linux code to run report
+#terminal linux code to run league report
 python3 report.py -g 17 -l 85647
 python3 report.py -g 17 -l 1088941
 

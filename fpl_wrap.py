@@ -83,7 +83,7 @@ class ParticipantReport(Participant):
         self.f['auto_sub_out_points'] = [sum([get_player_stats_from_db(y, event)[0] for y in self.f['auto_sub_out_player'][event-1]]) for event in range(1, self.gw+1)]
 
     def plots_1(self):
-
+        self.f['captain'] = self.f['captain'].map(lambda x: get_player(x))
         captain_bar_chart = so.Plot(self.f, x = 'captain').add(so.Bars(), so.Count())\
         .scale(y = so.Continuous().tick(every=1))\
         .label(y = "Count")

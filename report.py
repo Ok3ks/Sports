@@ -3,11 +3,14 @@ from src.paths import WEEKLY_REPORT_DIR
 from functools import lru_cache
 import operator
 
-import os 
+from os.path import join,realpath
 import pandas as pd
-from src.utils import get_basic_stats
-from src.db import get_player, get_player_stats_from_db,check_minutes
 
+from src.utils import get_basic_stats
+from src.db import get_player, get_player_stats_from_db,check_minutes,create_connection
+from src.paths import BASE_DIR
+
+conn = create_connection(realpath(join(BASE_DIR,"fpl")))
 #Refactor to composition instead of inheritance
 class LeagueWeeklyReport(League):
 
@@ -39,8 +42,6 @@ class LeagueWeeklyReport(League):
         """Merges Weekly score dataframe with transfers dataframe"""
         self.f = pd.DataFrame(self.get_gw_transfers(self.gw))
         self.f = self.f.T
-        print(self.f)
-
         self.f['transfer_points_in'] = self.f['element_in'].map(lambda x: sum([get_player_stats_from_db(y, self.gw)[0] for y in x]))
         self.f['transfer_points_out'] = self.f['element_out'].map(lambda x:sum([get_player_stats_from_db(y, self.gw)[0]for y in x]))
         self.f['transfers'] = self.f['element_out'].map(lambda x: len(x))
@@ -49,7 +50,6 @@ class LeagueWeeklyReport(League):
         self.f.reset_index(inplace= True)
         self.f.rename(columns= {'index': 'entry_id'}, inplace= True)
         self.f = self.o_df.merge(self.f, on='entry_id', how='right')
-        print(self.f['element_out'])
         return self.f
     
     def add_auto_sub(self):
@@ -59,7 +59,7 @@ class LeagueWeeklyReport(League):
         self.f['auto_sub_in_points'] = self.f['auto_sub_in_player'].map(lambda x: sum([get_player_stats_from_db(y, self.gw)[0] for y in x]))
         self.f['auto_sub_out_points'] = self.f['auto_sub_in_player'].map(lambda x: sum([get_player_stats_from_db(y, self.gw)[0] for y in x]))
         
-    def create_report(self,fp,gw):
+    def create_report(self,display = True):
 
         self.captain = self.o_df['captain'].value_counts().to_dict()
         self.chips = self.o_df['active_chip'].value_counts().to_dict()
@@ -90,19 +90,19 @@ class LeagueWeeklyReport(League):
 
             return {"rise":rise, "fall": fall}
 
-        def captain(gw):
-            self.captain = [(get_player(id = key), value, get_player_stats_from_db(key, gw)[0] * 2,) for key,value in self.captain.items()]
+        def captain():
+            self.captain = [(get_player(id = key), value, get_player_stats_from_db(key, self.gw)[0] * 2,) for key,value in self.captain.items()]
             self.captain = sorted(self.captain, key = operator.itemgetter(2), reverse=True)
             return self.captain
 
-        def promoted_vice(gw):
+        def promoted_vice():
             self.vice_to_cap= {}
             ben = {get_player(item): [] for item in set(self.o_df['vice_captain'])}
         
             for row in self.o_df.itertuples():
-                if check_minutes(int(row.captain), gw)[0] == 0:
+                if check_minutes(int(row.captain), self.gw)[0] == 0:
                     self.vice_to_cap[get_player(row.vice_captain)] = [get_player(row.captain)]
-                    self.vice_to_cap[get_player(row.vice_captain)].append(get_player_stats_from_db(row.vice_captain, gw)[0]*2)
+                    self.vice_to_cap[get_player(row.vice_captain)].append(get_player_stats_from_db(row.vice_captain, self.gw)[0]*2)
                     ben[get_player(row.vice_captain)].append(self.participants_name[str(row.entry_id)])
 
             for key,values in ben.items():
@@ -132,8 +132,6 @@ class LeagueWeeklyReport(League):
 #       
         def out_transfer_stats():
             counts = self.f['element_out'].value_counts().reset_index().to_dict('list')
-            print(counts)
-            #try:
             most_transf_out = [(counts['element_out'][i], get_player(counts['index'][i])) for i in range(3)]
             least_transf_out = [(counts['element_out'][-i] , get_player(counts['index'][-i])) for i in range(1,4)]
             return {"most_transferred_out": most_transf_out, "least_transferred_out": least_transf_out}
@@ -164,9 +162,7 @@ class LeagueWeeklyReport(League):
         def best_transfer_in():
             """Output = {"best_transfer_in":[()]}"""
             best_transfer_in = []
-
             self.no_chips = self.no_chips.sort_values(by = 'delta', ascending=False)
-            print(self.no_chips)
             for i in range(0,3):
                 player_in = self.no_chips.iloc[i,:]['element_in']
                 player_out = self.no_chips.iloc[i,:]['element_out']
@@ -202,8 +198,8 @@ class LeagueWeeklyReport(League):
                 most_points.append((self.participants_name[participant_id],point_player, points_on_bench),)
             return {"most_points_on_bench" :most_points}
         
-        self.captain = captain(gw)
-        self.vice_to_cap = promoted_vice(gw)
+        self.captain = captain()
+        self.vice_to_cap = promoted_vice()
         output = {"captain": self.captain, "promoted_vice": self.vice_to_cap, "chips": self.chips }
         #output = {"chips": self.chips }
 
@@ -220,7 +216,9 @@ class LeagueWeeklyReport(League):
         output.update(most_points_on_bench())
         output.update(jammy_points())
 
-        to_json(output, fp)
+        if display:
+            print(output)
+        return output
 
 #Output of report page should be a json for a django template
 if __name__ == "__main__":
@@ -230,7 +228,6 @@ if __name__ == "__main__":
 
     parser.add_argument('-g', '--gameweek_id', type= int, help = "Gameweek you are trying to get a report of")
     parser.add_argument('-l', '--league_id', type= int, help = "League_ID you are interested in")
-    
     args = parser.parse_args()
 
     test = LeagueWeeklyReport(args.gameweek_id, args.league_id)
@@ -239,5 +236,5 @@ if __name__ == "__main__":
     test.merge_league_weekly_transfer()
     test.add_auto_sub()
 
-    #output_name = os.path.join(REPORT_DIR, str(args.league_id)+'_'+ str(args.gameweek_id))
-    test.create_report(f"{WEEKLY_REPORT_DIR}/{str(args.league_id)}_{str(args.gameweek_id)}.json", args.gameweek_id)  #Move to S3
+    output = test.create_report(display=True)
+    to_json(output, f"{WEEKLY_REPORT_DIR}/{str(args.league_id)}_{str(args.gameweek_id)}.json")
