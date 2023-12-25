@@ -1,14 +1,14 @@
 # Goal: Create an analytic tool for Fantasy Premier League
 
+## Web application ./app
+
+## Data scraping and gathering, Writing to DB
+
 ## Feature prototyping
 
 ## Analytic features 
 
 ## Tests
-
-## Data scraping and gathering
-
-## Web application ./app
 
 ## Containerisation 
 
@@ -16,6 +16,7 @@
 
 ## Continuous integration and deployment workflows
 
+## Create APIs
 
-# Tools: Python, SQLite, Pandas, Django, Pytest, GCP, Terraform, pip 
+### Tools: Python, SQLite, Pandas, Django, Pytest, GCP, Terraform, pip 
 
