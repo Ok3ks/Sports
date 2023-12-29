@@ -3,6 +3,9 @@ from src.urls import GW_URL, FIXTURE_URL, TRANSFER_URL, HISTORY_URL, H2H_LEAGUE,
 import pytest
 import requests
 
+from src.utils import to_json
+from src.paths import MOCK_DIR
+
 #from typing import Any, List, Dict
 
 def test_gameweek_endpoint(gw_fixture):
@@ -62,6 +65,8 @@ def test_gameweek_endpoint(gw_fixture):
     assert 'points' in r['elements'][0]['explain'][0]['stats'][0]
     assert 'value' in r['elements'][0]['explain'][0]['stats'][0]
 
+    to_json(r, f"{MOCK_DIR}/endpoints/gameweek_endpoint.json")
+
 def test_fixture_endpoint():
     
     r = requests.get(FIXTURE_URL)
@@ -96,6 +101,9 @@ def test_fixture_endpoint():
     assert type(r[0]['stats']) == list
     del fixture_keys
 
+    out_dict = {"fixture":r}
+    to_json(out_dict, f"{MOCK_DIR}/endpoints/fixture_endpoint.json")
+
 def test_transfer_endpoint(participant):
     """Tests transfer endpoint given a valid entry_id. 
     Response is a list of transfers for previous gameweeks"""
@@ -119,6 +127,9 @@ def test_transfer_endpoint(participant):
     assert 'time' in transfer_keys
 
     assert len(transfer_keys) == 7
+
+    out_dict = {"transfer" : r}
+    to_json(out_dict, f"{MOCK_DIR}/endpoints/transfer_endpoint.json")
 
 
 def test_history_endpoint(participant):
@@ -178,6 +189,7 @@ def test_history_endpoint(participant):
     assert 'event' in chips_keys
 
     assert len(chips_keys) == 3, "Number of keys has changed"
+    to_json(r, f"{MOCK_DIR}/endpoints/history_endpoint.json")
     
 
 def test_h2h_league_endpoint(h2h_league):
@@ -229,6 +241,7 @@ def test_h2h_league_endpoint(h2h_league):
     assert 'knockout_name' in results_keys
 
     assert len(results_keys) == 25, "Number of keys has changed"
+    to_json(r, f"{MOCK_DIR}/endpoints/h2h_league_endpoint.json")
 
 def test_league_endpoint(classic_league):
 
@@ -299,6 +312,8 @@ def test_league_endpoint(classic_league):
     assert 'entry' in participant_info
     assert 'entry_name' in participant_info
 
+    to_json(r, f"{MOCK_DIR}/endpoints/league_endpoint.json")
+
 
 def test_fpl_player_endpoint(participant,gw_fixture):
 
@@ -344,12 +359,14 @@ def test_fpl_player_endpoint(participant,gw_fixture):
 
     assert len(picks_keys) == 5, 'Keys have changed'
     assert type(r['automatic_subs']) == list
+    to_json(r, f"{MOCK_DIR}/endpoints/player_endpoint.json")
 
 def test_fpl_url_endpoint():
     r = requests.get(FPL_URL)
     assert r.status_code == 200, "Endpoint unavailable"
 
     r = r.json()
+    assert type(r) == dict
     keys = list(r.keys())
 
     assert 'events' in keys
@@ -597,19 +614,17 @@ def test_fpl_url_endpoint():
 
     assert len(elements_keys) == 88, "Keys have changed"
 
-    def a_b(key = 'total_players'):
-        if type(r[key]) == dict:
-            print(r[key].keys())
-            print(len(r[key].keys()))
-        elif type(r[key]) == list:
-            print('-')
-            print(r[key][0].keys())
-            print(len(r[key][0].keys()))
-        else: 
-            print (type(r[key]))
-
-    a_b(key = 'elements')
-
+    to_json(r, f"{MOCK_DIR}/endpoints/fpl_url_endpoint.json")
 
 if __name__ == "__main__":
+    test_fixture_endpoint()
+    test_fpl_player_endpoint(98120, 8)
     test_fpl_url_endpoint()
+
+    test_gameweek_endpoint(8)
+    test_h2h_league_endpoint(1089000)
+    test_league_endpoint(85647)
+
+    test_history_endpoint(98120)
+    test_transfer_endpoint(98120)
+    

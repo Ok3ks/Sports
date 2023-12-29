@@ -1,5 +1,5 @@
 from src.utils import League, to_json
-from src.paths import WEEKLY_REPORT_DIR
+from src.paths import WEEKLY_REPORT_DIR,MOCK_DIR
 from functools import lru_cache
 import operator
 
@@ -10,6 +10,8 @@ from src.utils import get_basic_stats
 from src.db import get_player, get_player_stats_from_db,check_minutes,create_connection
 from src.paths import BASE_DIR
 
+import json
+
 conn = create_connection(realpath(join(BASE_DIR,"fpl")))
 #Refactor to composition instead of inheritance
 class LeagueWeeklyReport(League):
@@ -18,7 +20,7 @@ class LeagueWeeklyReport(League):
         super().__init__(league_id)
         self.gw = gw
         
-    @lru_cache
+    @lru_cache(10)
     def weekly_score_transformation(self):
         """Transforms weekly score into Dataframe, and returns weekly dataframe"""
         
@@ -33,10 +35,14 @@ class LeagueWeeklyReport(League):
         self.o_df['rank'] = self.o_df['total_points'].rank(ascending=False)
         self.o_df.rename(columns={'entry':'entry_id'}, inplace= True)
         self.o_df['rank'] = self.o_df['rank'].map(int)
-        print(self.o_df)
+        out = self.o_df.to_dict()
+
+        to_json(out, f"{MOCK_DIR}/leagues/weekly_score_transformation.json")
+        to_json({"participants": self.participants},  f"{MOCK_DIR}/leagues/participants.json")
+
         return self.o_df
 
-    @lru_cache
+    @lru_cache(10)
     def merge_league_weekly_transfer(self):
 
         """Merges Weekly score dataframe with transfers dataframe"""
@@ -58,7 +64,9 @@ class LeagueWeeklyReport(League):
         self.f['auto_sub_out_player'] = self.f['auto_subs'].map(lambda x: x['out'])
         self.f['auto_sub_in_points'] = self.f['auto_sub_in_player'].map(lambda x: sum([get_player_stats_from_db(y, self.gw)[0] for y in x]))
         self.f['auto_sub_out_points'] = self.f['auto_sub_in_player'].map(lambda x: sum([get_player_stats_from_db(y, self.gw)[0] for y in x]))
-        
+        out = self.f.to_dict()
+        to_json(out, f"{MOCK_DIR}/leagues/add_auto_sub.json")
+
     def create_report(self,display = True):
 
         self.captain = self.o_df['captain'].value_counts().to_dict()
@@ -79,14 +87,21 @@ class LeagueWeeklyReport(League):
             df['last_rank'] = df['last_rank'].astype(int)
             df['rank_delta'] = df['last_rank'] - df['rank']
 
-            rise_df = df[df['rank_delta'] > 0]
-            fall_df = df[df['rank_delta'] < 0]
+            rise_df = df[df['rank_delta'] > 0].sort_values(by='rank_delta', ascending= False)
+            fall_df = df[df['rank_delta'] < 0].sort_values(by='rank_delta', ascending= True)
 
-            for i,j in zip(rise_df['player_name'], rise_df['rank_delta']):
-                rise.append((i,j,))
 
-            for i,j in zip(fall_df['player_name'], fall_df['rank_delta']):
-                fall.append((i,j,))
+            for i in range(0,4):
+                cur_rank = rise_df.iloc[i,:]['rank']
+                last_rank = int(rise_df.iloc[i,:]['last_rank'])
+                participant_name = str(rise_df.iloc[i,:]['player_name'])
+                rise.append((cur_rank, last_rank, participant_name))
+
+            for i in range(0,4):
+                cur_rank = fall_df.iloc[i,:]['rank']
+                last_rank = int(fall_df.iloc[i,:]['last_rank'])
+                participant_name = str(fall_df.iloc[i,:]['player_name'])
+                fall.append((cur_rank, last_rank, participant_name))
 
             return {"rise":rise, "fall": fall}
 
@@ -228,13 +243,31 @@ if __name__ == "__main__":
 
     parser.add_argument('-g', '--gameweek_id', type= int, help = "Gameweek you are trying to get a report of")
     parser.add_argument('-l', '--league_id', type= int, help = "League_ID you are interested in")
+    parser.add_argument('-dry', '--dry_run', type=bool, help= "Dry run")
+
     args = parser.parse_args()
+    if args.dry_run:
 
-    test = LeagueWeeklyReport(args.gameweek_id, args.league_id)
+        test = LeagueWeeklyReport(args.gameweek_id, args.league_id)
+        with open(f"{MOCK_DIR}/leagues/weekly_score_transformation.json", 'r') as ins:
+            test.o_df = json.load(ins)
 
-    test.weekly_score_transformation()
-    test.merge_league_weekly_transfer()
-    test.add_auto_sub()
+        with open(f"{MOCK_DIR}/leagues/add_auto_sub.json", 'r') as ins:
+            test.f = json.load(ins)
 
-    output = test.create_report(display=True)
-    to_json(output, f"{WEEKLY_REPORT_DIR}/{str(args.league_id)}_{str(args.gameweek_id)}.json")
+        with open(f"{MOCK_DIR}/leagues/participants.json", 'r') as ins:
+            test.participants = json.load(ins)
+
+        test.o_df = pd.DataFrame(test.o_df)
+        test.f = pd.DataFrame(test.f)
+        test.participants = test.participants['participants']
+        output = test.create_report(display=True)
+
+    else: 
+        test = LeagueWeeklyReport(args.gameweek_id, args.league_id)
+
+        test.weekly_score_transformation()
+        test.merge_league_weekly_transfer()
+        test.add_auto_sub()
+        output = test.create_report(display=True)
+    #to_json(output, f"{WEEKLY_REPORT_DIR}/{str(args.league_id)}_{str(args.gameweek_id)}.json")
