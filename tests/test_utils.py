@@ -6,7 +6,7 @@ import os
 import json
 
 from tests.test_endpoints import test_fpl_url_endpoint
-from src.utils import check_gw, Participant, get_curr_event,League
+from src.utils import check_gw, Participant, get_curr_event,League, GameweekError
 
 from src.urls import FPL_URL,TRANSFER_URL
 import requests
@@ -69,8 +69,8 @@ def test_get_diff_gw_transfers(participant, span_fixture):
     assert list(row[span_fixture[0]].keys())[0] == participant
     assert set(row.keys()).union(set(span_fixture)) == set(span_fixture)
 
-def test_get_all_gw_transfers(participant,diff_gw_fixture):
-    row = get_gw_transfers([participant], diff_gw_fixture, all = True)
+def test_get_all_gw_transfers(participant,span_fixture):
+    row = get_gw_transfers([participant], span_fixture, all = True)
     keys = list(row.keys())
 
     start = keys[-1]
@@ -90,14 +90,14 @@ def test_get_participant_entry(participant, gw_fixture):
     assert "points_on_bench" in team_list_keys
     assert "event_transfers_cost" in team_list_keys
     assert "captain" in team_list_keys
-    assert "participants" in team_list_keys
+    assert "players" in team_list_keys
     assert "bench" in team_list_keys
     assert "auto_subs" in team_list_keys
 
-    assert len(team_list['players']) == 11 , 'Onfield players must be 11'
-    assert len(team_list['bench']) == 5, "Bench players must be 4"
-    assert len(team_list['captain']) == 1, "One captain"
-    assert len(team_list['vice_captain']) == 1, "One vice captain"
+    assert len(team_list['players'].split(',')) == 11 , 'Onfield players must be 11'
+    assert len(team_list['bench'].split(',')) == 4, "Bench players must be 4"
+    assert type(team_list['captain']) == int, "One captain"
+    assert type(team_list['vice_captain']) == int, "One vice captain"
 
 class TestParticipant():
 
@@ -139,22 +139,24 @@ class TestParticipant():
         output = test.get_all_week_transfers()
 
         assert type(output) == dict
-        #some weeks transfers are saved, so assertions cannot work 
-        #event_keys = set(list(output.keys()))
-        #all_keys = [i for i in range(1, curr_gw+1)]
-        #assert event_keys.union(all_keys) == event_keys
+    
+    @pytest.mark.parametrize("gameweek_list,gameweek_int", [([3,10], 8)])
+    def test_get_all_week_entries(self, participant,gameweek_list, gameweek_int):
+        test = Participant(participant)
+        test_list = test.get_all_week_entries(gameweek_list)
+        test_int = test.get_all_week_entries(gameweek_int)
 
-    def test_get_all_week_entries():
-        pass
+        assert len(test_list) == len(gameweek_list)
+        assert len(test_int)  == gameweek_int
+    
+    @pytest.mark.parametrize("gameweek_list,gameweek_int", [([1,10, 39], [13])])
+    def test_get_all_week_entries_incl_invalid(self, participant,gameweek_list, gameweek_int):
+        
+        test = Participant(participant)
 
-    def test_participant_get_all_week_entries():
-        pass
-
-    def test_participant_get_span_week_transfers():
-        pass
-
-    def test_participant_get_all_week_transfers():
-        pass
+        with pytest.raises(GameweekError):
+            test.get_all_week_entries(gameweek_list)
+        
 
 class TestLeague():
     
@@ -193,12 +195,17 @@ class TestLeague():
         assert 'entry' in test.participants[0].keys()
         assert 'entry_name' in test.participants[0].keys()
     
+        assert type(list(test.participant_name.values())[0]) == str
         assert type(names) == dict
 
-    def test_league_get_all_participant_entries():
-        pass
+    def test_league_get_all_participant_entries(self, league_fixture):
+        test = League(league_fixture)
+        test_all_entries = test.get_all_participant_entries(12)
+        assert len(test.participants) == len(test_all_entries)
+        assert type(test_all_entries) == list
 
-    def test_league_get_gw_transfers():
+
+    def test_league_get_gw_transfers(self, league_fixture):
         pass
 
 if __name__ == "__main__":

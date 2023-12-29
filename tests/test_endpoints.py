@@ -96,10 +96,10 @@ def test_fixture_endpoint():
     assert type(r[0]['stats']) == list
     del fixture_keys
 
-def test_transfer_endpoint(player):
+def test_transfer_endpoint(participant):
     """Tests transfer endpoint given a valid entry_id. 
     Response is a list of transfers for previous gameweeks"""
-    r = requests.get(TRANSFER_URL.format(player))
+    r = requests.get(TRANSFER_URL.format(participant))
     print(r.status_code)
     
     assert r.status_code == 200, 'Endpoint unavailable'
@@ -121,11 +121,11 @@ def test_transfer_endpoint(player):
     assert len(transfer_keys) == 7
 
 
-def test_history_endpoint(player):
+def test_history_endpoint(participant):
 
     """Extracts a players history for prior seasons given an id"""
 
-    r = requests.get(HISTORY_URL.format(player))
+    r = requests.get(HISTORY_URL.format(participant))
     assert r.status_code == 200, 'Endpoint unavailable'
     r = r.json()
 
@@ -300,9 +300,9 @@ def test_league_endpoint(classic_league):
     assert 'entry_name' in participant_info
 
 
-def test_fpl_player_endpoint(player,gw_fixture):
+def test_fpl_player_endpoint(participant,gw_fixture):
 
-    r = requests.get(FPL_PLAYER.format(player, gw_fixture))
+    r = requests.get(FPL_PLAYER.format(participant, gw_fixture))
     assert r.status_code == 200, 'Endpoint unavailable, check player_id and gameweek'
 
     r = r.json()    
