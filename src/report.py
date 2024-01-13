@@ -218,7 +218,6 @@ class LeagueWeeklyReport(League):
         self.captain = captain()
         self.vice_to_cap = promoted_vice()
         output = {"captain": self.captain, "promoted_vice": self.vice_to_cap, "chips": self.chips }
-        #output = {"chips": self.chips }
 
         output.update(outliers())
         output.update(rise_and_fall())
