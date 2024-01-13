@@ -19,6 +19,8 @@ class LeagueWeeklyReport(League):
     def __init__(self, gw: int, league_id:int):
         super().__init__(league_id)
         self.gw = gw
+
+    #ab
         
     @lru_cache(10)
     def weekly_score_transformation(self):
