@@ -1,0 +1,38 @@
+name : CI
+
+on :
+  push:
+    paths:
+      - 'src/**' 
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix: 
+        python-version: ["3.9"]
+
+    #ADD authorization
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-python@v4
+          with:
+            python-version: ${{ matrix.python-version }}
+
+      - name : load dependencies
+        id: init_env
+        run: python3 -m env | pip install -r requirements.txt
+
+      - name : Run tests with pytests
+        run: |
+          source init_env.sh 
+          echo "Running Tests"
+          pytest tests
+
+
