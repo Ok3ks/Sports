@@ -29,7 +29,6 @@ jobs:
         id: init_env
         run: python3 -m venv env | pip install -r requirements.txt
 
-
       - name : Run tests with pytests
         run: |
           source init_env.sh 
