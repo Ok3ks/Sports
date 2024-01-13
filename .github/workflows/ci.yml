@@ -17,21 +17,23 @@ jobs:
 
     #ADD authorization
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v3
           with:
             python-version: ${{ matrix.python-version }}
-
+              
       - name : load dependencies
         id: init_env
-        run: python3 -m env | pip install -r requirements.txt
+        run: python3 -m venv env | pip install -r requirements.txt
+
 
       - name : Run tests with pytests
         run: |
           source init_env.sh 
+          source env/bin/activate
           echo "Running Tests"
           pytest tests
 
