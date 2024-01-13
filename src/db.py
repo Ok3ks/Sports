@@ -25,7 +25,7 @@ def create_connection(db_file):
 
 pat = realpath(join(BASE_DIR, 'fpl'))
 engine = create_engine(f"sqlite:///{pat}/")
-print(engine)
+#print(engine)
 session = Session(engine)
 conn = create_connection(realpath(join(BASE_DIR,"fpl")))
 
@@ -44,16 +44,17 @@ def get_player(id, session = session):
     return out
 
 #ORM for each gameweek
-def get_player_stats_from_db(id, gw,conn = conn):
+def get_player_stats_from_db(id, gw):
     #GameweekSc
     query = f"SELECT total_points FROM Gameweek_{gw} WHERE player_id={id}"
-    c = conn.cursor()
-    c.execute(query)
+    conn = create_connection(realpath(join(BASE_DIR,"fpl")))
+    c = conn.execute(query)
     #print(c.fetchall())
     return c.fetchone()
 
-def check_minutes(id, gw, conn = conn):
+def check_minutes(id, gw):
     query = f"SELECT minutes FROM Gameweek_{gw} WHERE player_id={id}"
+    conn = create_connection(realpath(join(BASE_DIR,"fpl")))
     c = conn.cursor()
     c.execute(query)
     #print(c.fetchall())
@@ -86,6 +87,7 @@ def create_table(conn):
                         );
                         """
         #this created tables with column names 0,1,2. had to use ALTER TABLE
+        conn = create_connection(realpath(join(BASE_DIR,"fpl")))
         c = conn.cursor()
         c.execute(create_table_sql)
         print("Table Created")
@@ -109,6 +111,7 @@ def dummy_insert(conn):
 def insert(conn, data):
     try:
         #assert columns in data - conftest 
+        conn = create_connection(realpath(join(BASE_DIR,"fpl")))
         data.to_sql("EPL_PLAYERS_2023_1ST_HALF",conn,if_exists='replace',index=False)
         conn.commit()
         print("Data Insert Successful")
