@@ -38,7 +38,7 @@ backcall==0.2.0
     # via
     #   -r requirements.in
     #   ipython
-backports-zoneinfo==0.2.1
+#backports-zoneinfo==0.2.1
     # via
     #   pytz-deprecation-shim
     #   tzlocal
