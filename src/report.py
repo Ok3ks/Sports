@@ -20,7 +20,6 @@ class LeagueWeeklyReport(League):
         super().__init__(league_id)
         self.gw = gw
 
-    #ab
         
     @lru_cache(10)
     def weekly_score_transformation(self):
@@ -28,7 +27,6 @@ class LeagueWeeklyReport(League):
         
         one_df = pd.DataFrame(self.get_all_participant_entries(self.gw))
         self.o_df = one_df[~one_df['players'].isna()]
-
         
         self.o_df['points_breakdown'] = self.o_df['players'].map(lambda x: [get_player_stats_from_db(y, self.gw)[0] for y in x.split(",")])
         self.o_df['captain_points'] = self.o_df['captain'].map(lambda x: get_player_stats_from_db(x, self.gw)[0] * 2)
@@ -38,9 +36,6 @@ class LeagueWeeklyReport(League):
         self.o_df.rename(columns={'entry':'entry_id'}, inplace= True)
         self.o_df['rank'] = self.o_df['rank'].map(int)
         out = self.o_df.to_dict()
-
-        to_json(out, f"{MOCK_DIR}/leagues/weekly_score_transformation.json")
-        to_json({"participants": self.participants},  f"{MOCK_DIR}/leagues/participants.json")
 
         return self.o_df
 
@@ -67,7 +62,6 @@ class LeagueWeeklyReport(League):
         self.f['auto_sub_in_points'] = self.f['auto_sub_in_player'].map(lambda x: sum([get_player_stats_from_db(y, self.gw)[0] for y in x]))
         self.f['auto_sub_out_points'] = self.f['auto_sub_in_player'].map(lambda x: sum([get_player_stats_from_db(y, self.gw)[0] for y in x]))
         out = self.f.to_dict()
-        to_json(out, f"{MOCK_DIR}/leagues/add_auto_sub.json")
 
     def create_report(self,display = True):
 
@@ -92,15 +86,17 @@ class LeagueWeeklyReport(League):
             rise_df = df[df['rank_delta'] > 0].sort_values(by='rank_delta', ascending= False)
             fall_df = df[df['rank_delta'] < 0].sort_values(by='rank_delta', ascending= True)
 
-
-            for i in range(0,4):
-                cur_rank = rise_df.iloc[i,:]['rank']
+            n = min(len(rise_df), 4)
+            for i in range(0,n):
+                cur_rank = int(rise_df.iloc[i,:]['rank'])
                 last_rank = int(rise_df.iloc[i,:]['last_rank'])
                 participant_name = str(rise_df.iloc[i,:]['player_name'])
                 rise.append((cur_rank, last_rank, participant_name))
+                break
 
-            for i in range(0,4):
-                cur_rank = fall_df.iloc[i,:]['rank']
+            n = min(len(fall_df), 4)
+            for i in range(0,n):
+                cur_rank = int(fall_df.iloc[i,:]['rank'])
                 last_rank = int(fall_df.iloc[i,:]['last_rank'])
                 participant_name = str(fall_df.iloc[i,:]['player_name'])
                 fall.append((cur_rank, last_rank, participant_name))
@@ -148,26 +144,33 @@ class LeagueWeeklyReport(League):
             return {"exceptional": exceptional ,"abysmal": abysmal, "league_average": league_average}
 #       
         def out_transfer_stats():
+            """ """
+            
+            n = min(len(self.f), 3)
             counts = self.f['element_out'].value_counts().reset_index().to_dict('list')
-            most_transf_out = [(counts['element_out'][i], get_player(counts['index'][i])) for i in range(3)]
-            least_transf_out = [(counts['element_out'][-i] , get_player(counts['index'][-i])) for i in range(1,4)]
+            
+            most_transf_out = [(counts['element_out'][i], get_player(counts['index'][i])) for i in range(n)]
+            least_transf_out = [(counts['element_out'][-i] , get_player(counts['index'][-i])) for i in range(-1,-1-n)]
             return {"most_transferred_out": most_transf_out, "least_transferred_out": least_transf_out}
 
         def in_transfer_stats():
             """Output = {"most_transferred_in" : [], "least_transferred_in": []}"""
 
+            n = min(len(self.f), 3)
             counts = self.f['element_in'].value_counts().reset_index().to_dict('list')
-            most_transf_in = [(counts['element_in'][i], get_player(counts['index'][i])) for i in range(3)]
-            least_transf_in = [(counts['element_in'][-i] , get_player(counts['index'][-i])) for i in range(1,4)] #because -0 == 0
+            
+            most_transf_in = [(counts['element_in'][i], get_player(counts['index'][i])) for i in range(n)]
+            least_transf_in = [(counts['element_in'][-i] , get_player(counts['index'][-i])) for i in range(-1,-1-n)] #because -0 == 0
+            
             return {"most_transferred_in" :most_transf_in, "least_transferred_in": least_transf_in}
 #
-
         def worst_transfer_in():
             """Output = {"worst_transfer_in":[()]}"""
             worst_transfer_in = []
 
+            n = min(len(self.f), 3)
             self.no_chips = self.no_chips.sort_values(by = 'delta', ascending=False)
-            for i in range(1,3):
+            for i in range(1,n):
                 player_in = self.no_chips.iloc[-i,:]['element_in']
                 player_out = self.no_chips.iloc[-i,:]['element_out']
                 points_lost = int(self.no_chips.iloc[-i,:]['delta'])
@@ -179,8 +182,11 @@ class LeagueWeeklyReport(League):
         def best_transfer_in():
             """Output = {"best_transfer_in":[()]}"""
             best_transfer_in = []
+            
             self.no_chips = self.no_chips.sort_values(by = 'delta', ascending=False)
-            for i in range(0,3):
+            n = min(len(self.f), 3)
+            
+            for i in range(0,n):
                 player_in = self.no_chips.iloc[i,:]['element_in']
                 player_out = self.no_chips.iloc[i,:]['element_out']
                 points_gained = int(self.no_chips.iloc[i,:]['delta'])
@@ -193,7 +199,9 @@ class LeagueWeeklyReport(League):
             """ Points obtained from the bench """
             jammy_points = []
             self.f= self.f.sort_values(by='auto_sub_in_points', ascending=False)
-            for i in range(3):
+
+            n = min(len(self.f), 3)
+            for i in range(n):
                 auto_sub_in = self.f.iloc[i,:]['auto_sub_in_player']
                 auto_sub_out = self.f.iloc[i,:]['auto_sub_out_player']
                 auto_sub_points = int(self.f.iloc[i,:]['auto_sub_in_points'])
@@ -207,7 +215,9 @@ class LeagueWeeklyReport(League):
             self.f['points_on_bench'] = self.no_chips['points_on_bench'].astype(int)
             self.f = self.f.sort_values(by = 'points_on_bench', ascending= False)
             most_points = []
-            for i in range(3):
+
+            n = min(len(self.f), 3)
+            for i in range(n):
                 player_on_bench = self.f.iloc[i,:]['bench'].split(",")
                 point_player = {get_player(id =i):get_player_stats_from_db(int(i), self.gw)[0] for i in player_on_bench}
                 points_on_bench = int(self.f.iloc[i,:]['points_on_bench'])
@@ -234,6 +244,8 @@ class LeagueWeeklyReport(League):
 
         if display:
             print(output)
+            to_json(output, f"{WEEKLY_REPORT_DIR}/{str(self.league_id)}_{str(self.gw)}.json")
+        
         return output
 
 #Output of report page should be a json for a django template
@@ -271,4 +283,4 @@ if __name__ == "__main__":
         test.merge_league_weekly_transfer()
         test.add_auto_sub()
         output = test.create_report(display=True)
-    #to_json(output, f"{WEEKLY_REPORT_DIR}/{str(args.league_id)}_{str(args.gameweek_id)}.json")
+    
