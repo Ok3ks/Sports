@@ -2,6 +2,8 @@ on:
   push:
     paths: 
       - 'src/report.py'
+env:
+  user: okeks121
 
 jobs:
   build:
@@ -23,5 +25,5 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
-          tags: user/app:latest
+          tags: ${{ env.user }}/test:latest
 
