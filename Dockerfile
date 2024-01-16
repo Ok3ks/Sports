@@ -3,9 +3,9 @@ FROM python:3.9-slim
 WORKDIR /fast_api
 
 COPY src ./
-COPY requirements.txt .
-COPY fpl .
-COPY init_env.sh .
+COPY requirements.txt ./
+COPY fpl ./
+COPY init_env.sh ./
 
 RUN pip install -r requirements.txt
 RUN . init_env.sh
@@ -15,5 +15,5 @@ RUN . init_env.sh
 #RUN ["python3", "update_gameweek_score.py" "-${gameweek}"] 
 #if gameweek is ongoing, return response that gameweek is ongoing
 
-WORKDIR /fast_api/src
-CMD uvicorn api:app
+#WORKDIR /fast_api/src
+CMD uvicorn src.api:app
