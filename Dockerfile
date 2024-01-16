@@ -4,7 +4,8 @@ WORKDIR /fast_api
 
 COPY ["src" "./"]
 COPY ["requirements.txt", './']
-COPY ["fpl", ""]
+COPY ["fpl", "./"]
+COPY ["init_env.sh", "./"]
 
 RUN pip install -r requirements.txt
 RUN ["source", "init_env.sh"]
