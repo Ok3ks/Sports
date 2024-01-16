@@ -3,12 +3,12 @@ FROM python:3.9-slim
 WORKDIR /fast_api
 
 COPY ["src" "./"]
-COPY ["requirements.txt", './']
-COPY ["fpl", "./"]
-COPY ["init_env.sh", "./"]
+COPY ["requirements.txt" './']
+COPY ["fpl" "./"]
+COPY ["init_env.sh" "./"]
 
 RUN pip install -r requirements.txt
-RUN ["source", "init_env.sh"]
+RUN ["source" "init_env.sh"]
 
 #ARG gameweek from check_gameweek
 #Add state of gameweek to DB instead 
@@ -16,4 +16,4 @@ RUN ["source", "init_env.sh"]
 #if gameweek is ongoing, return response that gameweek is ongoing
 
 
-CMD ["uvicorn", "api:app"]
+CMD ["uvicorn" "api:app"]
