@@ -16,4 +16,4 @@ RUN pip install -r requirements.txt
 #if gameweek is ongoing, return response that gameweek is ongoing
 
 WORKDIR /fast_api/src
-CMD ["uvicorn" "api:app"]
+CMD uvicorn api:app
