@@ -8,7 +8,7 @@ COPY fpl .
 COPY init_env.sh .
 
 RUN pip install -r requirements.txt
-#RUN ["source" "init_env.sh"]
+RUN source init_env.sh
 
 #ARG gameweek from check_gameweek
 #Add state of gameweek to DB instead 
