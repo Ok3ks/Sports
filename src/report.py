@@ -15,6 +15,7 @@ import json
 conn = create_connection(realpath(join(BASE_DIR,"fpl")))
 #Refactor to composition instead of inheritance
 class LeagueWeeklyReport(League):
+    #
 
     def __init__(self, gw: int, league_id:int):
         super().__init__(league_id)
