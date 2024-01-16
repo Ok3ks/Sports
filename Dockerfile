@@ -2,10 +2,10 @@ FROM python:3.9-slim
 
 WORKDIR /fast_api
 
-COPY ["src" "./"]
-COPY ["requirements.txt" "./"]
-COPY ["fpl" "./"]
-#COPY ["init\_env\.sh" "./"]
+COPY ["src" ./]
+COPY ["requirements.txt" ./]
+COPY ["fpl" ./]
+COPY ["init_env.sh" ./]
 
 RUN pip install -r requirements.txt
 #RUN ["source" "init_env.sh"]
