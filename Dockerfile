@@ -2,7 +2,7 @@ FROM python:3.9-slim
 
 WORKDIR /fast_api
 
-COPY src ./
+COPY src ./src
 COPY requirements.txt ./
 COPY fpl ./
 COPY init_env.sh ./
