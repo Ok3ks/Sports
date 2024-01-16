@@ -2,8 +2,8 @@ FROM python:3.9-slim
 
 WORKDIR /fast_api
 
-COPY ["src" "/"]
-COPY ["requirements.txt" './']
+COPY ["src" "./"]
+COPY ["requirements.txt" "./"]
 COPY ["fpl" "./"]
 #COPY ["init\_env\.sh" "./"]
 
