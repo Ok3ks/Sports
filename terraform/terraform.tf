@@ -5,6 +5,5 @@ terraform {
             version = "5.11.0"
         }
     }
-    required_providers = ">=1.1.0"
 }
 
