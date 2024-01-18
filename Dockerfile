@@ -7,9 +7,8 @@ COPY requirements.txt ./
 COPY fpl ./
 COPY init_env.sh ./
 
-RUN python3 -m venv en
 RUN pip install -r requirements.txt
-RUN "init_env.sh"
+RUN source init_env.sh
 
 
 #ARG gameweek from check_gameweek
