@@ -8,7 +8,7 @@ COPY fpl ./
 COPY init_env.sh ./
 
 RUN pip install -r requirements.txt
-RUN init_env.sh
+SHELL ["/bin/bash", "-c", "init_env.sh"]
 
 
 #ARG gameweek from check_gameweek
