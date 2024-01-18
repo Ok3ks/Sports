@@ -16,5 +16,5 @@ SHELL ["/bin/bash", "-c", "init_env.sh"]
 #RUN ["python3", "update_gameweek_score.py" "-${gameweek}"] 
 #if gameweek is ongoing, return response that gameweek is ongoing
 
-#WORKDIR /fast_api/src
-CMD uvicorn src.api:app
+WORKDIR /fast_api/src
+CMD uvicorn api:app
