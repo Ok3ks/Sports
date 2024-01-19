@@ -18,4 +18,4 @@ SHELL ["/bin/bash", "-c", "init_env.sh"]
 
 #WORKDIR /fast_api/src
 #CMD python3 -m uvicorn api:app
-CMD ["uvicorn", "src.api:app", "--host", "127.0.0.1", "--port", "8080"]
+CMD ["uvicorn", "src.api:app"]
