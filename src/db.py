@@ -29,17 +29,17 @@ engine = create_engine(f"sqlite:///{pat}/")
 session = Session(engine)
 conn = create_connection(realpath(join(BASE_DIR,"fpl")))
 
-def get_player(id, session = session):
+def get_player(id, session = session, attr = 'player_name'):
     out = []
     if isinstance(id, list):
         for item in id:
             stmt = select(Player).where(Player.player_id == int(item))
             obj = session.scalars(stmt).one()
-            out.append(obj.player_name)
+            out.append(obj.__getattribute__(attr))
     else:
         stmt = select(Player).where(Player.player_id == int(id))
         out = session.scalars(stmt).one()
-        out = out.player_name
+        out = out.__getattribute__(attr)
         #print(obj.player_name)
     return out
 

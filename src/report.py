@@ -110,13 +110,13 @@ class LeagueWeeklyReport(League):
 
         def promoted_vice():
             self.vice_to_cap= {}
-            ben = {get_player(item): [] for item in set(self.o_df['vice_captain'])}
+            ben = {get_player(item) : [] for item in set(self.o_df['vice_captain'])}
         
             for row in self.o_df.itertuples():
                 if check_minutes(int(row.captain), self.gw)[0] == 0:
-                    self.vice_to_cap[get_player(row.vice_captain)] = [get_player(row.captain)]
-                    self.vice_to_cap[get_player(row.vice_captain)].append(get_player_stats_from_db(row.vice_captain, self.gw)[0]*2)
-                    ben[get_player(row.vice_captain)].append(self.participants_name[str(row.entry_id)])
+                    self.vice_to_cap[get_player(row.vice_captain) ] = [get_player(row.captain) ]
+                    self.vice_to_cap[get_player(row.vice_captain) ].append(get_player_stats_from_db(row.vice_captain, self.gw)[0]*2)
+                    ben[get_player(row.vice_captain) ].append(self.participants_name[str(row.entry_id)])
 
             for key,values in ben.items():
                 if key in self.vice_to_cap.keys():
@@ -159,8 +159,8 @@ class LeagueWeeklyReport(League):
             n = min(len(self.f), 3)
             counts = self.f['element_in'].value_counts().reset_index().to_dict('list')
             
-            most_transf_in = [(counts['element_in'][i], get_player(counts['index'][i])) for i in range(n)]
-            least_transf_in = [(counts['element_in'][-i] , get_player(counts['index'][-i])) for i in range(-1,-1-n)] #because -0 == 0
+            most_transf_in = [(counts['element_in'][i], get_player(counts['index'][i]) ) for i in range(n)]
+            least_transf_in = [(counts['element_in'][-i] , get_player(counts['index'][-i]) ) for i in range(-1,-1-n)] #because -0 == 0
             
             return {"most_transferred_in" :most_transf_in, "least_transferred_in": least_transf_in}
 #
