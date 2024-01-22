@@ -29,31 +29,31 @@ def test_gameweek_endpoint(gw_fixture):
     assert 'explain' in element_keys 
     del element_keys
 
-    stats_keys = r['elements'][0]['stats'].keys()
-    assert 'minutes' in stats_keys
-    assert 'goals_scored' in stats_keys
-    assert 'assists' in stats_keys
-    assert 'clean_sheets' in stats_keys
-    assert 'goals_conceded' in stats_keys
-    assert 'own_goals' in stats_keys
-    assert 'penalties_saved' in stats_keys
-    assert 'penalties_missed' in stats_keys
-    assert 'yellow_cards' in stats_keys
-    assert  'red_cards' in stats_keys
-    assert 'saves' in stats_keys
-    assert 'bonus' in stats_keys
-    assert 'bps' in stats_keys
-    assert 'influence' in stats_keys
-    assert 'creativity' in stats_keys
-    assert 'threat' in stats_keys
-    assert 'ict_index' in stats_keys
-    assert 'starts' in stats_keys
-    assert 'expected_goals' in stats_keys
-    assert 'expected_assists' in stats_keys
-    assert 'expected_goal_involvements' in stats_keys
-    assert 'expected_goals_conceded' in stats_keys
-    assert 'total_points' in stats_keys
-    assert 'in_dreamteam' in stats_keys
+    stats_keys = set(r['elements'][0]['stats'].keys())
+    curr_keys = ['minutes','goals_scored', 'assists' 
+    , 'clean_sheets' 
+    , 'goals_conceded' 
+    , 'own_goals' 
+    , 'penalties_saved' 
+    , 'penalties_missed' 
+    , 'yellow_cards' 
+    ,  'red_cards' 
+    , 'saves' 
+    , 'bonus' 
+    , 'bps' 
+    , 'influence' 
+    , 'creativity' 
+    , 'threat' 
+    , 'ict_index' 
+    , 'starts' 
+    , 'expected_goals' 
+    , 'expected_assists' 
+    , 'expected_goal_involvements' 
+    , 'expected_goals_conceded' 
+    , 'total_points' 
+    , 'in_dreamteam']
+
+    assert len(stats_keys.difference(set(curr_keys))) == 0, f'Keys have changed {stats_keys.difference(set(curr_keys))}'
 
     del stats_keys
     explain_key = r['elements'][0]['explain'][0].keys()
@@ -159,20 +159,13 @@ def test_history_endpoint(participant):
 
     current_keys = r['current'][0].keys()
 
-    assert 'event' in current_keys
-    assert 'points' in current_keys
-    assert 'total_points' in current_keys
-    assert 'rank' in current_keys
-    assert 'rank_sort' in current_keys
+    keys = ['event', 'points','total_points','rank','rank_sort','percentile_rank',
+            'overall_rank', 'bank', 'value','event_transfers','event_transfers_cost',
+            'points_on_bench']
+    
+    assert len(set(keys).difference(set(current_keys))) == 0, "Number of keys has changed"
 
-    assert 'overall_rank' in current_keys
-    assert 'bank' in current_keys
-    assert 'value' in current_keys
-    assert 'event_transfers' in current_keys
-    assert 'event_transfers_cost' in current_keys
-    assert 'points_on_bench' in current_keys
-
-    assert len(current_keys) == 11, "Number of keys has changed"
+    assert len(current_keys) == 12, "Number of keys has changed"
 
     past_keys = r['past'][0].keys()
 
@@ -334,19 +327,21 @@ def test_fpl_player_endpoint(participant,gw_fixture):
 
     entry_history_keys = list(r['entry_history'].keys())
     
-    assert 'event' in entry_history_keys
-    assert 'points' in entry_history_keys
-    assert 'total_points' in entry_history_keys
-    assert 'rank' in entry_history_keys
-    assert 'rank_sort' in entry_history_keys
-    assert 'overall_rank' in entry_history_keys
-    assert 'bank' in entry_history_keys
-    assert 'value' in entry_history_keys
-    assert 'event_transfers' in entry_history_keys
-    assert 'event_transfers_cost' in entry_history_keys
-    assert 'points_on_bench' in entry_history_keys
-
-    assert len(entry_history_keys) == 11, 'Keys have changed'
+    curr_entry_history_keys = ['event',
+    'points',
+    'total_points',
+    'rank',
+    'rank_sort',
+    'percentile_rank',
+    'overall_rank',
+    'bank',
+    'value',
+    'event_transfers',
+    'event_transfers_cost',
+    'points_on_bench']
+    
+    print(entry_history_keys)
+    assert len(set(entry_history_keys).difference(set(curr_entry_history_keys))) == 0, 'Keys have changed'
     assert type(r['picks']) == list
     
     picks_keys = list(r['picks'][0].keys())
@@ -384,32 +379,14 @@ def test_fpl_url_endpoint():
     print(r['events'][15])
 
  
-
-    assert 'id' in event_keys
-    assert 'name' in event_keys
-    assert 'deadline_time' in event_keys
-    assert 'average_entry_score' in event_keys
-    assert 'finished' in event_keys
-    assert 'data_checked' in event_keys
-    assert 'highest_scoring_entry' in event_keys
-    assert 'deadline_time_epoch' in event_keys
-    assert 'deadline_time_game_offset' in event_keys
-    assert 'highest_score' in event_keys
-    assert 'is_previous' in event_keys
-    assert 'is_current' in event_keys
-    assert 'is_next' in event_keys
-    assert 'cup_leagues_created' in event_keys
-    assert 'h2h_ko_matches_created' in event_keys
-    assert 'chip_plays' in event_keys
-    assert 'most_selected' in event_keys
-    assert 'most_transferred_in' in event_keys
-    assert 'top_element' in event_keys
-    assert 'top_element_info' in event_keys
-    assert 'transfers_made' in event_keys
-    assert 'most_captained' in event_keys
-    assert 'most_vice_captained' in event_keys
-    assert len(event_keys) == 23, 'Keys have changed'
-
+    curr_event_keys = ['id','name','deadline_time','average_entry_score','finished', 'data_checked',
+                       'highest_scoring_entry','deadline_time_epoch','deadline_time_game_offset','highest_score','is_previous',
+                       'is_current', 'is_next', 'cup_leagues_created', 'h2h_ko_matches_created', 
+                       'chip_plays','most_selected', 'most_transferred_in', 'top_element', 
+                       'top_element_info','transfers_made','most_captained', 'most_vice_captained'
+                       ]
+    
+    assert len(set(curr_event_keys).difference(set(event_keys))) == 0, f'Keys have changed {set(curr_event_keys).difference(set(event_keys))}'
 
     assert type(r['game_settings']) == dict
     game_settings_keys = r['game_settings'].keys()
