@@ -14,11 +14,5 @@ RUN pip install -r requirements.txt
 RUN PYTHONPATH=${PYTHONPATH}:$(pwd)
 #SHELL ["/bin/bash", "-c", "init_env.sh"]
 
-
-#Add state of gameweek to DB instead 
-#RUN ["python3", "update_gameweek_score.py" "-${gameweek}"] 
-#if gameweek is ongoing, return response that gameweek is ongoing
-
 EXPOSE  8080
-#CMD python3 -m uvicorn api:app
 CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8080"]

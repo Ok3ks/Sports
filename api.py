@@ -1,5 +1,5 @@
 """
-Building a REST API servicing a neural network checkpoint using FastAPI.
+Building a REST API using FastAPI.
 """
 import os
 from os.path import join,realpath
