@@ -17,5 +17,6 @@ SHELL ["/bin/bash", "-c", "init_env.sh"]
 #if gameweek is ongoing, return response that gameweek is ongoing
 
 WORKDIR /fast_api/src
+EXPOSE  8080
 #CMD python3 -m uvicorn api:app
 CMD ["uvicorn", "api:app"]
