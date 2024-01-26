@@ -21,4 +21,4 @@ RUN PYTHONPATH=${PYTHONPATH}:$(pwd)
 
 EXPOSE  8080
 #CMD python3 -m uvicorn api:app
-CMD ["uvicorn", "api:app"]
+CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8080"]
