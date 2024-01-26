@@ -5,6 +5,7 @@ WORKDIR /fast_api
 COPY src ./src
 COPY requirements.txt ./
 COPY fpl ./
+COPY api.py ./
 COPY init_env.sh ./
 
 RUN pip install -r requirements.txt
@@ -16,7 +17,6 @@ SHELL ["/bin/bash", "-c", "init_env.sh"]
 #RUN ["python3", "update_gameweek_score.py" "-${gameweek}"] 
 #if gameweek is ongoing, return response that gameweek is ongoing
 
-WORKDIR /fast_api/src
 EXPOSE  8080
 #CMD python3 -m uvicorn api:app
 CMD ["uvicorn", "api:app"]
