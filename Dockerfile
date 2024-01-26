@@ -6,7 +6,7 @@ COPY requirements.txt ./
 COPY fpl ./
 COPY api.py ./
 COPY init_env.sh ./
-COPY src ./src
+COPY src ./src/
 COPY fpl ./
 
 
