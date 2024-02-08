@@ -50,8 +50,6 @@ async def startup_event():
   response_model = InferenceResponse,
   responses = {422: {'model': ErrorResponse}, 500: {'model': ErrorResponse}})
 
-#parse request and check cache
-
 def predict(request: Request, body: InferenceInput, status_code = 200):
     print('`/api/v1/league` endpoint called.')
 

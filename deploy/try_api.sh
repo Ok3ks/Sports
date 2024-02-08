@@ -5,6 +5,6 @@ curl -X 'POST' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
-   "gameweek_id": 16,
+   "gameweek_id": 21,
    "league_id": 85647
   }'

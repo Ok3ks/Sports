@@ -13,4 +13,3 @@ module "sqldb" {
     project_id = var.project_id
     db_name = var.db_name
 }
-
