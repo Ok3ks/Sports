@@ -2,7 +2,7 @@ name: continuous deployment
 on:
   push:
     paths:
-      - 'src/report.py'
+      - 'deploy'
     branches: [main]
 
 env:
