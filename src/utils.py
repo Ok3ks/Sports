@@ -1,8 +1,10 @@
-import requests
+from requests import get as wget
 import time
 import pandas as pd
 import json
 import numpy as np
+
+#from line_profiler_decorator import profiler
 
 from os.path import join, realpath
 import os
@@ -11,8 +13,8 @@ from src.urls import GW_URL,FIXTURE_URL,TRANSFER_URL, HISTORY_URL, FPL_URL
 from src.urls import H2H_LEAGUE, LEAGUE_URL, FPL_PLAYER
 from functools import lru_cache
 
-from src.paths import APP_DIR
-from src.db import Player
+from src.paths import APP_DIR, MOCK_DIR
+from src.db import Player,get_player, get_player_stats_from_db
 from typing import List, Union, Optional, Tuple
 
 def to_json(x:dict, fp):
@@ -70,7 +72,7 @@ def get_gw_transfers(alist:List[int], gw:Union[int,List[int]], all = False) -> d
 
     if valid:
         for entry_id in alist:
-            r = requests.get(TRANSFER_URL.format(entry_id))
+            r = wget(TRANSFER_URL.format(entry_id))
             if r.status_code == 200:
                 obj = r.json()
                 for item in obj:
@@ -86,6 +88,7 @@ def get_gw_transfers(alist:List[int], gw:Union[int,List[int]], all = False) -> d
                 print("{} does not exist or Transfer URL endpoint unavailable".format(entry_id))
     return row
 
+
 def get_participant_entry(entry_id:int, gw:int) -> dict:
 
     """Calls an Endpoint to retrieve a participants entry"""
@@ -95,39 +98,44 @@ def get_participant_entry(entry_id:int, gw:int) -> dict:
         valid, gw = False, None
 
     if valid:
-
-        r = requests.get(FPL_PLAYER.format(entry_id, gw))
+        #optimization, imported get directly from requests, but changed name to wget for easy reference
+        r = wget(FPL_PLAYER.format(entry_id, gw))
         
         print("Retrieving results, participant {} for event = {}".format(entry_id, gw))
-        team_list = {'auto_subs' : {'in': [], 'out': []}}
+
+        #optimization - assigning size of dictionary before hand to prevent resizing of dictionaries
+        team_list = {'auto_subs' : [], 'gw' : None, 'entry': None, 'active_chip': None,
+                     'points_on_bench' : None, 'total_points': None, 'event_transfers_cost': None,
+                     'players': '', 'bench': '','vice_captain': None, 'captain': None}
 
         if r.status_code == 200:
             obj = r.json()
 
             team_list['gw'] = gw
-            team_list['entry'] = entry_id
+            team_list['entry_id'] = entry_id
             team_list['active_chip'] = obj['active_chip']
             
             team_list['points_on_bench'] = obj['entry_history']['points_on_bench']
             team_list['total_points'] = obj['entry_history']['points']
-            team_list['points_on_bench'] = obj['entry_history']['points_on_bench']
             team_list['event_transfers_cost'] = obj['entry_history']['event_transfers_cost']
             
             if obj['automatic_subs']:
-                for item in obj['automatic_subs']:
-                    team_list['auto_subs']['in'].append(item['element_in'])
-                    team_list['auto_subs']['out'].append(item['element_out'])
+                #optimization 1
+                team_list["auto_subs"] = [(item['element_in'],item['element_out'],) for item in obj['automatic_subs']]
+                
+                #for item in obj['automatic_subs']:
+                    #team_list['auto_subs']['in'].append(item['element_in'])
+                    #team_list['auto_subs']['out'].append(item['element_out'])
+
             for item in obj['picks']:
                 if item['multiplier'] != 0:
-                    if 'players' not in list(team_list.keys()):
+                    if len(team_list['players']) < 1: 
                         team_list['players'] = str(item['element'])
-                    else: 
-                        team_list['players'] = team_list['players'] + ','+ str(item['element'])
+                    team_list['players'] = team_list['players'] + ','+ str(item['element'])
                 else:
-                    if 'bench' not in list(team_list.keys()):
+                    if len(team_list['bench']) < 1: 
                         team_list['bench'] = str(item['element'])
-                    else: 
-                        team_list['bench'] = team_list['bench'] + ','+ str(item['element'])
+                    team_list['bench'] = team_list['bench'] + ','+ str(item['element'])
                 if item['is_captain']:
                     team_list['captain'] = int(item['element'])
                 if item['is_vice_captain']:
@@ -135,10 +143,11 @@ def get_participant_entry(entry_id:int, gw:int) -> dict:
                 
         else:
             print("{} does not exist".format(entry_id))
+    
     return team_list
 
 def get_curr_event():
-    r = requests.get(FPL_URL)
+    r = wget(FPL_URL)
 
     curr_event = []
     r = r.json()
@@ -147,6 +156,86 @@ def get_curr_event():
             curr_event.append(event['id'])
             curr_event.append((event['finished'], event['data_checked']))
     return curr_event
+
+class Gameweek():
+    def __init__(self, gw = get_curr_event()[0]):
+        self.gw = gw
+
+    def get_payload(self):
+        temp = wget(GW_URL.format(self.gw))
+        temp_2 = wget(FPL_URL)
+
+        self.json = temp.json()
+        self.gw_json = temp_2.json()
+
+    def parse_payload(self):
+        out = []
+
+        for item in self.json['elements']:
+            obj = item['stats']
+            obj['id'] = item['id']
+            obj['value']=  item['explain'][0]['stats'][0]['value']
+            obj['fixture'] = item['explain'][0]['fixture']
+            out.append(obj)
+        
+        self.week_df = pd.DataFrame(out)
+        print(self.week_df)
+
+        for item in self.gw_json['events']:
+            if int(item['id']) == int(self.gw):
+                self.status = item
+
+    def highest_scoring_player(self):
+        highest = self.week_df.sort_values(by='total_points', ascending=False).iloc[0,:]
+        print(get_player(highest['id']).player_id)        
+        print(get_player(highest['id']).team) 
+    #highest scoring player, : output ownership, team, fixture
+        del highest
+        
+    def dream_team(self):
+        dream_team = self.week_df[self.week_df['in_dreamteam'] == True]
+        print(dream_team)
+        for i in dream_team.itertuples():
+            print(i[-3], get_player(i[-3]).player_name)
+
+    def highest_xg(self):
+        highest_xg = self.week_df.sort_values(by='expected_goals', ascending=False).iloc[0,:]
+        print("\n Higest Xg")
+        print(get_player(highest_xg['id']).team)
+        print(get_player(highest_xg['id']).player_name)
+
+    def highest_xgc(self):
+        highest_xgc = self.week_df.sort_values(by='expected_goals_conceded', ascending=False).iloc[0,:]
+        print("\n Highest Xgc")
+        print(get_player(highest_xgc['id']).team)
+        print(get_player(highest_xgc['id']).player_name)
+
+    def highest_xa(self):
+        highest_xa = self.week_df.sort_values(by='expected_assists', ascending=False).iloc[0,:]
+        print("\n Highest xA")
+        print(get_player(highest_xa['id']).team)
+        print(get_player(highest_xa['id']).player_name)
+
+    def gameweek_status(self):
+        if self.status['is_current']:
+            print(self.gw, "Current Gameweek")
+        else:
+            if not self.status['Finished']:
+                print(f"Gameweek {self.gw} is yet to be played")
+            else:
+                print(self.chip_usage())
+                print(self.highest_score())
+                print(self.gameweek_average())
+
+    def chip_usage(self):
+        return self.status['chip_plays']
+
+    def highest_score(self):
+        return self.status['highest_scoring_entry']
+    
+    def gameweek_average(self):
+        return self.status['average_entry_score']
+        
 
 class Participant():
     def __init__(self, entry_id):
@@ -163,7 +252,7 @@ class Participant():
             valid, gw = False, None
 
         if all or valid:
-            r = requests.get(TRANSFER_URL.format(self.participant))
+            r = wget(TRANSFER_URL.format(self.participant))
             if r.status_code == 200:
                 obj = r.json()
                 for item in obj:
@@ -230,7 +319,7 @@ class League():
             has_next = True
             PAGE_COUNT = 1
             while has_next:
-                r = requests.get(LEAGUE_URL.format(self.league_id, PAGE_COUNT))
+                r = wget(LEAGUE_URL.format(self.league_id, PAGE_COUNT))
                 obj =r.json()
                 assert r.status_code == 200, 'error connecting to the endpoint'
                 del r
@@ -254,8 +343,13 @@ class League():
     def get_all_participant_entries(self,gw, refresh = False) -> list:
         if not self.participants or refresh:
             self.obtain_league_participants()
-        self.participant_entries = [get_participant_entry(participant['entry'],gw) for participant in self.participants]
-        return self.participant_entries
+
+        # optimization 2
+        for participant in self.participants:
+            yield get_participant_entry(participant['entry'], gw)
+
+        #self.participant_entries = [get_participant_entry(participant['entry'],gw) for participant in self.participants]
+        #return self.participant_entries
     
     def get_gw_transfers(self,gw, refresh = False) -> dict:
         if not self.participants or refresh:
@@ -265,5 +359,28 @@ class League():
     
 
 if __name__ == "__main__":
-    league = League(1088941)
-    print(league.obtain_league_participants())
+
+    import argparse
+    parser = argparse.ArgumentParser(prog = "weeklyreport", description = "Provide Gameweek ID and League ID")
+
+    parser.add_argument('-g', '--gameweek_id', type= int, help = "Gameweek you are trying to get a report of")
+    parser.add_argument('-dry', '--dry_run', type=bool, help= "Dry run")
+
+    args = parser.parse_args()
+    if args.dry_run:
+
+        test_gw = Gameweek(args.gameweek_id)
+        with open(f"{MOCK_DIR}/endpoints/gameweek_endpoint.json", 'r') as ins:
+            test_gw.json = json.load(ins)
+
+        with open(f"{MOCK_DIR}/endpoints/fpl_url_endpoint.json", 'r') as ins_2:
+            test_gw.gw_json = json.load(ins_2)
+
+        test_gw.parse_payload()
+        #test_gw.highest_scoring_player()
+        #test_gw.dream_team()
+        #test_gw.highest_xg()
+        #test_gw.highest_xgc()
+        #test_gw.highest_xa()
+
+        #test_gw.gameweek_status()

@@ -23,6 +23,7 @@ class LeagueWeeklyReport(League):
         super().__init__(league_id)
         self.gw = gw
     
+    @lru_cache(10)
     @profile
     def get_data(self):
         self.one_df = pd.DataFrame(self.get_all_participant_entries(self.gw))
@@ -40,7 +41,7 @@ class LeagueWeeklyReport(League):
         self.o_df['vice_captain_points'] = self.o_df['vice_captain'].map(lambda x: get_player_stats_from_db(x, self.gw)[0])
         
         self.o_df['rank'] = self.o_df['total_points'].rank(ascending=False)
-        self.o_df.rename(columns={'entry':'entry_id'}, inplace= True)
+        #self.o_df.rename(columns={'entry':'entry_id'}, inplace= True)
         self.o_df['rank'] = self.o_df['rank'].map(int)
         return self.o_df
     
@@ -65,9 +66,14 @@ class LeagueWeeklyReport(League):
     @profile
     def add_auto_sub(self):
         
-        #to_json(self.f.to_dict(), join(MOCK_DIR, 'reports/add_auto_sub.json'))
-        self.f['auto_sub_in_player'] = self.f['auto_subs'].map(lambda x: x['in'])
-        self.f['auto_sub_out_player'] = self.f['auto_subs'].map(lambda x: x['out'])
+        #optimization 1 - switching lists to tuples
+        print(self.f['auto_subs'])
+        self.f['auto_sub_in_player'] = self.f['auto_subs'].map(lambda x: [y[0] for y in x if x])
+        #print(self.f['auto_subs'])
+        #self.f['auto_sub_in_player'] = self.f['auto_subs'].map(lambda x: x['in'])
+        self.f['auto_sub_out_player'] = self.f['auto_subs'].map(lambda x: [y[1] for y in x if x])
+        #self.f['auto_sub_out_player'] = self.f['auto_subs'].map(lambda x: x['out'])
+
         self.f['auto_sub_in_points'] = self.f['auto_sub_in_player'].map(lambda x: sum([get_player_stats_from_db(y, self.gw)[0] for y in x]))
         self.f['auto_sub_out_points'] = self.f['auto_sub_in_player'].map(lambda x: sum([get_player_stats_from_db(y, self.gw)[0] for y in x]))
 
