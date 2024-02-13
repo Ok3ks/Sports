@@ -14,7 +14,7 @@ from src.urls import H2H_LEAGUE, LEAGUE_URL, FPL_PLAYER
 from functools import lru_cache
 
 from src.paths import APP_DIR, MOCK_DIR
-from src.db import Player,get_player, get_player_stats_from_db
+from src.db.db import Player,get_player, get_player_stats_from_db
 from typing import List, Union, Optional, Tuple
 
 def to_json(x:dict, fp):
@@ -30,11 +30,20 @@ def get_basic_stats(total_points:List[Union[int,float]]):
     return Q1,average,Q3
 
 def parse_transfers(item:dict) -> dict:
+
     row = {}
+    """
+        row[item['entry']] = {'element_in': [], 'element_out': []}
+        row[item['entry']] = row.get(item['entry'], {})
+
+        row[item['entry']]['element_in'] = [item['element_in']]
+        row[item['entry']]['element_out'] = [item['element_out']]
+    """
 
     row[item['entry']] = row.get(item['entry'], {})
     row[item['entry']]['element_in'] = row[item['entry']].get('element_in', [])
     row[item['entry']]['element_out'] = row[item['entry']].get('element_out', [])
+
     row[item['entry']]['element_in'].append(item['element_in'])
     row[item['entry']]['element_out'].append(item['element_out'])     
    
@@ -59,35 +68,37 @@ class GameweekError(Exception):
     def __init__(self, message="Gameweek is not valid (Should be in range 1,38)"):
         super().__init__(message)
 
+
 def get_gw_transfers(alist:List[int], gw:Union[int,List[int]], all = False) -> dict : 
     """Input is a list of entry_id. Gw is the gameweek number.
     'all' toggles between extracting all gameweeks or not"""
     
-    row =  {}
-
     try:
         valid, gw = check_gw(gw)
     except TypeError:
         valid, gw = False, None
-
+    row = {}
     if valid:
+
         for entry_id in alist:
             r = wget(TRANSFER_URL.format(entry_id))
             if r.status_code == 200:
                 obj = r.json()
+                #updates by gameweek
                 for item in obj:
                     if all:
                         row[item['event']] = parse_transfers(item)
                     else: 
-                        if type(gw) == int and int(item['event']) == gw:
+                        if type(gw) == int and int(item['event']) == gw: 
+                            #updates each id
                             row.update(parse_transfers(item))
                         elif type(gw) == list:
                             if int(item['event']) in gw:
                                 row[item['event']] = parse_transfers(item)
             else:
                 print("{} does not exist or Transfer URL endpoint unavailable".format(entry_id))
-    return row
 
+    return row
 
 def get_participant_entry(entry_id:int, gw:int) -> dict:
 
@@ -189,7 +200,6 @@ class Gameweek():
         highest = self.week_df.sort_values(by='total_points', ascending=False).iloc[0,:]
         print(get_player(highest['id']).player_id)        
         print(get_player(highest['id']).team) 
-    #highest scoring player, : output ownership, team, fixture
         del highest
         
     def dream_team(self):
@@ -340,7 +350,7 @@ class League():
         self.participant_name = {str(participant['entry']) : participant['entry_name'] for participant in self.participants}
         return self.participant_name
 
-    def get_all_participant_entries(self,gw, refresh = False) -> list:
+    def get_all_participant_entries(self,gw, refresh = False):
         if not self.participants or refresh:
             self.obtain_league_participants()
 
@@ -351,9 +361,11 @@ class League():
         #self.participant_entries = [get_participant_entry(participant['entry'],gw) for participant in self.participants]
         #return self.participant_entries
     
-    def get_gw_transfers(self,gw, refresh = False) -> dict:
+    def get_gw_transfers(self,gw, refresh = False):
+        
         if not self.participants or refresh:
             self.obtain_league_participants()
+
         self.transfers = get_gw_transfers(self.entry_ids,gw)
         return self.transfers
     

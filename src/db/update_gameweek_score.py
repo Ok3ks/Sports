@@ -2,7 +2,7 @@
 import pandas as pd
 import sqlite3
 from sqlite3 import Error, OperationalError
-from db import create_connection
+from src.db.db import create_connection_engine
 
 from os.path import realpath,join
 from src.paths import BASE_DIR
@@ -17,15 +17,15 @@ from src.urls import GW_URL
 class Base(DeclarativeBase):
     pass
     
+
 def insert(conn, data, gw):
     try:
         #assert columns in data - conftest 
-        data.to_sql(f"Gameweek_{gw}",conn,if_exists='replace',index=False)
-        conn.commit()
+        data.to_sql(f"Player_Gameweek_Scores",conn,if_exists='append',method = "multi", index=False)
+        #conn.commit()
         print("Data Insert Successful")
     except Error as e:
         print(e)
-    else:
         print("Pass a dataframe as data")
 
 def insert_from_json(conn, path):
@@ -42,6 +42,7 @@ def update_db_gameweek_score(conn, gw):
     temp = {item['id']:item['stats'] for item in r['elements']}
     df = pd.DataFrame(temp)
     df = df.T
+    df['gameweek'] = gw
     df.columns = ['minutes',
             'goals_scored',
             'assists',
@@ -65,7 +66,8 @@ def update_db_gameweek_score(conn, gw):
             'expected_goal_involvements',
             'expected_goals_conceded',
             'total_points',
-            'in_dreamteam']
+            'in_dreamteam',
+            'gameweek']
 
     df.reset_index(level= 0, names = 'player_id', inplace = True)
     #df['event'] = gw
@@ -79,7 +81,7 @@ if __name__ == "__main__":
 
     parser.add_argument('-g', '--gameweek_id', type= int, help = "Gameweek you are trying to get a report of")
     args = parser.parse_args()
-    connection = create_connection(realpath(join(BASE_DIR,"fpl"))) #Add database directory as constant
+    connection = create_connection_engine("fpl") #Add database directory as constant
 
     try:
         update_db_gameweek_score(connection, args.gameweek_id)
