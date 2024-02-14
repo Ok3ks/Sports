@@ -9,15 +9,19 @@ import json
 from src.utils import get_basic_stats, League, to_json
 from src.db.db import get_player, get_player_stats_from_db,check_minutes,create_connection
 
+
+
 if 'line_profiler' not in dir() and 'profile' not in dir():
     def profile(func):
         return func
 
 class LeagueWeeklyReport(League):
 #
+    @profile
     def __init__(self, gw: int, league_id:int):
         super().__init__(league_id)
         self.gw = gw
+        #self.participants = self.obtain_league_participants()
     
     @lru_cache(10)
     @profile
@@ -125,11 +129,12 @@ class LeagueWeeklyReport(League):
 
             return {"rise":rise, "fall": fall}
 
-        @profile
-        def captain():
-            self.captain = [(get_player(id = key), value, self.player_points[key] * 2,) for key,value in self.captain.items()]
-            self.captain = sorted(self.captain, key = operator.itemgetter(2), reverse=True)
-            return self.captain
+        
+        #def captain():
+            #self.captain = self.o_df.sort_values(by="captain_points", ascending=False).value_counts().to_dict()
+            #self.captain = [(get_player(id = key), value, self.player_points[key] * 2,) for key,value in self.captain.items()]
+            #self.captain = sorted(self.captain, key = operator.itemgetter(2), reverse=True)
+            #return self._captain
 
         @profile
         def promoted_vice():
@@ -249,7 +254,6 @@ class LeagueWeeklyReport(League):
                 most_points.append((self.participants_name[participant_id],point_player, points_on_bench),)
             return {"most_points_on_bench" :most_points}
         
-        self.captain = captain()
         self.vice_to_cap = promoted_vice()
         output = {"captain": self.captain, "promoted_vice": self.vice_to_cap, "chips": self.chips }
 
@@ -275,11 +279,14 @@ class LeagueWeeklyReport(League):
 #Output of report page should be a json for a django template
 if __name__ == "__main__":
 
+    from multiprocessing import Pool
+
     import argparse
     parser = argparse.ArgumentParser(prog = "weeklyreport", description = "Provide Gameweek ID and League ID")
 
     parser.add_argument('-g', '--gameweek_id', type= int,  help = "Gameweek you are trying to get a report of")
     parser.add_argument('-l', '--league_id', type= int, help = "League_ID you are interested in")
+    parser.add_argument('-t', '--thread', type=int, help="Number of threads to run program on")
     parser.add_argument('-dry', '--dry_run', type=bool, help= "Dry run")
 
     args = parser.parse_args()
@@ -305,6 +312,10 @@ if __name__ == "__main__":
         test = LeagueWeeklyReport(args.gameweek_id, args.league_id)
 
         test.get_data()
+        #test.get_all_participant_entries(args.gameweek_id, thread = args.thread)
+        #print(test.get_all_participant_entries(args.gameweek_id))
+        #print(test.res)
+    
         test.weekly_score_transformation()
         test.merge_league_weekly_transfer()
         test.add_auto_sub()

@@ -9,6 +9,7 @@ from src.paths import BASE_DIR
 from sqlalchemy import Integer,create_engine, select, String
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import Session,DeclarativeBase
+from src.db.db import insert, insert_from_json
 
 import requests
 from src.urls import GW_URL
@@ -16,21 +17,6 @@ from src.urls import GW_URL
 #clean up
 class Base(DeclarativeBase):
     pass
-    
-
-def insert(conn, data, gw):
-    try:
-        #assert columns in data - conftest 
-        data.to_sql(f"Player_Gameweek_Scores",conn,if_exists='append',method = "multi", index=False)
-        #conn.commit()
-        print("Data Insert Successful")
-    except Error as e:
-        print(e)
-        print("Pass a dataframe as data")
-
-def insert_from_json(conn, path):
-    file = pd.read_json(path)
-    insert(conn, data = file)
 
 def update_db_gameweek_score(conn, gw):
     """This function retrieves current information of players

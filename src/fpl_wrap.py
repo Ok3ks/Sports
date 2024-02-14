@@ -17,7 +17,7 @@ import operator
 import os 
 import pandas as pd
 from src.utils import get_basic_stats, get_curr_event
-from src.db import get_player, get_player_stats_from_db,check_minutes
+from src.db.db import get_player, get_player_stats_from_db,check_minutes
 
 class ParticipantReport(Participant):
 

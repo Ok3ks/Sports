@@ -4,6 +4,9 @@ import pandas as pd
 import json
 import numpy as np
 
+from multiprocessing.dummy import Pool
+from itertools import chain
+
 #from line_profiler_decorator import profiler
 
 from os.path import join, realpath
@@ -14,8 +17,9 @@ from src.urls import H2H_LEAGUE, LEAGUE_URL, FPL_PLAYER
 from functools import lru_cache
 
 from src.paths import APP_DIR, MOCK_DIR
-from src.db.db import Player,get_player, get_player_stats_from_db
-from typing import List, Union, Optional, Tuple
+
+from src.db.db import get_player,create_connection_engine
+from typing import List, Union
 
 def to_json(x:dict, fp):
     with open(fp, 'w') as outs:
@@ -150,12 +154,12 @@ def get_participant_entry(entry_id:int, gw:int) -> dict:
                 if item['is_captain']:
                     team_list['captain'] = int(item['element'])
                 if item['is_vice_captain']:
-                    team_list['vice_captain'] = int(item['element'])
-                
+                    team_list['vice_captain'] = int(item['element']) 
         else:
             print("{} does not exist".format(entry_id))
     
     return team_list
+
 
 def get_curr_event():
     r = wget(FPL_URL)
@@ -315,17 +319,21 @@ class Participant():
             return self.all_gw_entries
         else:
             raise GameweekError
+    
+
         
 class League():
     def __init__(self, league_id):
         self.league_id = league_id
         self.participants = []
+        self.res = None
+
 
     def obtain_league_participants(self,refresh = False):
         """This function uses the league url as an endpoint to query for participants of a league at a certain date.
         Should be used to update participants table in DB """
         
-        if (not self.participants) or refresh:
+        if refresh or len(self.participants) == 0:
             has_next = True
             PAGE_COUNT = 1
             while has_next:
@@ -336,47 +344,77 @@ class League():
                 self.participants.extend(obj['standings']['results'])
                 has_next = obj['standings']['has_next']
                 PAGE_COUNT += 1
-                time.sleep(2)
                 print("All participants on page {} have been extracted".format(PAGE_COUNT))
-                
+        
+        self.league_name = obj['league']['name']
         self.entry_ids = [participant['entry'] for participant in self.participants]
         return self.participants
     
-    
+
     def get_participant_name(self, refresh = False) -> dict:
         """ Creates participant id to name hash table """
-        if not self.participants or refresh:
+        if refresh or len(self.participants) == 0:
             self.obtain_league_participants()
-        self.participant_name = {str(participant['entry']) : participant['entry_name'] for participant in self.participants}
-        return self.participant_name
+        #self.participant_name = {str(participant['entry']) : participant['entry_name'] for participant in self.participants}
+        self.id_participant = ([participant['entry'], participant['entry_name'], participant['player_name']] for participant in self.participants)
+        #return self.participant_name
 
-    def get_all_participant_entries(self,gw, refresh = False):
-        if not self.participants or refresh:
+
+    def batch_participant_entry(self, batch):
+        for participant in batch:
+            yield get_participant_entry(participant['entry'], self.gw)
+
+    def get_all_participant_entries(self,gw, refresh = False, thread=None):
+        self.gw = gw
+
+        if refresh or len(self.participants) == 0:
             self.obtain_league_participants()
 
         # optimization 2
         for participant in self.participants:
             yield get_participant_entry(participant['entry'], gw)
+        #if not self.res:
+            #if thread:
+                #thread = thread
+                #spread_process = Pool(processes=4)
+                #processes_per_worker = [self.participants[i*50:(i+1)*50] for i in range(thread)]
+
+                #res = spread_process.map(self.batch_participant_entry, processes_per_worker)
+                #self.res = chain.from_iterable(res)
+        
+        #return self.res
 
         #self.participant_entries = [get_participant_entry(participant['entry'],gw) for participant in self.participants]
         #return self.participant_entries
     
-    def get_gw_transfers(self,gw, refresh = False):
-        
-        if not self.participants or refresh:
+
+    def get_gw_transfers(self,gw, refresh = False, thread=None):
+        self.transfers = []
+        if refresh or len(self.participants) == 0:
             self.obtain_league_participants()
 
+        #if not self.transfers:
+            #if thread:
+                #thread = thread
+                #spread_process = Pool(processes=thread)
+
+                #processes_per_worker = [self.participants[i*50:(i+1)*50] for i in range(thread)]
+
+                #res = spread_process.map(get_gw_transfers, processes_per_worker)
+                #self.transfers = chain.from_iterable(res)
         self.transfers = get_gw_transfers(self.entry_ids,gw)
         return self.transfers
     
 
 if __name__ == "__main__":
-
+    from src.db.db import create_id_table, insert
     import argparse
     parser = argparse.ArgumentParser(prog = "weeklyreport", description = "Provide Gameweek ID and League ID")
 
     parser.add_argument('-g', '--gameweek_id', type= int, help = "Gameweek you are trying to get a report of")
     parser.add_argument('-dry', '--dry_run', type=bool, help= "Dry run")
+    parser.add_argument('-l', '--league_id', type= int, help = "Gameweek you are trying to get a report of")
+    parser.add_argument('-t', '--thread', type = int)
 
     args = parser.parse_args()
     if args.dry_run:
@@ -394,5 +432,13 @@ if __name__ == "__main__":
         #test_gw.highest_xg()
         #test_gw.highest_xgc()
         #test_gw.highest_xa()
-
         #test_gw.gameweek_status()
+    else:
+        test = League(args.league_id)
+        test.get_participant_name()
+        connection = create_connection_engine("fpl")
+        #create_id_table(table_name= test.league_name)
+        df = pd.DataFrame(test.id_participant)
+        df.columns = ['id', 'participant_entry_name', 'participant_player_name']
+        df.to_sql(test.league_name,connection, if_exists='append', chunksize=1000, method="multi")
+        #test.get_all_participant_entries(args.gameweek_id, thread=args.thread)
