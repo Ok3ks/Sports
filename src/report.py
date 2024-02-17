@@ -83,8 +83,8 @@ class LeagueWeeklyReport(League):
     def add_auto_sub(self):
         
         #optimization 1 - switching dictionaries to tuples
-        self.f['auto_sub_in_player'] = self.f['auto_subs'].map(lambda x: [y[0] for y in x if x])
-        self.f['auto_sub_out_player'] = self.f['auto_subs'].map(lambda x: [y[1] for y in x if x])
+        self.f['auto_sub_in_player'] = self.f['auto_sub_in'].map(lambda x: [y for y in x.split(',') if x])
+        self.f['auto_sub_out_player'] = self.f['auto_sub_out'].map(lambda x: [y for y in x.split(",") if x])
 
         self.f['auto_sub_in_points'] = self.f['auto_sub_in_player'].map(lambda x: sum([self.player_points[y] for y in x]))
         #self.f['auto_sub_out_points'] = self.f['auto_sub_out_player'].map(lambda x: sum([get_player_stats_from_db(y, self.gw)[0] for y in x]))

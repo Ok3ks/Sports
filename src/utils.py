@@ -115,15 +115,15 @@ def get_participant_entry(entry_id:int, gw:int) -> dict:
     if valid:
         #optimization, imported get directly from requests, but changed name to wget for easy reference
         r = wget(FPL_PLAYER.format(entry_id, gw))
-        
-        print("Retrieving results, participant {} for event = {}".format(entry_id, gw))
 
         #optimization - assigning size of dictionary before hand to prevent resizing of dictionaries
-        team_list = {'auto_subs' : [], 'gw' : None, 'entry': None, 'active_chip': None,
+        team_list = {'auto_sub_in' : '', 'gw' : None, 'entry_id': None, 'active_chip': None,
+                     'auto_sub_out' :'',
                      'points_on_bench' : None, 'total_points': None, 'event_transfers_cost': None,
                      'players': '', 'bench': '','vice_captain': None, 'captain': None}
 
         if r.status_code == 200:
+            print("Retrieving results, participant {} for event = {}".format(entry_id, gw))
             obj = r.json()
 
             team_list['gw'] = gw
@@ -136,11 +136,16 @@ def get_participant_entry(entry_id:int, gw:int) -> dict:
             
             if obj['automatic_subs']:
                 #optimization 1
-                team_list["auto_subs"] = [(item['element_in'],item['element_out'],) for item in obj['automatic_subs']]
+                #team_list["auto_subs"] = [(item['element_in'],item['element_out'],) for item in obj['automatic_subs']]
                 
-                #for item in obj['automatic_subs']:
-                    #team_list['auto_subs']['in'].append(item['element_in'])
-                    #team_list['auto_subs']['out'].append(item['element_out'])
+                for item in obj['automatic_subs']:
+                    if len(team_list['auto_sub_in']) < 1:
+                        team_list['auto_sub_in'] = item['element_in']
+                    if len(team_list['auto_sub_out']) < 1:
+                        team_list['auto_sub_out'] = item['element_out']
+                        
+                    team_list['auto_sub_in'] = team_list['auto_sub_in'] + item['element_in']
+                    team_list['auto_sub_out'] = team_list['auto_sub_out'] + item['element_out']
 
             for item in obj['picks']:
                 if item['multiplier'] != 0:
@@ -156,10 +161,10 @@ def get_participant_entry(entry_id:int, gw:int) -> dict:
                 if item['is_vice_captain']:
                     team_list['vice_captain'] = int(item['element']) 
         else:
+            print(f"{r.status_code}")
             print("{} does not exist".format(entry_id))
     
     return team_list
-
 
 def get_curr_event():
     r = wget(FPL_URL)
