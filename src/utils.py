@@ -140,22 +140,25 @@ def get_participant_entry(entry_id:int, gw:int) -> dict:
                 
                 for item in obj['automatic_subs']:
                     if len(team_list['auto_sub_in']) < 1:
-                        team_list['auto_sub_in'] = item['element_in']
+                        team_list['auto_sub_in'] = str(item['element_in'])
+                    else:
+                        team_list['auto_sub_in'] = team_list['auto_sub_in'] +','+ str(item['element_in'])
                     if len(team_list['auto_sub_out']) < 1:
-                        team_list['auto_sub_out'] = item['element_out']
-                        
-                    team_list['auto_sub_in'] = team_list['auto_sub_in'] + item['element_in']
-                    team_list['auto_sub_out'] = team_list['auto_sub_out'] + item['element_out']
+                        team_list['auto_sub_out'] = str(item['element_out'])
+                    else:
+                        team_list['auto_sub_out'] = team_list['auto_sub_out'] + ','+ str(item['element_out'])
 
             for item in obj['picks']:
                 if item['multiplier'] != 0:
                     if len(team_list['players']) < 1: 
                         team_list['players'] = str(item['element'])
-                    team_list['players'] = team_list['players'] + ','+ str(item['element'])
+                    else:
+                        team_list['players'] = team_list['players'] + ','+ str(item['element'])
                 else:
                     if len(team_list['bench']) < 1: 
                         team_list['bench'] = str(item['element'])
-                    team_list['bench'] = team_list['bench'] + ','+ str(item['element'])
+                    else:
+                        team_list['bench'] = team_list['bench'] + ','+ str(item['element'])
                 if item['is_captain']:
                     team_list['captain'] = int(item['element'])
                 if item['is_vice_captain']:
