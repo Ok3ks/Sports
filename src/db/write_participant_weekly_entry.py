@@ -36,8 +36,8 @@ def create_participant_gameweek_table(conn = '', table_name = ''):
 
 def insert(table_name, conn, rows = ()):
     try:
-        create_table_sql=text(f"""INSERT INTO {table_name} (
-                        {rows}); """)
+        create_table_sql=text(f"""INSERT INTO {table_name} 
+                        {rows}; """)
         session = sessionmaker(conn)
 
         with session() as session:
@@ -53,35 +53,37 @@ if __name__ == "__main__":
     #from multiprocessing import Process,Value
     from concurrent.futures import ProcessPoolExecutor,as_completed
     import time
+    from itertools import islice
+    import pandas as pd
 
     conn = create_connection_engine('fpl')
     parser = argparse.ArgumentParser("Writing participant entries into DB")
 
     parser.add_argument('-g', '--gameweek_id', type= int, help= "Gameweek entry")
     parser.add_argument('-t', '--processes', type=int, help="Number of processes")
+    parser.add_argument('-ta', '--table_name', default= "Overall", type =str)
 
     args = parser.parse_args()
-
     list_of_entry_ids = get_entry_ids(table_name="Nigeria")
 
-    start_time= time.time()
+    length = sum(1 for _ in get_entry_ids(table_name="Nigeria"))
+    
     p = ProcessPoolExecutor(max_workers=4)
 
     create_participant_gameweek_table(conn =conn, table_name=f"Gameweek_{args.gameweek_id}")
+    
+    start_time= time.time()
 
-    fin = [p.submit(get_participant_entry, gw =args.gameweek_id, entry_id = i) for i in list_of_entry_ids]
-    for result in as_completed(fin):
-        insert(f"Gameweek_{args.gameweek_id}", conn, rows = tuple(result.result().values()))
-        #break
-        
+    for start in range(0, length, 5000):
+        fin = [p.submit(get_participant_entry, gw =args.gameweek_id, entry_id = i) for i in islice(list_of_entry_ids,start,start+5000)]
+        df = pd.DataFrame([result.result() for result in as_completed(fin)])
+        df.to_sql(f'Gameweek_{args.gameweek_id}', conn, if_exists='append',method='multi')
+
     end_time = time.time()
     print(end_time - start_time)
-    
+
     #start_time = time.time()
     #for i in list_of_entry_ids:
         #get_participant_entry(i, args.gameweek_id)
     #end_time = time.time()
     #print(end_time - start_time)
-
-    #print(a.keys())
-    #print(list(a.values()))
