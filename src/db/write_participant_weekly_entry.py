@@ -34,19 +34,6 @@ def create_participant_gameweek_table(conn = '', table_name = ''):
         print(e)
     return conn
 
-def insert(table_name, conn, rows = ()):
-    try:
-        create_table_sql=text(f"""INSERT INTO {table_name} 
-                        {rows}; """)
-        session = sessionmaker(conn)
-
-        with session() as session:
-            session.execute(create_table_sql)
-        print("Table Created")
-    except Error as e:
-        print(e)
-    pass
-
 if __name__ == "__main__":
 
     import argparse
@@ -56,28 +43,29 @@ if __name__ == "__main__":
     from itertools import islice
     import pandas as pd
 
-    conn = create_connection_engine('fpl')
     parser = argparse.ArgumentParser("Writing participant entries into DB")
 
     parser.add_argument('-g', '--gameweek_id', type= int, help= "Gameweek entry")
     parser.add_argument('-t', '--processes', type=int, help="Number of processes")
     parser.add_argument('-ta', '--table_name', default= "Overall", type =str)
+    parser.add_argument('-db', '--db_name', type = str, help= "Database name", required= True)
 
     args = parser.parse_args()
     list_of_entry_ids = get_entry_ids(table_name="Nigeria")
-
     length = sum(1 for _ in get_entry_ids(table_name="Nigeria"))
-    
+
+    conn = create_connection_engine(args.db_name)
     p = ProcessPoolExecutor(max_workers=4)
 
     create_participant_gameweek_table(conn =conn, table_name=f"Gameweek_{args.gameweek_id}")
-    
     start_time= time.time()
 
     for start in range(0, length, 5000):
+        count = 0
         fin = [p.submit(get_participant_entry, gw =args.gameweek_id, entry_id = i) for i in islice(list_of_entry_ids,start,start+5000)]
         df = pd.DataFrame([result.result() for result in as_completed(fin)])
-        df.to_sql(f'Gameweek_{args.gameweek_id}', conn, if_exists='append',method='multi')
+        df.to_sql(f'Gameweek_{args.gameweek_id}', conn, if_exists='append',method='multi', index=False)
+        print("cycle {} complete".format(count+1))
 
     end_time = time.time()
     print(end_time - start_time)

@@ -1,10 +1,30 @@
-from src.db.db import create_connection_engine, create_table
+from src.db.db import create_connection_engine
 import requests
 from src.urls import FPL_URL
 
 from sqlalchemy.orm import sessionmaker
-import pandas as pd
+from sqlalchemy import text
+from pymysql import Error
 
+import pandas as pd
+def create_table(conn, table_name = "EPL_PLAYERS_2023_1ST_HALF"):
+
+    """Creates a table with columns, player_id, position, team, and player_name"""
+    try:
+        create_table_sql=text(f"""CREATE TABLE IF NOT EXISTS {table_name} (
+                            player_id INTEGER PRIMARY KEY,
+                            team VARCHAR (255),
+                            position VARCHAR (2000),
+                            player_name VARCHAR (200)
+                        );
+                        """)
+        session = sessionmaker(conn)
+        with session() as session:
+            session.execute(create_table_sql)
+        print("Table Created")
+    except Error as e:
+        print(e)
+    return conn
 
 def update_db_player_info(engine, table_name = "EPL_PLAYERS_2023_1ST_HALF"):
     """This function retrieves current information of players
@@ -24,7 +44,7 @@ def update_db_player_info(engine, table_name = "EPL_PLAYERS_2023_1ST_HALF"):
     data.to_sql(f"{table_name}",engine, if_exists= 'replace', method='multi', index=False)
     print(f"success adding data")
 
-if __name__ == "__main__": 
+if __name__ == "__main__":
     
     import argparse
     parser = argparse.ArgumentParser("Update Player information, this happens twice a year")

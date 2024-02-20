@@ -61,20 +61,6 @@ class PlayerGameweekScores(Base):
     in_dreamteam: Mapped[bool] = mapped_column(Boolean)
     gameweek: Mapped[int] = mapped_column(Integer,primary_key = True)
 
-def create_connection(db):
-    conn = None
-    try:
-        conn = pymysql.connect(
-            host='localhost', 
-            user='root',  
-            password = "password", 
-            db=db, 
-        )
-        #print("Connection has been created successfully")
-        return conn
-    except Error as e:
-        print(e)
-    return conn
 
 def insert(conn, data, gw):
     try:
@@ -89,6 +75,21 @@ def insert(conn, data, gw):
 def insert_from_json(conn, path):
     file = pd.read_json(path)
     insert(conn, data = file)
+
+def create_connection(db):
+    conn = None
+    try:
+        conn = pymysql.connect(
+            host='localhost', 
+            user='root',  
+            password = "password", 
+            db=db, 
+        )
+        #print("Connection has been created successfully")
+        return conn
+    except Error as e:
+        print(e)
+    return conn
 
 def create_connection_engine(db):
     """Creates a SQLAlchemy engine with a mysql database"""
@@ -125,7 +126,13 @@ def get_teams(session = sessionmaker(create_connection_engine('fpl'))):
         statement = select(distinct(Player.team))
         obj = session.execute(statement).all()
         return obj
-
+    
+def get_entry_ids(session = sessionmaker(create_connection_engine('fpl')), table_name = ''):
+    with session() as session:
+        statement = text(f"""SELECT id FROM {table_name} """)
+        obj = session.execute(statement).all()
+        return (i.id for i in obj)
+    
 #ORM for each gameweek
 def get_player_stats_from_db(gw, session = session):
     stmt = text(f"SELECT player_id, total_points FROM Player_Gameweek_Scores WHERE gameweek = {gw}")
@@ -151,24 +158,6 @@ def get_available_gameweek_scores(session = sessionmaker(create_connection_engin
     return c.fetchall()
 
 
-def create_table(conn, table_name = "EPL_PLAYERS_2023_1ST_HALF"):
-
-    """Creates a table with columns, player_id, position, team, and player_name"""
-    try:
-        create_table_sql=text(f"""CREATE TABLE IF NOT EXISTS {table_name} (
-                            player_id INTEGER PRIMARY KEY,
-                            team VARCHAR (255),
-                            position VARCHAR (2000),
-                            player_name VARCHAR (200)
-                        );
-                        """)
-        session = sessionmaker(conn)
-        with session() as session:
-            session.execute(create_table_sql)
-        print("Table Created")
-    except Error as e:
-        print(e)
-    return conn
 
 def create_id_table(conn, table_name = "league_name"):
 
@@ -187,6 +176,8 @@ def create_id_table(conn, table_name = "league_name"):
     except Error as e:
         print(e)
     return conn
+
+
 
 
 if __name__ == "__main__":
