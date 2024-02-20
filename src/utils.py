@@ -367,6 +367,21 @@ class League():
         self.id_participant = ([participant['entry'], participant['entry_name'], participant['player_name']] for participant in self.participants)
         #return self.participant_name
 
+    def get_league_participant_mp(self, PAGE_COUNT):
+        has_next = True
+        out = []
+            
+        r = wget(LEAGUE_URL.format(self.league_id, PAGE_COUNT))
+        obj =r.json()
+        assert r.status_code == 200, 'error connecting to the endpoint'
+        del r
+        out.extend(obj['standings']['results'])
+        has_next = obj['standings']['has_next']
+        PAGE_COUNT += 1
+        print("page {} done".format(PAGE_COUNT))
+
+        return ([participant['entry'], participant['entry_name'], participant['player_name']] for participant in out)
+        
 
     def batch_participant_entry(self, batch):
         for participant in batch:
