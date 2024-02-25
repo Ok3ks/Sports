@@ -6,12 +6,10 @@ from os.path import join,realpath
 import pandas as pd
 import json
 
-
 from src.utils import get_basic_stats, League, to_json
-from src.db import get_player, get_player_stats_from_db,check_minutes,create_connection
+from src.db.db import get_player, get_player_stats_from_db,check_minutes,create_connection
 
 
-conn = create_connection(realpath(join(BASE_DIR,"fpl")))
 
 if 'line_profiler' not in dir() and 'profile' not in dir():
     def profile(func):
@@ -19,15 +17,18 @@ if 'line_profiler' not in dir() and 'profile' not in dir():
 
 class LeagueWeeklyReport(League):
 #
+    @profile
     def __init__(self, gw: int, league_id:int):
         super().__init__(league_id)
         self.gw = gw
+        #self.participants = self.obtain_league_participants()
     
     @lru_cache(10)
     @profile
     def get_data(self):
         self.one_df = pd.DataFrame(self.get_all_participant_entries(self.gw))
         self.f = pd.DataFrame(self.get_gw_transfers(self.gw))
+        #print(self.f.T)
 
     @lru_cache(10)
     @profile
@@ -35,14 +36,22 @@ class LeagueWeeklyReport(League):
         """Transforms weekly score into Dataframe, and returns weekly dataframe"""
         
         self.o_df = self.one_df[~self.one_df['players'].isna()]
+                
+        #optimization 4 - loaded all player rows into memory at once
+        self.player_points = get_player_stats_from_db(self.gw)
+        #del player_set
 
-        self.o_df['points_breakdown'] = self.o_df['players'].map(lambda x: [get_player_stats_from_db(y, self.gw)[0] for y in x.split(",")])
-        self.o_df['captain_points'] = self.o_df['captain'].map(lambda x: get_player_stats_from_db(x, self.gw)[0] * 2)
-        self.o_df['vice_captain_points'] = self.o_df['vice_captain'].map(lambda x: get_player_stats_from_db(x, self.gw)[0])
+        self.o_df['points_breakdown'] = self.o_df['players'].map(lambda x: [self.player_points[int(y)] for y in x.split(",")])
+        self.o_df['captain_points'] = self.o_df['captain'].map(lambda x: self.player_points[x] * 2)
+        self.o_df['vice_captain_points'] = self.o_df['vice_captain'].map(lambda x: self.player_points[x])
+
+        #self.o_df['points_breakdown'] = self.o_df['players'].map(lambda x: [get_player_stats_from_db(y, self.gw)[0] for y in x.split(",")])
+        #self.o_df['captain_points'] = self.o_df['captain'].map(lambda x: get_player_stats_from_db(x, self.gw)[0] * 2)
+        #self.o_df['vice_captain_points'] = self.o_df['vice_captain'].map(lambda x: get_player_stats_from_db(x, self.gw)[0])
         
-        self.o_df['rank'] = self.o_df['total_points'].rank(ascending=False)
-        #self.o_df.rename(columns={'entry':'entry_id'}, inplace= True)
-        self.o_df['rank'] = self.o_df['rank'].map(int)
+        #optimization 3
+        self.o_df = self.o_df.sort_values(by = 'total_points', ascending=False).reset_index(drop=True)
+        self.o_df['rank'] = [i+1 for i in self.o_df.index.to_list()]
         return self.o_df
     
     @lru_cache(10)
@@ -52,8 +61,8 @@ class LeagueWeeklyReport(League):
         """Merges Weekly score dataframe with transfers dataframe"""
 
         self.f = self.f.T
-        self.f['transfer_points_in'] = self.f['element_in'].map(lambda x: sum([get_player_stats_from_db(y, self.gw)[0] for y in x]))
-        self.f['transfer_points_out'] = self.f['element_out'].map(lambda x:sum([get_player_stats_from_db(y, self.gw)[0]for y in x]))
+        self.f['transfer_points_in'] = self.f['element_in'].map(lambda x: sum([self.player_points[int(y)] for y in x]))
+        self.f['transfer_points_out'] = self.f['element_out'].map(lambda x:sum([self.player_points[y] for y in x]))
         self.f['transfers'] = self.f['element_out'].map(lambda x: len(x))
         self.f['delta'] = self.f['transfer_points_in'] - self.f['transfer_points_out']
 
@@ -63,19 +72,22 @@ class LeagueWeeklyReport(League):
         self.f = self.o_df.merge(self.f, on='entry_id', how='right')
         return self.f
     
+    def captain_minutes(self):
+
+        self.o_df['captain'] = self.o_df['captain'].astype(int)
+        self.o_df['cap_minutes'] = [check_minutes(x, self.gw)[0] for x in self.o_df['captain']]
+
+        print(self.o_df)
+    
     @profile
     def add_auto_sub(self):
         
-        #optimization 1 - switching lists to tuples
-        print(self.f['auto_subs'])
-        self.f['auto_sub_in_player'] = self.f['auto_subs'].map(lambda x: [y[0] for y in x if x])
-        #print(self.f['auto_subs'])
-        #self.f['auto_sub_in_player'] = self.f['auto_subs'].map(lambda x: x['in'])
-        self.f['auto_sub_out_player'] = self.f['auto_subs'].map(lambda x: [y[1] for y in x if x])
-        #self.f['auto_sub_out_player'] = self.f['auto_subs'].map(lambda x: x['out'])
+        #optimization 1 - switching dictionaries to tuples
+        self.f['auto_sub_in_player'] = self.f['auto_sub_in'].map(lambda x: [y for y in x.split(',')])
+        self.f['auto_sub_out_player'] = self.f['auto_sub_out'].map(lambda x: [y for y in x.split(',')])
 
-        self.f['auto_sub_in_points'] = self.f['auto_sub_in_player'].map(lambda x: sum([get_player_stats_from_db(y, self.gw)[0] for y in x]))
-        self.f['auto_sub_out_points'] = self.f['auto_sub_in_player'].map(lambda x: sum([get_player_stats_from_db(y, self.gw)[0] for y in x]))
+        self.f['auto_sub_in_points'] = self.f['auto_sub_in_player'].map(lambda x: sum([self.player_points[y] for y in x]))
+        #self.f['auto_sub_out_points'] = self.f['auto_sub_out_player'].map(lambda x: sum([get_player_stats_from_db(y, self.gw)[0] for y in x]))
 
     @profile
     def create_report(self,display = True):
@@ -117,43 +129,30 @@ class LeagueWeeklyReport(League):
 
             return {"rise":rise, "fall": fall}
 
-        @profile
-        def captain():
-            self.captain = [(get_player(id = key), value, get_player_stats_from_db(key, self.gw)[0] * 2,) for key,value in self.captain.items()]
-            self.captain = sorted(self.captain, key = operator.itemgetter(2), reverse=True)
-            return self.captain
 
         @profile
         def promoted_vice():
-            self.vice_to_cap= {}
-            ben = {get_player(item) : [] for item in set(self.o_df['vice_captain'])}
-        
-            for row in self.o_df.itertuples():
-                if check_minutes(int(row.captain), self.gw)[0] == 0:
-                    self.vice_to_cap[get_player(row.vice_captain) ] = [get_player(row.captain) ]
-                    self.vice_to_cap[get_player(row.vice_captain) ].append(get_player_stats_from_db(row.vice_captain, self.gw)[0]*2)
-                    ben[get_player(row.vice_captain)].append(self.participants_name[str(row.entry_id)])
-
-            for key,values in ben.items():
-                if key in self.vice_to_cap.keys():
-                    self.vice_to_cap[key].append(len(values))
             
-            self.vice_to_cap = [[key,values[1],values[2]] for key,values in self.vice_to_cap.items()]
-            self.vice_to_cap = sorted(self.vice_to_cap, key =operator.itemgetter(1))
-            return self.vice_to_cap
+            self.o_df['promoted_vice'] = self.o_df['cap_minutes'].map(lambda x: True if x == 0 else False)
+            promoted_vice = self.o_df[self.o_df['promoted_vice'] == True].sort_values(by='vice_captain_points',ascending=False).reset_index(drop=True).iloc[:3,:]
+
+            return [(i.vice_captain_points*2, self.participants_name[str(i.entry_id)], get_player(i.captain), get_player(i.vice_captain)) for i in promoted_vice.itertuples()] 
+        
         
         @profile
         def outliers():
             Q1,league_average,Q3 = get_basic_stats(self.o_df['total_points'])
             IQR = Q3 - Q1
-            exceptional_df = self.o_df[self.o_df['total_points'] > Q3 +1.5*IQR]
+            #exceptional_df = self.o_df[self.o_df['total_points'] > Q3 +1.5*IQR] 
+            max_df = self.o_df[self.o_df['total_points'] == self.o_df['total_points'].max()] 
             abysmal_df = self.o_df[self.o_df['total_points'] < Q1 - 1.5*IQR]
 
             exceptional = []
             abysmal = []
 
-            for i,j in zip(exceptional_df['entry_id'], exceptional_df['total_points']):
+            for i,j in zip(max_df['entry_id'], max_df['total_points']):
                 exceptional.append((self.participants_name[str(i)],j))
+
 
             for i,j in zip(abysmal_df['entry_id'], abysmal_df['total_points']):
                 abysmal.append((self.participants_name[str(i)],j))
@@ -221,6 +220,7 @@ class LeagueWeeklyReport(League):
             """ Points obtained from the bench """
             jammy_points = []
             self.f= self.f.sort_values(by='auto_sub_in_points', ascending=False)
+            print(self.f)
 
             n = min(len(self.f), 3)
             for i in range(n):
@@ -242,13 +242,12 @@ class LeagueWeeklyReport(League):
             n = min(len(self.f), 3)
             for i in range(n):
                 player_on_bench = self.f.iloc[i,:]['bench'].split(",")
-                point_player = {get_player(id =i):get_player_stats_from_db(int(i), self.gw)[0] for i in player_on_bench}
+                point_player = {get_player(id =i):self.player_points[int(i)] for i in player_on_bench}
                 points_on_bench = int(self.f.iloc[i,:]['points_on_bench'])
                 participant_id = str(self.f.iloc[i,:]['entry_id'])
                 most_points.append((self.participants_name[participant_id],point_player, points_on_bench),)
             return {"most_points_on_bench" :most_points}
         
-        self.captain = captain()
         self.vice_to_cap = promoted_vice()
         output = {"captain": self.captain, "promoted_vice": self.vice_to_cap, "chips": self.chips }
 
@@ -274,11 +273,14 @@ class LeagueWeeklyReport(League):
 #Output of report page should be a json for a django template
 if __name__ == "__main__":
 
+    from multiprocessing import Pool
+
     import argparse
     parser = argparse.ArgumentParser(prog = "weeklyreport", description = "Provide Gameweek ID and League ID")
 
-    parser.add_argument('-g', '--gameweek_id', type= int, default= 15,  help = "Gameweek you are trying to get a report of")
-    parser.add_argument('-l', '--league_id', default= 85647,type= int, help = "League_ID you are interested in")
+    parser.add_argument('-g', '--gameweek_id', type= int,  help = "Gameweek you are trying to get a report of")
+    parser.add_argument('-l', '--league_id', type= int, help = "League_ID you are interested in")
+    parser.add_argument('-t', '--thread', type=int, help="Number of threads to run program on")
     parser.add_argument('-dry', '--dry_run', type=bool, help= "Dry run")
 
     args = parser.parse_args()
@@ -304,8 +306,13 @@ if __name__ == "__main__":
         test = LeagueWeeklyReport(args.gameweek_id, args.league_id)
 
         test.get_data()
+        #test.get_all_participant_entries(args.gameweek_id, thread = args.thread)
+        #print(test.get_all_participant_entries(args.gameweek_id))
+        #print(test.res)
+    
         test.weekly_score_transformation()
         test.merge_league_weekly_transfer()
         test.add_auto_sub()
+        test.captain_minutes()
         output = test.create_report(display=True)
     

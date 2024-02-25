@@ -4,8 +4,6 @@ import pandas as pd
 import json
 import numpy as np
 
-#from line_profiler_decorator import profiler
-
 from os.path import join, realpath
 import os
 
@@ -14,8 +12,9 @@ from src.urls import H2H_LEAGUE, LEAGUE_URL, FPL_PLAYER
 from functools import lru_cache
 
 from src.paths import APP_DIR, MOCK_DIR
-from src.db import Player,get_player, get_player_stats_from_db
-from typing import List, Union, Optional, Tuple
+
+from src.db.db import get_player,create_connection_engine
+from typing import List, Union
 
 def to_json(x:dict, fp):
     with open(fp, 'w') as outs:
@@ -30,11 +29,20 @@ def get_basic_stats(total_points:List[Union[int,float]]):
     return Q1,average,Q3
 
 def parse_transfers(item:dict) -> dict:
+
     row = {}
+    """
+        row[item['entry']] = {'element_in': [], 'element_out': []}
+        row[item['entry']] = row.get(item['entry'], {})
+
+        row[item['entry']]['element_in'] = [item['element_in']]
+        row[item['entry']]['element_out'] = [item['element_out']]
+    """
 
     row[item['entry']] = row.get(item['entry'], {})
     row[item['entry']]['element_in'] = row[item['entry']].get('element_in', [])
     row[item['entry']]['element_out'] = row[item['entry']].get('element_out', [])
+
     row[item['entry']]['element_in'].append(item['element_in'])
     row[item['entry']]['element_out'].append(item['element_out'])     
    
@@ -59,35 +67,37 @@ class GameweekError(Exception):
     def __init__(self, message="Gameweek is not valid (Should be in range 1,38)"):
         super().__init__(message)
 
+
 def get_gw_transfers(alist:List[int], gw:Union[int,List[int]], all = False) -> dict : 
     """Input is a list of entry_id. Gw is the gameweek number.
     'all' toggles between extracting all gameweeks or not"""
     
-    row =  {}
-
     try:
         valid, gw = check_gw(gw)
     except TypeError:
         valid, gw = False, None
-
+    row = {}
     if valid:
+
         for entry_id in alist:
             r = wget(TRANSFER_URL.format(entry_id))
             if r.status_code == 200:
                 obj = r.json()
+                #updates by gameweek
                 for item in obj:
                     if all:
                         row[item['event']] = parse_transfers(item)
                     else: 
-                        if type(gw) == int and int(item['event']) == gw:
+                        if type(gw) == int and int(item['event']) == gw: 
+                            #updates each id
                             row.update(parse_transfers(item))
                         elif type(gw) == list:
                             if int(item['event']) in gw:
                                 row[item['event']] = parse_transfers(item)
             else:
                 print("{} does not exist or Transfer URL endpoint unavailable".format(entry_id))
-    return row
 
+    return row
 
 def get_participant_entry(entry_id:int, gw:int) -> dict:
 
@@ -100,48 +110,53 @@ def get_participant_entry(entry_id:int, gw:int) -> dict:
     if valid:
         #optimization, imported get directly from requests, but changed name to wget for easy reference
         r = wget(FPL_PLAYER.format(entry_id, gw))
-        
-        print("Retrieving results, participant {} for event = {}".format(entry_id, gw))
 
         #optimization - assigning size of dictionary before hand to prevent resizing of dictionaries
-        team_list = {'auto_subs' : [], 'gw' : None, 'entry': None, 'active_chip': None,
+        team_list = {'auto_sub_in' : '', 'auto_sub_out' : '', 'gw' : gw, 'entry_id': entry_id, 'active_chip': None,
                      'points_on_bench' : None, 'total_points': None, 'event_transfers_cost': None,
                      'players': '', 'bench': '','vice_captain': None, 'captain': None}
 
         if r.status_code == 200:
+            print("Retrieving results, participant {} for event = {}".format(entry_id, gw))
             obj = r.json()
 
-            team_list['gw'] = gw
-            team_list['entry_id'] = entry_id
             team_list['active_chip'] = obj['active_chip']
-            
             team_list['points_on_bench'] = obj['entry_history']['points_on_bench']
             team_list['total_points'] = obj['entry_history']['points']
             team_list['event_transfers_cost'] = obj['entry_history']['event_transfers_cost']
             
             if obj['automatic_subs']:
                 #optimization 1
-                team_list["auto_subs"] = [(item['element_in'],item['element_out'],) for item in obj['automatic_subs']]
-                
-                #for item in obj['automatic_subs']:
-                    #team_list['auto_subs']['in'].append(item['element_in'])
-                    #team_list['auto_subs']['out'].append(item['element_out'])
+                #team_list["auto_subs"] = [(item['element_in'],item['element_out'],) for item in obj['automatic_subs']]
+
+                for item in obj['automatic_subs']:
+                    if len(team_list['auto_sub_in']) < 1:
+                        team_list['auto_sub_in'] = str(item['element_in'])
+                    else:
+                        team_list['auto_sub_in'] = team_list['auto_sub_in'] +','+ str(item['element_in'])
+                    if len(team_list['auto_sub_out']) < 1:
+                        team_list['auto_sub_out'] = str(item['element_out'])
+                    else:
+                        team_list['auto_sub_out'] = team_list['auto_sub_out'] + ','+ str(item['element_out'])
+
 
             for item in obj['picks']:
                 if item['multiplier'] != 0:
                     if len(team_list['players']) < 1: 
                         team_list['players'] = str(item['element'])
-                    team_list['players'] = team_list['players'] + ','+ str(item['element'])
+                    else:
+                        team_list['players'] = team_list['players'] + ','+ str(item['element'])
                 else:
                     if len(team_list['bench']) < 1: 
                         team_list['bench'] = str(item['element'])
-                    team_list['bench'] = team_list['bench'] + ','+ str(item['element'])
+                    else:
+                        team_list['bench'] = team_list['bench'] + ','+ str(item['element'])
                 if item['is_captain']:
                     team_list['captain'] = int(item['element'])
                 if item['is_vice_captain']:
-                    team_list['vice_captain'] = int(item['element'])
-                
+                    team_list['vice_captain'] = int(item['element']) 
         else:
+            print(f"{r.status_code}")
             print("{} does not exist".format(entry_id))
     
     return team_list
@@ -189,7 +204,6 @@ class Gameweek():
         highest = self.week_df.sort_values(by='total_points', ascending=False).iloc[0,:]
         print(get_player(highest['id']).player_id)        
         print(get_player(highest['id']).team) 
-    #highest scoring player, : output ownership, team, fixture
         del highest
         
     def dream_team(self):
@@ -305,17 +319,21 @@ class Participant():
             return self.all_gw_entries
         else:
             raise GameweekError
+    
+
         
 class League():
     def __init__(self, league_id):
         self.league_id = league_id
         self.participants = []
+        self.res = None
+
 
     def obtain_league_participants(self,refresh = False):
         """This function uses the league url as an endpoint to query for participants of a league at a certain date.
         Should be used to update participants table in DB """
         
-        if (not self.participants) or refresh:
+        if refresh or len(self.participants) == 0:
             has_next = True
             PAGE_COUNT = 1
             while has_next:
@@ -326,34 +344,58 @@ class League():
                 self.participants.extend(obj['standings']['results'])
                 has_next = obj['standings']['has_next']
                 PAGE_COUNT += 1
-                time.sleep(2)
                 print("All participants on page {} have been extracted".format(PAGE_COUNT))
-                
+        
+        self.league_name = obj['league']['name']
         self.entry_ids = [participant['entry'] for participant in self.participants]
         return self.participants
     
-    
+
     def get_participant_name(self, refresh = False) -> dict:
         """ Creates participant id to name hash table """
-        if not self.participants or refresh:
+        if refresh or len(self.participants) == 0:
             self.obtain_league_participants()
-        self.participant_name = {str(participant['entry']) : participant['entry_name'] for participant in self.participants}
-        return self.participant_name
+        #self.participant_name = {str(participant['entry']) : participant['entry_name'] for participant in self.participants}
+        self.id_participant = ([participant['entry'], participant['entry_name'], participant['player_name']] for participant in self.participants)
+        #return self.participant_name
 
-    def get_all_participant_entries(self,gw, refresh = False) -> list:
-        if not self.participants or refresh:
+    def get_league_participant_mp(self, PAGE_COUNT):
+        has_next = True
+        out = []
+            
+        r = wget(LEAGUE_URL.format(self.league_id, PAGE_COUNT))
+        obj =r.json()
+        assert r.status_code == 200, 'error connecting to the endpoint'
+        del r
+        out.extend(obj['standings']['results'])
+        has_next = obj['standings']['has_next']
+        PAGE_COUNT += 1
+        print("page {} done".format(PAGE_COUNT))
+
+        return ([participant['entry'], participant['entry_name'], participant['player_name']] for participant in out)
+        
+
+    def batch_participant_entry(self, batch):
+        for participant in batch:
+            yield get_participant_entry(participant['entry'], self.gw)
+
+    def get_all_participant_entries(self,gw, refresh = False, thread=None):
+        self.gw = gw
+
+        if refresh or len(self.participants) == 0:
             self.obtain_league_participants()
 
         # optimization 2
         for participant in self.participants:
             yield get_participant_entry(participant['entry'], gw)
-
-        #self.participant_entries = [get_participant_entry(participant['entry'],gw) for participant in self.participants]
-        #return self.participant_entries
+       
     
-    def get_gw_transfers(self,gw, refresh = False) -> dict:
-        if not self.participants or refresh:
+
+    def get_gw_transfers(self,gw, refresh = False, thread=None):
+        self.transfers = []
+        if refresh or len(self.participants) == 0:
             self.obtain_league_participants()
+
         self.transfers = get_gw_transfers(self.entry_ids,gw)
         return self.transfers
     
@@ -365,6 +407,8 @@ if __name__ == "__main__":
 
     parser.add_argument('-g', '--gameweek_id', type= int, help = "Gameweek you are trying to get a report of")
     parser.add_argument('-dry', '--dry_run', type=bool, help= "Dry run")
+    parser.add_argument('-l', '--league_id', type= int, help = "Gameweek you are trying to get a report of")
+    parser.add_argument('-t', '--thread', type = int)
 
     args = parser.parse_args()
     if args.dry_run:
@@ -382,5 +426,15 @@ if __name__ == "__main__":
         #test_gw.highest_xg()
         #test_gw.highest_xgc()
         #test_gw.highest_xa()
-
         #test_gw.gameweek_status()
+    else:
+        print(get_participant_entry(entry_id= 98120, gw = 1))
+        #test = League(args.league_id)
+        #test.get_participant_name()
+        #connection = create_connection_engine("fpl")
+        #create_id_table(table_name= test.league_name)
+        #df = pd.DataFrame(test.id_participant)
+        #df.columns = ['id', 'participant_entry_name', 'participant_player_name']
+        
+        #df.to_sql(test.league_name,connection, if_exists='append', chunksize=1000, method="multi")
+        #test.get_all_participant_entries(args.gameweek_id, thread=args.thread)
