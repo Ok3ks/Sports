@@ -4,11 +4,6 @@ import pandas as pd
 import json
 import numpy as np
 
-from multiprocessing.dummy import Pool
-from itertools import chain
-
-#from line_profiler_decorator import profiler
-
 from os.path import join, realpath
 import os
 
@@ -117,8 +112,7 @@ def get_participant_entry(entry_id:int, gw:int) -> dict:
         r = wget(FPL_PLAYER.format(entry_id, gw))
 
         #optimization - assigning size of dictionary before hand to prevent resizing of dictionaries
-        team_list = {'auto_sub_in' : '', 'gw' : None, 'entry_id': None, 'active_chip': None,
-                     'auto_sub_out' :'',
+        team_list = {'auto_sub_in' : '', 'auto_sub_out' : '', 'gw' : gw, 'entry_id': entry_id, 'active_chip': None,
                      'points_on_bench' : None, 'total_points': None, 'event_transfers_cost': None,
                      'players': '', 'bench': '','vice_captain': None, 'captain': None}
 
@@ -126,10 +120,7 @@ def get_participant_entry(entry_id:int, gw:int) -> dict:
             print("Retrieving results, participant {} for event = {}".format(entry_id, gw))
             obj = r.json()
 
-            team_list['gw'] = gw
-            team_list['entry_id'] = entry_id
             team_list['active_chip'] = obj['active_chip']
-            
             team_list['points_on_bench'] = obj['entry_history']['points_on_bench']
             team_list['total_points'] = obj['entry_history']['points']
             team_list['event_transfers_cost'] = obj['entry_history']['event_transfers_cost']
@@ -137,7 +128,7 @@ def get_participant_entry(entry_id:int, gw:int) -> dict:
             if obj['automatic_subs']:
                 #optimization 1
                 #team_list["auto_subs"] = [(item['element_in'],item['element_out'],) for item in obj['automatic_subs']]
-                
+
                 for item in obj['automatic_subs']:
                     if len(team_list['auto_sub_in']) < 1:
                         team_list['auto_sub_in'] = str(item['element_in'])
@@ -147,6 +138,7 @@ def get_participant_entry(entry_id:int, gw:int) -> dict:
                         team_list['auto_sub_out'] = str(item['element_out'])
                     else:
                         team_list['auto_sub_out'] = team_list['auto_sub_out'] + ','+ str(item['element_out'])
+
 
             for item in obj['picks']:
                 if item['multiplier'] != 0:
@@ -396,19 +388,7 @@ class League():
         # optimization 2
         for participant in self.participants:
             yield get_participant_entry(participant['entry'], gw)
-        #if not self.res:
-            #if thread:
-                #thread = thread
-                #spread_process = Pool(processes=4)
-                #processes_per_worker = [self.participants[i*50:(i+1)*50] for i in range(thread)]
-
-                #res = spread_process.map(self.batch_participant_entry, processes_per_worker)
-                #self.res = chain.from_iterable(res)
-        
-        #return self.res
-
-        #self.participant_entries = [get_participant_entry(participant['entry'],gw) for participant in self.participants]
-        #return self.participant_entries
+       
     
 
     def get_gw_transfers(self,gw, refresh = False, thread=None):
@@ -416,21 +396,12 @@ class League():
         if refresh or len(self.participants) == 0:
             self.obtain_league_participants()
 
-        #if not self.transfers:
-            #if thread:
-                #thread = thread
-                #spread_process = Pool(processes=thread)
-
-                #processes_per_worker = [self.participants[i*50:(i+1)*50] for i in range(thread)]
-
-                #res = spread_process.map(get_gw_transfers, processes_per_worker)
-                #self.transfers = chain.from_iterable(res)
         self.transfers = get_gw_transfers(self.entry_ids,gw)
         return self.transfers
     
 
 if __name__ == "__main__":
-    from src.db.db import create_id_table, insert
+
     import argparse
     parser = argparse.ArgumentParser(prog = "weeklyreport", description = "Provide Gameweek ID and League ID")
 
@@ -457,11 +428,13 @@ if __name__ == "__main__":
         #test_gw.highest_xa()
         #test_gw.gameweek_status()
     else:
-        test = League(args.league_id)
-        test.get_participant_name()
-        connection = create_connection_engine("fpl")
+        print(get_participant_entry(entry_id= 98120, gw = 1))
+        #test = League(args.league_id)
+        #test.get_participant_name()
+        #connection = create_connection_engine("fpl")
         #create_id_table(table_name= test.league_name)
-        df = pd.DataFrame(test.id_participant)
-        df.columns = ['id', 'participant_entry_name', 'participant_player_name']
-        df.to_sql(test.league_name,connection, if_exists='append', chunksize=1000, method="multi")
+        #df = pd.DataFrame(test.id_participant)
+        #df.columns = ['id', 'participant_entry_name', 'participant_player_name']
+        
+        #df.to_sql(test.league_name,connection, if_exists='append', chunksize=1000, method="multi")
         #test.get_all_participant_entries(args.gameweek_id, thread=args.thread)

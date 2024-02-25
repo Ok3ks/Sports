@@ -6,7 +6,26 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text
 from pymysql import Error
 
+from sqlalchemy import Integer, String, create_engine, select,text,distinct
+from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Session,DeclarativeBase,sessionmaker
+
 import pandas as pd
+
+class Base(DeclarativeBase):
+    pass
+
+class Player(Base):
+    __tablename__ = "EPL_PLAYERS_2023_1ST_HALF"
+
+    player_id: Mapped[int] = mapped_column(Integer,primary_key = True)
+    team: Mapped[str] = mapped_column(String)
+    position: Mapped[str] = mapped_column(String)
+    player_name: Mapped[str] = mapped_column(String)
+
+    def __repr__(self) -> str:
+        return f"Player(player_id={self.player_id}, team={self.team}, position ={self.position}, player_name={self.player_name})"
+    
 def create_table(conn, table_name = "EPL_PLAYERS_2023_1ST_HALF"):
 
     """Creates a table with columns, player_id, position, team, and player_name"""
@@ -25,6 +44,7 @@ def create_table(conn, table_name = "EPL_PLAYERS_2023_1ST_HALF"):
     except Error as e:
         print(e)
     return conn
+
 
 def update_db_player_info(engine, table_name = "EPL_PLAYERS_2023_1ST_HALF"):
     """This function retrieves current information of players

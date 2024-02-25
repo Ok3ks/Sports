@@ -7,15 +7,14 @@ from sqlite3 import Error, OperationalError
 from os.path import realpath,join
 from src.paths import BASE_DIR
 
-from sqlalchemy import Integer, String, create_engine, select,text,distinct,Boolean, Float
+from src.paths import REPORT_DIR
+from sqlalchemy import Integer, String, create_engine, select,text,distinct
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import Session,DeclarativeBase,sessionmaker
 from sqlalchemy import URL
 
 import requests
 from src.urls import FPL_URL
-
-
 
 class Base(DeclarativeBase):
     pass
@@ -31,50 +30,6 @@ class Player(Base):
     def __repr__(self) -> str:
         return f"Player(player_id={self.player_id}, team={self.team}, position ={self.position}, player_name={self.player_name})"
 
-class PlayerGameweekScores(Base):
-    __tablename__ = "Player_Gameweek_scores"
-
-    player_id: Mapped[int] = mapped_column(Integer)
-    minutes: Mapped[int]= mapped_column(Integer)
-    goals_scored: Mapped[int] = mapped_column(Integer)
-    assists: Mapped[int]= mapped_column(Integer)
-    clean_sheets:Mapped[int] = mapped_column(Integer)
-    goals_conceded:Mapped[int] = mapped_column(Integer)
-    own_goals:Mapped[int] = mapped_column(Integer)
-    penalties_saved:Mapped[int] = mapped_column(Integer)
-    penalties_missed:Mapped[int] = mapped_column(Integer)
-    yellow_cards:Mapped[int] = mapped_column(Integer)
-    red_cards: Mapped[int] = mapped_column(Integer)
-    saves: Mapped[int] = mapped_column(Integer)
-    bonus: Mapped[int]= mapped_column(Integer)
-    bps: Mapped[int] = mapped_column(Integer)
-    influence:Mapped[float] = mapped_column(Float)
-    creativity: Mapped[float] = mapped_column(Float)
-    threat: Mapped[float] = mapped_column(Float)
-    ict_index: Mapped[float] = mapped_column(Float)
-    starts: Mapped[float] = mapped_column(Float)
-    expected_goals: Mapped[float] = mapped_column(Float)
-    expected_assists: Mapped[float] = mapped_column(Float)
-    expected_goal_involvements: Mapped[float] = mapped_column(Float)
-    expected_goals_conceded: Mapped[float] = mapped_column(Float)
-    total_points: Mapped[int] = mapped_column(Integer)
-    in_dreamteam: Mapped[bool] = mapped_column(Boolean)
-    gameweek: Mapped[int] = mapped_column(Integer,primary_key = True)
-
-
-def insert(conn, data, gw):
-    try:
-        #assert columns in data - conftest 
-        data.to_sql(f"Player_Gameweek_Scores",conn,if_exists='append',method = "multi", index=False)
-        #conn.commit()
-        print("Data Insert Successful")
-    except Error as e:
-        print(e)
-        print("Pass a dataframe as data")
-
-def insert_from_json(conn, path):
-    file = pd.read_json(path)
-    insert(conn, data = file)
 
 def create_connection(db):
     conn = None
@@ -85,7 +40,6 @@ def create_connection(db):
             password = "password", 
             db=db, 
         )
-        #print("Connection has been created successfully")
         return conn
     except Error as e:
         print(e)
@@ -126,12 +80,14 @@ def get_teams(session = sessionmaker(create_connection_engine('fpl'))):
         statement = select(distinct(Player.team))
         obj = session.execute(statement).all()
         return obj
-    
+
 def get_entry_ids(session = sessionmaker(create_connection_engine('fpl')), table_name = ''):
     with session() as session:
-        statement = text(f"""SELECT id FROM {table_name} """)
-        obj = session.execute(statement).all()
-        return (i.id for i in obj)
+        statement_1 = text(f"""SELECT id FROM {table_name}""" )
+        statement_2 = text(f"""SELECT count(id) FROM {table_name}""" )
+        obj = session.execute(statement_1).all()
+        obj_2 = session.execute(statement_2).one()
+        return (i.id for i in obj), obj_2[0]
     
 #ORM for each gameweek
 def get_player_stats_from_db(gw, session = session):
@@ -157,8 +113,6 @@ def get_available_gameweek_scores(session = sessionmaker(create_connection_engin
         c = session.execute(stmt)
     return c.fetchall()
 
-
-
 def create_id_table(conn, table_name = "league_name"):
 
     """Creates a table with columns, player_id, position, team, and player_name"""
@@ -178,16 +132,5 @@ def create_id_table(conn, table_name = "league_name"):
     return conn
 
 
-
-
 if __name__ == "__main__":
-    import argparse
-    parser = argparse.ArgumentParser("Update Player information, this happens twice a year")
-    
-    #parser.add_argument('-t',"--table_name", type=str, help= "Table name", required=False)
-    parser.add_argument('-db', '--db_name', type = str, help= "Database name", required= True)
-    
-    args = parser.parse_args()
-    engine = create_connection_engine(args.db_name) #Add database directory as constant
-    session = sessionmaker(engine)
-    print(get_player_stats_from_db(6))
+   pass

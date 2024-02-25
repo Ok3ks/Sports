@@ -83,8 +83,8 @@ class LeagueWeeklyReport(League):
     def add_auto_sub(self):
         
         #optimization 1 - switching dictionaries to tuples
-        self.f['auto_sub_in_player'] = self.f['auto_sub_in'].map(lambda x: [y for y in x.split(',') if x])
-        self.f['auto_sub_out_player'] = self.f['auto_sub_out'].map(lambda x: [y for y in x.split(",") if x])
+        self.f['auto_sub_in_player'] = self.f['auto_sub_in'].map(lambda x: [y for y in x.split(',')])
+        self.f['auto_sub_out_player'] = self.f['auto_sub_out'].map(lambda x: [y for y in x.split(',')])
 
         self.f['auto_sub_in_points'] = self.f['auto_sub_in_player'].map(lambda x: sum([self.player_points[y] for y in x]))
         #self.f['auto_sub_out_points'] = self.f['auto_sub_out_player'].map(lambda x: sum([get_player_stats_from_db(y, self.gw)[0] for y in x]))
@@ -129,12 +129,6 @@ class LeagueWeeklyReport(League):
 
             return {"rise":rise, "fall": fall}
 
-        
-        #def captain():
-            #self.captain = self.o_df.sort_values(by="captain_points", ascending=False).value_counts().to_dict()
-            #self.captain = [(get_player(id = key), value, self.player_points[key] * 2,) for key,value in self.captain.items()]
-            #self.captain = sorted(self.captain, key = operator.itemgetter(2), reverse=True)
-            #return self._captain
 
         @profile
         def promoted_vice():
