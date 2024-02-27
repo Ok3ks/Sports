@@ -10,6 +10,7 @@ import os
 from src.urls import GW_URL,FIXTURE_URL,TRANSFER_URL, HISTORY_URL, FPL_URL
 from src.urls import H2H_LEAGUE, LEAGUE_URL, FPL_PLAYER
 from functools import lru_cache
+from requests.exceptions import ConnectionError
 
 from src.paths import APP_DIR, MOCK_DIR
 
@@ -107,59 +108,66 @@ def get_participant_entry(entry_id:int, gw:int) -> dict:
     except TypeError:
         valid, gw = False, None
 
+
     if valid:
         #optimization, imported get directly from requests, but changed name to wget for easy reference
-        r = wget(FPL_PLAYER.format(entry_id, gw))
+        try :
+            r = wget(FPL_PLAYER.format(entry_id, gw))
 
-        #optimization - assigning size of dictionary before hand to prevent resizing of dictionaries
-        team_list = {'auto_sub_in' : '', 'auto_sub_out' : '', 'gw' : gw, 'entry_id': entry_id, 'active_chip': None,
-                     'points_on_bench' : None, 'total_points': None, 'event_transfers_cost': None,
-                     'players': '', 'bench': '','vice_captain': None, 'captain': None}
+            #optimization - assigning size of dictionary before hand to prevent resizing of dictionaries
+            team_list = {'auto_sub_in' : '', 'auto_sub_out' : '', 'gw' : gw, 'entry_id': entry_id, 'active_chip': None,
+                        'points_on_bench' : None, 'total_points': None, 'event_transfers_cost': None,
+                        'players': '', 'bench': '','vice_captain': None, 'captain': None}
 
-        if r.status_code == 200:
-            print("Retrieving results, participant {} for event = {}".format(entry_id, gw))
-            obj = r.json()
+            if r.status_code == 200:
+                print("Retrieving results, participant {} for event = {}".format(entry_id, gw))
+                obj = r.json()
 
-            team_list['active_chip'] = obj['active_chip']
-            team_list['points_on_bench'] = obj['entry_history']['points_on_bench']
-            team_list['total_points'] = obj['entry_history']['points']
-            team_list['event_transfers_cost'] = obj['entry_history']['event_transfers_cost']
-            
-            if obj['automatic_subs']:
-                #optimization 1
-                #team_list["auto_subs"] = [(item['element_in'],item['element_out'],) for item in obj['automatic_subs']]
+                team_list['active_chip'] = obj['active_chip']
+                team_list['points_on_bench'] = obj['entry_history']['points_on_bench']
+                team_list['total_points'] = obj['entry_history']['points']
+                team_list['event_transfers_cost'] = obj['entry_history']['event_transfers_cost']
+                
+                if obj['automatic_subs']:
+                    #optimization 1
+                    #team_list["auto_subs"] = [(item['element_in'],item['element_out'],) for item in obj['automatic_subs']]
 
-                for item in obj['automatic_subs']:
-                    if len(team_list['auto_sub_in']) < 1:
-                        team_list['auto_sub_in'] = str(item['element_in'])
+                    for item in obj['automatic_subs']:
+                        if len(team_list['auto_sub_in']) < 1:
+                            team_list['auto_sub_in'] = str(item['element_in'])
+                        else:
+                            team_list['auto_sub_in'] = team_list['auto_sub_in'] +','+ str(item['element_in'])
+                        if len(team_list['auto_sub_out']) < 1:
+                            team_list['auto_sub_out'] = str(item['element_out'])
+                        else:
+                            team_list['auto_sub_out'] = team_list['auto_sub_out'] + ','+ str(item['element_out'])
+
+
+                for item in obj['picks']:
+                    if item['multiplier'] != 0:
+                        if len(team_list['players']) < 1: 
+                            team_list['players'] = str(item['element'])
+                        else:
+                            team_list['players'] = team_list['players'] + ','+ str(item['element'])
                     else:
-                        team_list['auto_sub_in'] = team_list['auto_sub_in'] +','+ str(item['element_in'])
-                    if len(team_list['auto_sub_out']) < 1:
-                        team_list['auto_sub_out'] = str(item['element_out'])
-                    else:
-                        team_list['auto_sub_out'] = team_list['auto_sub_out'] + ','+ str(item['element_out'])
+                        if len(team_list['bench']) < 1: 
+                            team_list['bench'] = str(item['element'])
+                        else:
+                            team_list['bench'] = team_list['bench'] + ','+ str(item['element'])
+                    if item['is_captain']:
+                        team_list['captain'] = int(item['element'])
+                    if item['is_vice_captain']:
+                        team_list['vice_captain'] = int(item['element']) 
+                return team_list
+            else:
+                print(f"{r.status_code}")
+                print("{} does not exist".format(entry_id))
+        
+        except ConnectionError:
+            pass
+            #time.sleep(30)
+            #get_participant_entry(entry_id = entry_id, gw = gw)
 
-
-            for item in obj['picks']:
-                if item['multiplier'] != 0:
-                    if len(team_list['players']) < 1: 
-                        team_list['players'] = str(item['element'])
-                    else:
-                        team_list['players'] = team_list['players'] + ','+ str(item['element'])
-                else:
-                    if len(team_list['bench']) < 1: 
-                        team_list['bench'] = str(item['element'])
-                    else:
-                        team_list['bench'] = team_list['bench'] + ','+ str(item['element'])
-                if item['is_captain']:
-                    team_list['captain'] = int(item['element'])
-                if item['is_vice_captain']:
-                    team_list['vice_captain'] = int(item['element']) 
-        else:
-            print(f"{r.status_code}")
-            print("{} does not exist".format(entry_id))
-    
-    return team_list
 
 def get_curr_event():
     r = wget(FPL_URL)
@@ -320,7 +328,8 @@ class Participant():
         else:
             raise GameweekError
     
-
+import gevent
+from itertools import chain
         
 class League():
     def __init__(self, league_id):
@@ -388,8 +397,13 @@ class League():
         # optimization 2
         for participant in self.participants:
             yield get_participant_entry(participant['entry'], gw)
-       
-    
+
+        #multithreaded version
+        #req = [gevent.spawn(get_participant_entry, gw=gw, entry_id = i) for i in range(1, len(self.entry_ids), 1)]
+        #res = [response.value for response in gevent.iwait(req)]
+        #print(res)
+        #return res
+
 
     def get_gw_transfers(self,gw, refresh = False, thread=None):
         self.transfers = []
@@ -428,13 +442,17 @@ if __name__ == "__main__":
         #test_gw.highest_xa()
         #test_gw.gameweek_status()
     else:
-        print(get_participant_entry(entry_id= 98120, gw = 1))
-        #test = League(args.league_id)
-        #test.get_participant_name()
-        #connection = create_connection_engine("fpl")
+        #print(get_participant_entry(entry_id= 98120, gw = 1))
+        test = League(args.league_id)
+        entries = test.get_all_participant_entries(args.gameweek_id)
+        print(entries)
+        df = pd.DataFrame(entries)
+        print(df)
+        
+        connection = create_connection_engine("fpl")
+        df.to_sql(f"Downtown_{args.gameweek_id}", con= connection, index=False, method = 'multi')
         #create_id_table(table_name= test.league_name)
         #df = pd.DataFrame(test.id_participant)
         #df.columns = ['id', 'participant_entry_name', 'participant_player_name']
-        
         #df.to_sql(test.league_name,connection, if_exists='append', chunksize=1000, method="multi")
         #test.get_all_participant_entries(args.gameweek_id, thread=args.thread)
