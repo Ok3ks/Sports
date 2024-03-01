@@ -16,7 +16,7 @@ class Base(DeclarativeBase):
     pass
 
 class Player(Base):
-    __tablename__ = "EPL_PLAYERS_2023_1ST_HALF"
+    __tablename__ = "EPL_PLAYERS_2023_2ND_HALF"
 
     player_id: Mapped[int] = mapped_column(Integer,primary_key = True)
     team: Mapped[str] = mapped_column(String)

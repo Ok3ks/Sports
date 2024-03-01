@@ -31,7 +31,6 @@ if __name__ == "__main__":
         res = [response.value for response in gevent.iwait(req)]
         count = sum(1 for _ in res)
 
-        #print(count)
         df = pd.DataFrame(chain.from_iterable(res))
         df.columns = ['id', 'participant_entry_name', 'participant_player_name']
         df.to_sql(f"League_{str(test.league_id),connection}", if_exists='append', chunksize=1000, method="multi")

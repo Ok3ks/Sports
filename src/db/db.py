@@ -83,7 +83,8 @@ def get_teams(session = sessionmaker(create_connection_engine('fpl'))):
 
 def get_entry_ids(session = sessionmaker(create_connection_engine('fpl')), table_name = ''):
     with session() as session:
-        statement_1 = text(f"""SELECT id FROM {table_name}""" )
+        
+        statement_1 = text(f"""SELECT id FROM {table_name} ORDER BY id""" )
         statement_2 = text(f"""SELECT count(id) FROM {table_name}""" )
         obj = session.execute(statement_1).all()
         obj_2 = session.execute(statement_2).one()

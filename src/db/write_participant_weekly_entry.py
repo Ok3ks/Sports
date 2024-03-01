@@ -42,35 +42,41 @@ if __name__ == "__main__":
 
     from itertools import islice
     import pandas as pd
-    from src.utils import League
 
-    from itertools import chain
-    parser = argparse.ArgumentParser("Writing participant entries into DB")
-
+    parser = argparse.ArgumentParser(prog="Writing ALL participant entries into DB")
     parser.add_argument('-g', '--gameweek_id', type= int, help= "Gameweek entry")
-    parser.add_argument('-t', '--processes', type=int, help="Number of processes")
-    parser.add_argument('-ta', '--table_name', default= "Overall", type =int)
     parser.add_argument('-db', '--db_name', type = str, help= "Database name", required= True)
+    parser.add_argument('-s','--start', type= int, help="start counter", required=True, default= 0)
+    parser.add_argument('-e', '--end', type=int, help="end counter", required=True)
+
     args = parser.parse_args()
+    engine = create_connection_engine(args.db_name)
+
+    #list of entry_ids is ordered in descending order, assuming ids are monotonically increasing
+    list_of_entry_ids,LENGTH = get_entry_ids(table_name=f"`314`")
+    last_element = next(list_of_entry_ids)
+    print(LENGTH) 
 
     TABLE_NAME = f"Entries_Gameweek_{args.gameweek_id}"
-    engine = create_connection_engine('fpl')
-    list_of_entry_ids,LENGTH = get_entry_ids(table_name=f"`{args.table_name}`")
-
     create_gameweek_entries_table(conn =engine, table_name= TABLE_NAME)
     start_time= time.time()
 
-    for n in range(0, LENGTH, 100):
+    for n in range(args.start,args.end,100):
         #optimum number of spawned threads to 100
-        req = [gevent.spawn(get_participant_entry, gw=args.gameweek_id, entry_id = i) for i in islice(list_of_entry_ids, n,n+100,1)]
+        req = [gevent.spawn(get_participant_entry, gw=args.gameweek_id, entry_id = i) for i in range(n, n+100, 1)]
         res = [response.value for response in gevent.iwait(req)]
-
         #chaining tuples obtained from spawned processes
-        df = pd.DataFrame(res)
-        print(df)
-        
-        df.to_sql(TABLE_NAME, engine, if_exists='append',method='multi', index = False)
-        print("cycle {} complete".format(n))
+        try:
+            df = pd.DataFrame(res)
+        except AttributeError:
+            time.sleep(30)
+            req = [gevent.spawn(get_participant_entry, gw=args.gameweek_id, entry_id = i) for i in range(n, n+100, 1)]
+            res = [response.value for response in gevent.iwait(req)]
+            df = pd.DataFrame(res)
+        finally:
+            print(df)
+            df.to_sql(TABLE_NAME, engine, if_exists='append',method='multi', index = False)
+            print("cycle {} complete".format(n+100))
 
         if n%10_000 == 0:
             time.sleep(5)
