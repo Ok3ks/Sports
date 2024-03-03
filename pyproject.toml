@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "sports"
+version = "1.0.0"
+description = "\"Analytics Tool\""
+authors = ["ok3ks <freelanceokeks@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+pymysql = "^1.1.0"
+sqlalchemy = "^2.0.27"
+pandas = "^1.5.3"
+requests = "^2.31.0"
+seaborn = "^0.13.2"
+gevent = "^24.2.1"
+
+[tool.poetry.group.dev.dependencies]
+
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,8 @@
+repo: https://github.com/ok3ks/Sports
+rev: ''
+default_install_hook_types: pre-commit
+hooks:
+  id: poetry-check
+  id: poetry-lock
+  id: poetry-export
+  id: poetry-install
