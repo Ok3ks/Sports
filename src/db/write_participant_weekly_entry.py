@@ -63,14 +63,14 @@ if __name__ == "__main__":
 
     for n in range(args.start,args.end,100):
         #optimum number of spawned threads to 100
-        req = [gevent.spawn(get_participant_entry, gw=args.gameweek_id, entry_id = i) for i in range(n, n+100, 1)]
+        req = [gevent.spawn(get_participant_entry, gw=args.gameweek_id, entry_id = i) for i in range(n, min(args.end, n+100), 1)]
         res = [response.value for response in gevent.iwait(req)]
         #chaining tuples obtained from spawned processes
         try:
             df = pd.DataFrame(res)
         except AttributeError:
-            time.sleep(30)
-            req = [gevent.spawn(get_participant_entry, gw=args.gameweek_id, entry_id = i) for i in range(n, n+100, 1)]
+            time.sleep(10)
+            req = [gevent.spawn(get_participant_entry, gw=args.gameweek_id, entry_id = i) for i in range(n, min(args.end,n+100), 1)]
             res = [response.value for response in gevent.iwait(req)]
             df = pd.DataFrame(res)
         finally:
@@ -79,11 +79,12 @@ if __name__ == "__main__":
             print("cycle {} complete".format(n+100))
 
         if n%10_000 == 0:
-            time.sleep(5)
+            time.sleep(3)
 
+    #write code for 404 error 
+    
     end_time = time.time()
     print(end_time - start_time)
-
     
 
     

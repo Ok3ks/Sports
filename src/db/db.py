@@ -2,6 +2,8 @@
 import pandas as pd
 import sqlite3
 import pymysql
+import redis
+
 from sqlite3 import Error, OperationalError
 
 from os.path import realpath,join
@@ -60,6 +62,14 @@ def create_connection_engine(db):
     return create_engine(url_object)
 
 session = sessionmaker(create_connection_engine('fpl'))
+
+def no_sql_db():
+    return redis.Redis(
+        host ="""redis-15909.c302.asia-northeast1-1
+        .gce.cloud.redislabs.com""",
+        port=15909,
+        password='55DzcTvYLBDNTGOVBlUQg1BOs86lmX4N'
+    )
 
 def get_player(id, session = session):
     out = []

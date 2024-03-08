@@ -78,8 +78,7 @@ def get_gw_transfers(alist:List[int], gw:Union[int,List[int]], all = False) -> d
     except TypeError:
         valid, gw = False, None
     row = {}
-    if valid:
-
+    if valid or all:
         for entry_id in alist:
             r = wget(TRANSFER_URL.format(entry_id))
             if r.status_code == 200:
@@ -97,6 +96,34 @@ def get_gw_transfers(alist:List[int], gw:Union[int,List[int]], all = False) -> d
                                 row[item['event']] = parse_transfers(item)
             else:
                 print("{} does not exist or Transfer URL endpoint unavailable".format(entry_id))
+    return row
+
+def get_gw_transfers_mt(entry_id:List[int], gw:Union[int,List[int]], all = False) -> dict : 
+    """Input is a list of entry_id. Gw is the gameweek number.
+    'all' toggles between extracting all gameweeks or not"""
+
+    try:
+        valid, gw = check_gw(gw)
+    except TypeError:
+            valid, gw = False, None
+    row = {}
+    if valid or all:
+        r = wget(TRANSFER_URL.format(entry_id))
+        # row = r.json()
+        if r.status_code == 200:
+            obj = r.json()                #updates by gameweek
+            for item in obj:
+                if all:
+                    row[item['event']] = parse_transfers(item)
+                else: 
+                    if type(gw) == int and int(item['event']) == gw: 
+                        #updates each id
+                        row.update(parse_transfers(item))
+                    elif type(gw) == list:
+                        if int(item['event']) in gw:
+                            row[item['event']] = parse_transfers(item)
+    else:
+        print("{} does not exist or Transfer URL endpoint unavailable".format(entry_id))
 
     return row
 
@@ -403,7 +430,6 @@ class League():
         #res = [response.value for response in gevent.iwait(req)]
         #print(res)
         #return res
-
 
     def get_gw_transfers(self,gw, refresh = False, thread=None):
         self.transfers = []
