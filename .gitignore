@@ -4,3 +4,12 @@
 *_venv
 \reports
 
+\deploy\*\.terraform
+\app
+\infra_env
+\mock_data
+
+
+\__pycache_
+\.pytest_cache
+\cache
