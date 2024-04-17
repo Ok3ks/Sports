@@ -15,7 +15,6 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import Session,DeclarativeBase,sessionmaker
 from sqlalchemy import URL
 
-import requests
 from src.urls import FPL_URL
 
 class Base(DeclarativeBase):
@@ -33,13 +32,14 @@ class Player(Base):
         return f"Player(player_id={self.player_id}, team={self.team}, position ={self.position}, player_name={self.player_name})"
 
 
-def create_connection(db):
+def create_connection(db, host = "localhost", user = "root", password = "password"):
     conn = None
     try:
+
         conn = pymysql.connect(
-            host='localhost', 
-            user='root',  
-            password = "password", 
+            host=host, 
+            user=user,  
+            password =password, 
             db=db, 
         )
         return conn
@@ -47,14 +47,14 @@ def create_connection(db):
         print(e)
     return conn
 
-def create_connection_engine(db):
+def create_connection_engine(db, host = "localhost", user = "root", password = "password"):
     """Creates a SQLAlchemy engine with a mysql database"""
 
     url_object = URL.create(
         "mysql+pymysql",
-        username="root",
-        password="password", 
-        host="localhost",
+        username=user,
+        password=password, 
+        host=host,
         database=db)
 
     #short syntax    

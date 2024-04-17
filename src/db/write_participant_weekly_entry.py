@@ -1,12 +1,17 @@
-from multiprocessing import Pool
 from src.utils import get_participant_entry
-
+import os
 from pymysql import Error
 from sqlalchemy import text
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy import URL
 
-from src.db.db import create_connection_engine,get_entry_ids
+from src.db.db import create_connection_engine
 
+import argparse
+import gevent
+import time
+from itertools import islice
+import pandas as pd
 
 def create_gameweek_entries_table(conn = '', table_name = ''):
     """Creates a table with columns, player_id, position, team, and player_name"""
@@ -34,28 +39,23 @@ def create_gameweek_entries_table(conn = '', table_name = ''):
         print(e)
     return conn
 
+def main():
+    pass
+    
+
 if __name__ == "__main__":
-
-    import argparse
-    import gevent
-    import time
-
-    from itertools import islice
-    import pandas as pd
-
     parser = argparse.ArgumentParser(prog="Writing ALL participant entries into DB")
     parser.add_argument('-g', '--gameweek_id', type= int, help= "Gameweek entry")
     parser.add_argument('-db', '--db_name', type = str, help= "Database name", required= True)
+    parser.add_argument('-h', '--host',  type = str, help= "Database host", required= True)
+    
+    # parser.add_argument('-p', '--username',  type = str, help= "Username required to access db", required= True)
+
     parser.add_argument('-s','--start', type= int, help="start counter", required=True, default= 0)
     parser.add_argument('-e', '--end', type=int, help="end counter", required=True)
 
     args = parser.parse_args()
-    engine = create_connection_engine(args.db_name)
-
-    #list of entry_ids is ordered in descending order, assuming ids are monotonically increasing
-    list_of_entry_ids,LENGTH = get_entry_ids(table_name=f"`314`")
-    last_element = next(list_of_entry_ids)
-    print(LENGTH) 
+    engine = create_connection_engine(args.db_name, host=args.host, user=os.getenv("USERNAME"), password=os.getenv("PASSWORD"))
 
     TABLE_NAME = f"Entries_Gameweek_{args.gameweek_id}"
     create_gameweek_entries_table(conn =engine, table_name= TABLE_NAME)
@@ -80,13 +80,11 @@ if __name__ == "__main__":
 
         if n%10_000 == 0:
             time.sleep(3)
+        if n%100_000 == 0:
+            quotient = n //10_000
+            time.sleep(quotient*2)
 
     #write code for 404 error 
     
     end_time = time.time()
     print(end_time - start_time)
-    
-
-    
-
-    

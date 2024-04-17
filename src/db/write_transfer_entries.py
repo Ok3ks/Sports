@@ -34,6 +34,7 @@ if __name__ == "__main__":
 
     for n in range(args.start,args.end, 100):
         #optimum number of spawned threads to 100
+        cycle = args.start //100
         try:
             req = [gevent.spawn(get_gw_transfers_mt, gw=8, all = True,entry_id = i) for i in range(n, min(args.end, n+100), 1)]
             res = [response.value for response in gevent.iwait(req)]
@@ -48,7 +49,6 @@ if __name__ == "__main__":
         finally:
             columns = df.columns
             os.makedirs(join(MOCK_DIR, 'transfers', str(columns[0])), exist_ok=True)
-            df.to_json(path_or_buf=join(MOCK_DIR, 'transfers', str(columns[0]), f"transfers_{args.start}_{min(args.end, n+100)}.json"))
-            end_time = time.time()
-    
-    print(end_time-start_time)
+            df.to_json(path_or_buf=join(MOCK_DIR, 'transfers', str(columns[0]), f"transfers_{cycle+1}_.json"))
+    end_time = time.time()
+print(end_time-start_time)
