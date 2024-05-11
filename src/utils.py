@@ -1,22 +1,51 @@
 from requests import get as wget
-import time
 import pandas as pd
 import json
 import numpy as np
 
 from os.path import join, realpath
-import os
+import gevent
+from itertools import chain
 
 from src.urls import GW_URL,FIXTURE_URL,TRANSFER_URL, HISTORY_URL, FPL_URL
-from src.urls import H2H_LEAGUE, LEAGUE_URL, FPL_PLAYER
+from src.urls import H2H_LEAGUE, LEAGUE_URL, FPL_PLAYER, NAME_URL
 from functools import lru_cache
 from requests.exceptions import ConnectionError
+import requests
 
-from src.paths import APP_DIR, MOCK_DIR
-
+from src.paths import APP_DIR, MOCK_DIR, CACHE_DIR
 from src.db.db import get_player,create_connection_engine
 from typing import List, Union
 
+from joblib import Memory
+
+memory = Memory(CACHE_DIR, verbose = 0)
+
+@memory.cache
+def get_fixtures():
+
+    r = wget(FIXTURE_URL)
+    assert r.status_code == 200, 'endpoint unavailable'
+    r = r.json()
+    a = [(k['code'], k['event'], k['finished'], k['id'], k['kickoff_time'], k['minutes'], k['team_a'], k['team_a_score'], k['team_h_score'], k['team_h'], k['team_h_difficulty'], k['team_a_difficulty']) for k in r]
+    df = pd.DataFrame(a, columns = ['code','event','finished','fixture_id','kickoff_time','minutes','team_a','team_a_score','team_h_score','team_h','team_h_difficulty', 'team_a_difficulty'])
+
+    home = requests.get(FPL_URL)
+    home = home.json()
+
+
+    return df
+
+@memory.cache
+def get_participant_info(entry_id):
+
+    r = wget(NAME_URL.format(entry_id))
+    print("Retrieving results, participant {}".format(entry_id))
+    r = r.json()
+
+    return {"participant_id": r['id'], "participant_first_name": r['player_first_name'], "participant_last_name": r['player_last_name']}
+     
+    
 def to_json(x:dict, fp):
     with open(fp, 'w') as outs:
         json.dump(x, outs)
@@ -127,6 +156,7 @@ def get_gw_transfers_mt(entry_id:List[int], gw:Union[int,List[int]], all = False
 
     return row
 
+@memory.cache
 def get_participant_entry(entry_id:int, gw:int) -> dict:
 
     """Calls an Endpoint to retrieve a participants entry"""
@@ -223,8 +253,9 @@ class Gameweek():
 
         for item in self.json['elements']:
             obj = item['stats']
+            print(item)
             obj['id'] = item['id']
-            obj['value']=  item['explain'][0]['stats'][0]['value']
+            # obj['value']=  item['explain'][0]['stats'][0]['value']
             obj['fixture'] = item['explain'][0]['fixture']
             out.append(obj)
         
@@ -354,15 +385,14 @@ class Participant():
             return self.all_gw_entries
         else:
             raise GameweekError
-    
-import gevent
-from itertools import chain
         
 class League():
     def __init__(self, league_id):
         self.league_id = league_id
         self.participants = []
+        self.entry_ids = []
         self.res = None
+
 
 
     def obtain_league_participants(self,refresh = False):
@@ -384,6 +414,7 @@ class League():
         
         self.league_name = obj['league']['name']
         self.entry_ids = [participant['entry'] for participant in self.participants]
+        
         return self.participants
     
 
@@ -395,20 +426,20 @@ class League():
         self.id_participant = ([participant['entry'], participant['entry_name'], participant['player_name']] for participant in self.participants)
         #return self.participant_name
 
-    def get_league_participant_mp(self, PAGE_COUNT):
-        has_next = True
-        out = []
+    # def get_league_participant_mp(self, PAGE_COUNT):
+    #     has_next = True
+    #     out = []
             
-        r = wget(LEAGUE_URL.format(self.league_id, PAGE_COUNT))
-        obj =r.json()
-        assert r.status_code == 200, 'error connecting to the endpoint'
-        del r
-        out.extend(obj['standings']['results'])
-        has_next = obj['standings']['has_next']
-        PAGE_COUNT += 1
-        print("page {} done".format(PAGE_COUNT))
+    #     r = wget(LEAGUE_URL.format(self.league_id, PAGE_COUNT))
+    #     obj =r.json()
+    #     assert r.status_code == 200, 'error connecting to the endpoint'
+    #     del r
+    #     out.extend(obj['standings']['results'])
+    #     has_next = obj['standings']['has_next']
+    #     PAGE_COUNT += 1
+    #     print("page {} done".format(PAGE_COUNT))
 
-        return ([participant['entry'], participant['entry_name'], participant['player_name']] for participant in out)
+    #     return ([participant['entry'], participant['entry_name'], participant['player_name']] for participant in out)
         
 
     def batch_participant_entry(self, batch):
@@ -418,18 +449,18 @@ class League():
     def get_all_participant_entries(self,gw, refresh = False, thread=None):
         self.gw = gw
 
-        if refresh or len(self.participants) == 0:
+        if refresh or len(self.participants) or len(self.entry_ids) == 0:
             self.obtain_league_participants()
 
         # optimization 2
-        for participant in self.participants:
-            yield get_participant_entry(participant['entry'], gw)
+        entries = (get_participant_entry(entry, gw) for entry in self.entry_ids)
+        return entries
 
-        #multithreaded version
-        #req = [gevent.spawn(get_participant_entry, gw=gw, entry_id = i) for i in range(1, len(self.entry_ids), 1)]
-        #res = [response.value for response in gevent.iwait(req)]
-        #print(res)
-        #return res
+    # def get_all_participant_entries_mp(self,gw):
+    #     req = [gevent.spawn(get_participant_entry, gw=gw, entry_id = i) for i in range(1, len(self.entry_ids), 1)]
+    #     res = [response.value for response in gevent.iwait(req)]
+    #     print(res)
+    #     return res
 
     def get_gw_transfers(self,gw, refresh = False, thread=None):
         self.transfers = []
@@ -442,43 +473,4 @@ class League():
 
 if __name__ == "__main__":
 
-    import argparse
-    parser = argparse.ArgumentParser(prog = "weeklyreport", description = "Provide Gameweek ID and League ID")
-
-    parser.add_argument('-g', '--gameweek_id', type= int, help = "Gameweek you are trying to get a report of")
-    parser.add_argument('-dry', '--dry_run', type=bool, help= "Dry run")
-    parser.add_argument('-l', '--league_id', type= int, help = "Gameweek you are trying to get a report of")
-    parser.add_argument('-t', '--thread', type = int)
-
-    args = parser.parse_args()
-    if args.dry_run:
-
-        test_gw = Gameweek(args.gameweek_id)
-        with open(f"{MOCK_DIR}/endpoints/gameweek_endpoint.json", 'r') as ins:
-            test_gw.json = json.load(ins)
-
-        with open(f"{MOCK_DIR}/endpoints/fpl_url_endpoint.json", 'r') as ins_2:
-            test_gw.gw_json = json.load(ins_2)
-
-        test_gw.parse_payload()
-        #test_gw.highest_scoring_player()
-        #test_gw.dream_team()
-        #test_gw.highest_xg()
-        #test_gw.highest_xgc()
-        #test_gw.highest_xa()
-        #test_gw.gameweek_status()
-    else:
-        #print(get_participant_entry(entry_id= 98120, gw = 1))
-        test = League(args.league_id)
-        entries = test.get_all_participant_entries(args.gameweek_id)
-        print(entries)
-        df = pd.DataFrame(entries)
-        print(df)
-        
-        connection = create_connection_engine("fpl")
-        df.to_sql(f"Downtown_{args.gameweek_id}", con= connection, index=False, method = 'multi')
-        #create_id_table(table_name= test.league_name)
-        #df = pd.DataFrame(test.id_participant)
-        #df.columns = ['id', 'participant_entry_name', 'participant_player_name']
-        #df.to_sql(test.league_name,connection, if_exists='append', chunksize=1000, method="multi")
-        #test.get_all_participant_entries(args.gameweek_id, thread=args.thread)
+    pass

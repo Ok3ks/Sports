@@ -2,7 +2,6 @@
 import pandas as pd
 import sqlite3
 import pymysql
-import redis
 
 from sqlite3 import Error, OperationalError
 
@@ -20,17 +19,29 @@ from src.urls import FPL_URL
 class Base(DeclarativeBase):
     pass
 
-class Player(Base):
+class Player_1(Base):
     __tablename__ = "EPL_PLAYERS_2023_1ST_HALF"
 
     player_id: Mapped[int] = mapped_column(Integer,primary_key = True)
     team: Mapped[str] = mapped_column(String)
     position: Mapped[str] = mapped_column(String)
     player_name: Mapped[str] = mapped_column(String)
+    team_code : Mapped[int] = mapped_column(Integer)
 
     def __repr__(self) -> str:
         return f"Player(player_id={self.player_id}, team={self.team}, position ={self.position}, player_name={self.player_name})"
 
+class Player_2(Base):
+    __tablename__ = "EPL_PLAYERS_2023_2ND_HALF"
+
+    player_id: Mapped[int] = mapped_column(Integer,primary_key = True)
+    team: Mapped[str] = mapped_column(String)
+    position: Mapped[str] = mapped_column(String)
+    player_name: Mapped[str] = mapped_column(String)
+    team_code : Mapped[int] = mapped_column(Integer)
+
+    def __repr__(self) -> str:
+        return f"Player(player_id={self.player_id}, team={self.team}, position ={self.position}, player_name={self.player_name})"
 
 def create_connection(db, host = "localhost", user = "root", password = "password"):
     conn = None
@@ -71,25 +82,66 @@ def no_sql_db():
         password='55DzcTvYLBDNTGOVBlUQg1BOs86lmX4N'
     )
 
-def get_player(id, session = session):
+def get_player(id:list, session = session):
     out = []
     with session() as session:
         if isinstance(id, list):
             for item in id:
-                stmt = select(Player.player_name).where(Player.player_id == int(item))
-                obj = session.scalars(stmt).all()
-                out.append(obj[0])
+                try:
+                    stmt = select(Player_1.player_name).where(Player_1.player_id == int(item))
+                    obj = session.scalars(stmt).all()
+                    out.append(obj[0])
+                except IndexError:
+                    stmt = select(Player_2.player_name).where(Player_2.player_id == int(item))
+                    obj = session.scalars(stmt).all()
+                    out.append(obj[0])
             return out
-        else:
-            stmt = select(Player.player_name).where(Player.player_id == int(id))
-            obj = session.scalars(stmt).one()
-            return obj
 
-def get_teams(session = sessionmaker(create_connection_engine('fpl'))):
+
+#buggy, does not work with id 
+def get_teams(id:list, 
+              session = session):
+    teams = []
     with session() as session:
-        statement = select(distinct(Player.team))
-        obj = session.execute(statement).all()
-        return obj
+        if isinstance(id, list):
+            for item in id:
+                try:
+                    stmt = select(Player_1.team).where(Player_1.player_id == int(item))
+                    #stmt = text(f"""SELECT team FROM EPL_PLAYERS_2023_1ST_HALF where player_id = {id} """ )
+                    obj = session.scalars(stmt).all()
+                    teams.append(obj[0])
+                except IndexError:
+                    stmt = select(Player_2.team).where(Player_2.player_id == int(item))
+                    obj = session.scalars(stmt).all()
+                    teams.append(obj[0])
+        else:
+            statement = select(distinct(Player_1.team))
+            obj = session.scalars(statement).all()
+            return obj[0]
+    return teams
+
+    
+def get_position(id:list, session = session):
+    out = []
+    with session() as session:
+        if isinstance(id, list):
+            for item in id:
+
+                try:
+                    stmt = select(Player_1.position).where(Player_1.player_id == int(item))
+                    obj = session.scalars(stmt).all()
+
+                    out.append(obj[0])
+                except IndexError:
+                    stmt = select(Player_2.position).where(Player_2.player_id == int(item))
+                    obj = session.scalars(stmt).all()
+
+                    out.append(obj[0])
+        else:
+            statement = select(distinct(Player_1.position))
+            obj = session.execute(statement).all()
+            return obj[0]
+    return out
 
 def get_entry_ids(session = sessionmaker(create_connection_engine('fpl')), table_name = ''):
     with session() as session:

@@ -4,5 +4,6 @@ TRANSFER_URL = 'https://fantasy.premierleague.com/api/entry/{}/transfers/' #play
 HISTORY_URL = "https://fantasy.premierleague.com/api/entry/{}/history/" #{} = PLAYER_ID
 H2H_LEAGUE = "https://fantasy.premierleague.com/api/leagues-h2h-matches/league/{}/" #{} = LEAGUE_ID
 LEAGUE_URL = "https://fantasy.premierleague.com/api/leagues-classic/{}/standings/?page_standings={}" #LEAGUE_ID, page_number
+NAME_URL =  "https://fantasy.premierleague.com/api/entry/{}" #participant ID
 FPL_PLAYER = "https://fantasy.premierleague.com/api/entry/{}/event/{}/picks/" #Player_ID, #Gameweek
 FPL_URL = "https://fantasy.premierleague.com/api/bootstrap-static/"

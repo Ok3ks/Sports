@@ -6,11 +6,18 @@ for i in {1..25}
 do python3 src write_participant_weekly -g -ta -l 
 done
 
-for i in $()
+
+sqlite3 -json fpl "select * from EPL_PLAYERS_2023_1ST_HALF" > file.json
 
 table of league to participants_id #important for offseason
 table of fixtures - write_fixtures.py
 table of transfer entries with each column representing each gameweek, and rows are entry_id (10m * 38) - write_transfer_entries.py
+
+source init_env.sh
+source auth.sh
+initialize virtual environment
+
+git reset --soft HEAD~
 
 Frontend
 

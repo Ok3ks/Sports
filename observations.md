@@ -20,4 +20,4 @@ Issue was generators have to be fully loaded into memory by pandas before execut
 
 - Learnt about pre-commits, through poetry and https://pre-commit.com/#intro. Very use feature for Continuous integration, and also be integrated with Github Actions by reference pre-commit-config.yaml file. custom pre-commit intros can also be written, as is with poetry pre-commit( poetry-check, poetry-install)
 
-- 
+- Was unable to modify 'secure-file-priv' in mysql to a filepath which would have enabled easy sqldump. Setting was read only, and I received a permission error when I tried to modify. work around was to add a write_to_csv.py file 

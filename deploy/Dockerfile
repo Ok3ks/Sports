@@ -14,5 +14,5 @@ RUN pip install -r requirements.txt
 RUN PYTHONPATH=${PYTHONPATH}:$(pwd)
 #SHELL ["/bin/bash", "-c", "init_env.sh"]
 
-EXPOSE  8080
-CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8080"]
+
+ENTRYPOINT [  ]

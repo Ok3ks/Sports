@@ -47,7 +47,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog="Writing ALL participant entries into DB")
     parser.add_argument('-g', '--gameweek_id', type= int, help= "Gameweek entry")
     parser.add_argument('-db', '--db_name', type = str, help= "Database name", required= True)
-    parser.add_argument('-h', '--host',  type = str, help= "Database host", required= True)
+    parser.add_argument('-ho', '--host',  type = str, help= "Database host", required= True)
     
     # parser.add_argument('-p', '--username',  type = str, help= "Username required to access db", required= True)
 
@@ -55,7 +55,7 @@ if __name__ == "__main__":
     parser.add_argument('-e', '--end', type=int, help="end counter", required=True)
 
     args = parser.parse_args()
-    engine = create_connection_engine(args.db_name, host=args.host, user=os.getenv("USERNAME"), password=os.getenv("PASSWORD"))
+    engine = create_connection_engine(args.db_name, host=args.host, user=os.getenv("DB_USERNAME"), password=os.getenv("DB_PASSWORD"))
 
     TABLE_NAME = f"Entries_Gameweek_{args.gameweek_id}"
     create_gameweek_entries_table(conn =engine, table_name= TABLE_NAME)
@@ -68,11 +68,15 @@ if __name__ == "__main__":
         #chaining tuples obtained from spawned processes
         try:
             df = pd.DataFrame(res)
-        except AttributeError:
-            time.sleep(10)
-            req = [gevent.spawn(get_participant_entry, gw=args.gameweek_id, entry_id = i) for i in range(n, min(args.end,n+100), 1)]
-            res = [response.value for response in gevent.iwait(req)]
-            df = pd.DataFrame(res)
+        except (AttributeError | ConnectionResetError):
+            n = 1
+            while AttributeError or ConnectionResetError:
+                SLEEP_TIME = 10*n
+                time.sleep(SLEEP_TIME)
+                req = [gevent.spawn(get_participant_entry, gw=args.gameweek_id, entry_id = i) for i in range(n, args.end, 1)]
+                res = [response.value for response in gevent.iwait(req)]
+                df = pd.DataFrame(res)
+                n += 1
         finally:
             print(df)
             df.to_sql(TABLE_NAME, engine, if_exists='append',method='multi', index = False)

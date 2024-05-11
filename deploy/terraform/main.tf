@@ -13,3 +13,9 @@ module "sqldb" {
     project_id = var.project_id
     db_name = var.db_name
 }
+
+secrets manager
+
+cloud storage
+
+app_engine

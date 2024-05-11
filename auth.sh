@@ -1,1 +1,3 @@
 export SECRET_KEY='django-insecure-f&xs472(b!o6_b$5l*--ea1*m^*_=y))edubhvkol3t4%2*#a_'
+export DB_USERNAME='root'
+export DB_PASSWORD='password'

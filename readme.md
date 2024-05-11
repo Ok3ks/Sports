@@ -18,5 +18,5 @@
 
 ## Create APIs
 
-### Tools: Python, SQLite, Pandas, Django, Pytest, GCP, Terraform, pip 
+### Tools: Python, SQLite, Pandas, Django, Pytest, GCP, Terraform, pip, MySQL 
 

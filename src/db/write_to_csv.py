@@ -3,9 +3,7 @@ Dumps a DB table into CSV using pandas
 
 """
 
-import gevent
 import pandas as pd
-import time
 import os
 
 
@@ -28,7 +26,7 @@ def get_table_content(session = sessionmaker(create_connection_engine('fpl')), t
 if __name__ == "__main__":
 
     import argparse
-    parser = argparse.ArgumentParser(prog="Writing ALL participant entries into DB")
+    parser = argparse.ArgumentParser(prog="Writing ALL table contents from DB into csv")
     parser.add_argument('-db', '--db_name', type = str, help= "Database name", required= True)
     parser.add_argument('-ho', '--host', type = str, default= None, help="Database host")
     parser.add_argument('-t', '--table_name', type=str, help="Table Name")

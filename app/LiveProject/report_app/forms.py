@@ -5,3 +5,7 @@ class playerForm(forms.Form):
 
 class leagueForm(forms.Form):
     league_id = forms.IntegerField(required=True)
+
+class registrationForm(forms.Form):
+    pass
+
