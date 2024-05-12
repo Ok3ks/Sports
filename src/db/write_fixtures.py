@@ -20,4 +20,5 @@ if __name__ == "__main__":
     engine = create_connection_engine(args.db_name, host=args.host, user=os.getenv("DB_USERNAME"), password=os.getenv("DB_PASSWORD"))
 
     fixtures = get_fixtures()
+    
     fixtures.to_sql(name = "Fixtures_table",con=engine,  if_exists="replace")

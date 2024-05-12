@@ -2,6 +2,7 @@
 import pandas as pd
 import sqlite3
 import pymysql
+import os 
 
 from sqlite3 import Error, OperationalError
 
@@ -68,18 +69,15 @@ def create_connection_engine(db, host = "localhost", user = "root", password = "
         host=host,
         database=db)
 
-    #short syntax    
-    #create_engine(f"mysql+pymysql://scott:tiger@localhost/{db}")
     return create_engine(url_object)
 
 session = sessionmaker(create_connection_engine('fpl'))
 
 def no_sql_db():
     return redis.Redis(
-        host ="""redis-15909.c302.asia-northeast1-1
-        .gce.cloud.redislabs.com""",
-        port=15909,
-        password='55DzcTvYLBDNTGOVBlUQg1BOs86lmX4N'
+        host = os.getenv(REDIS_HOST),
+        port=os.getenv(REDIS_PORT),
+        password=os.getenv(REDIS_PASSWORD)
     )
 
 def get_player(id:list, session = session):
@@ -97,8 +95,6 @@ def get_player(id:list, session = session):
                     out.append(obj[0])
             return out
 
-
-#buggy, does not work with id 
 def get_teams(id:list, 
               session = session):
     teams = []
@@ -107,7 +103,6 @@ def get_teams(id:list,
             for item in id:
                 try:
                     stmt = select(Player_1.team).where(Player_1.player_id == int(item))
-                    #stmt = text(f"""SELECT team FROM EPL_PLAYERS_2023_1ST_HALF where player_id = {id} """ )
                     obj = session.scalars(stmt).all()
                     teams.append(obj[0])
                 except IndexError:
@@ -151,7 +146,7 @@ def get_entry_ids(session = sessionmaker(create_connection_engine('fpl')), table
         obj = session.execute(statement_1).all()
         obj_2 = session.execute(statement_2).one()
         return (i.id for i in obj), obj_2[0]
-    
+
 #ORM for each gameweek
 def get_player_stats_from_db(gw, session = session):
     stmt = text(f"SELECT player_id, total_points FROM Player_Gameweek_Scores WHERE gameweek = {gw}")

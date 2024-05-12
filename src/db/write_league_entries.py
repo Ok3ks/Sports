@@ -23,7 +23,6 @@ if __name__ == "__main__":
 
     df = pd.DataFrame(data =entries)
     df = df.apply(lambda x: pd.Series(x[0], dtype=object)).T
-    #print(df.head())
     
     connection = create_connection_engine("fpl")
     df.to_sql(f"{league.league_name}_{args.gameweek_id}", if_exists='replace', con= connection, index=False, method = 'multi')

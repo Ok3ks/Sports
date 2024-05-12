@@ -6,7 +6,6 @@ Dumps a DB table into CSV using pandas
 import pandas as pd
 import os
 
-
 from src.db.db import create_connection_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text
@@ -37,8 +36,6 @@ if __name__ == "__main__":
         args.host = 'localhost'
     
     engine = create_connection_engine(args.db_name, host=args.host, user=os.getenv("DB_USERNAME"), password=os.getenv("DB_PASSWORD"))
-    
-    #STORAGE PATH AND FILENAME -- Modify appropriately
     HARD_DRIVE = "/Volumes/T7/DB"
     FILE_NAME = f'{args.table_name}.csv'
 
