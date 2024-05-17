@@ -50,12 +50,14 @@ def update_db_gameweek_score(conn, gw):
             'gameweek']
 
     df.reset_index(level= 0, names = 'player_id', inplace = True)
+    print(df[df['in_dreamteam'] == True])
     ##Combining all gameweeks into one database, which is why I am appending files
     #add team and position
 
-    df['team'] = get_teams(id = list(df['player_id']) )
+    df['team'] = get_teams(id = df['player_id'].to_list())
+    print(df.head())
     df['position'] = get_position(id = df['player_id'].to_list())
-    print(df.tail())
+    #print(df.tail())
 
     df.to_sql(f"Player_gameweek_score", conn, if_exists='append', method= 'multi')
     print("Data insert successful")
@@ -72,5 +74,5 @@ if __name__ == "__main__":
     try:
         update_db_gameweek_score(connection, args.gameweek_id)
     except ValueError:
-        print("Gameweek is unavailable")
+        print("Debug and find error")
     

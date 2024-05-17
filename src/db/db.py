@@ -95,8 +95,7 @@ def get_player(id:list, session = session):
                     out.append(obj[0])
             return out
 
-def get_teams(id:list, 
-              session = session):
+def get_teams(id:list, session = session):
     teams = []
     with session() as session:
         if isinstance(id, list):
@@ -106,10 +105,13 @@ def get_teams(id:list,
                     obj = session.scalars(stmt).all()
                     teams.append(obj[0])
                 except IndexError:
-                    stmt = select(Player_2.team).where(Player_2.player_id == int(item))
-                    obj = session.scalars(stmt).all()
-                    teams.append(obj[0])
-        else:
+                    try:
+                        stmt = select(Player_2.team).where(Player_2.player_id == int(item))
+                        obj = session.scalars(stmt).all()
+                        teams.append(obj[0])
+                    except IndexError:
+                        print(f"{item} needs to be added to player_information database")
+        else :
             statement = select(distinct(Player_1.team))
             obj = session.scalars(statement).all()
             return obj[0]
