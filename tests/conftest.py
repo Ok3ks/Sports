@@ -6,7 +6,7 @@ from os.path import join,realpath
 
 @pytest.fixture(scope="module")
 def league_fixture():
-    return int(1088941)
+    return int(538731)
 
 @pytest.fixture(scope="module")
 def auto_sub_fixture():
@@ -38,7 +38,7 @@ def league_weekly_score():
                     "34": {"in": [], "out": []}, "35": {"in": [], "out": []}, "36": {"in": [], "out": []}, "37": {"in": [], "out": []}, 
                     "38": {"in": [], "out": []}, "39": {"in": [], "out": []}, "40": {"in": [], "out": []}, 
                     },
-        "entry": {"0": 3960377, "1": 1086398, "2": 293449, "3": 98120, "4": 175583, "5": 1070898, "6": 4006993, "7": 6388931, "8": 18103, "9": 32133, "10": 3955774, "11": 563294, "12": 5748350, "13": 213565, "14": 5336861, "15": 1145568, "16": 4145862, "17": 3968042, "18": 4805585, "19": 6380329, "20": 3572212, "21": 6570495, "22": 4050576, "23": 3962660, "24": 24268, "25": 1172179, "26": 3829907, "27": 4691088, "28": 1635237, "29": 150479, "30": 4275778, "31": 669180, "32": 2873232, "33": 124922, "34": 4917316, "35": 890194, "36": 456141, "37": 6013821, "38": 2246822, "39": 992871, "40": 1680671},
+        "entry": {"0": 3960377, "1": 1086398, "2": 293449, "3": 1802621, "4": 175583, "5": 1070898, "6": 4006993, "7": 6388931, "8": 18103, "9": 32133, "10": 3955774, "11": 563294, "12": 5748350, "13": 213565, "14": 5336861, "15": 1145568, "16": 4145862, "17": 3968042, "18": 4805585, "19": 6380329, "20": 3572212, "21": 6570495, "22": 4050576, "23": 3962660, "24": 24268, "25": 1172179, "26": 3829907, "27": 4691088, "28": 1635237, "29": 150479, "30": 4275778, "31": 669180, "32": 2873232, "33": 124922, "34": 4917316, "35": 890194, "36": 456141, "37": 6013821, "38": 2246822, "39": 992871, "40": 1680671},
         "active_chip": {"0": None, "1": None, "2": None, "3": None, "4": None, "5": None, "6": None, "7": None, "8": None, "9": None, "10": None, "11": None, "12": None, "13": None, "14": None, "15": None, "16": None, "17": None, "18": None, "19": None, "20": None, "21": None, "22": None, "23": None, "24": None, "25": None, "26": None, "27": None, "28": None, "29": None, "30": None, "31": None, "32": None, "33": None, "34": None, "35": None, "36": None, "37": None, "38": None, "39": None, "40": None},
         "points_on_bench": {"0": -1, "1": 0, "2": 1, "3": 2, "4": 16, "5": 3, "6": 9, "7": 16, "8": 5, "9": 0, "10": 3, "11": 1, "12": 22, "13": 1, "14": 20, "15": 8, "16": 4, "17": 13, "18": 13, "19": 6, "20": 0, "21": 4, "22": 20, "23": 1, "24": 17, "25": 2, "26": 7, "27": 5, "28": 0, "29": 19, "30": 7, "31": 11, "32": 3, "33": 2, "34": 15, "35": 2, "36": 20, "37": 5, "38": 0, "39": 19, "40": 4},
         "total_points": {"0": 76, "1": 83, "2": 86, "3": 92, "4": 90, "5": 109, "6": 44, "7": 62, "8": 91, "9": 91, "10": 81, "11": 69, "12": 69, "13": 62, "14": 56, "15": 57, "16": 68, "17": 83, "18": 86, "19": 75, "20": 60, "21": 75, "22": 62, "23": 67, "24": 64, "25": 89, "26": 75, "27": 87, "28": 66, "29": 88, "30": 80, "31": 65, "32": 86, "33": 87, "34": 68, "35": 59, "36": 75, "37": 67, "38": 54, "39": 77, "40": 82},
@@ -70,7 +70,7 @@ def league_weekly_score():
     
 @pytest.fixture(scope="module")
 def league_weekly_transfer():
-    return {"1086398": {"element_in": [355], "element_out": [343]}, "98120": {"element_in": [294], "element_out": [362]}, 
+    return {"1086398": {"element_in": [355], "element_out": [343]}, "1802621": {"element_in": [294], "element_out": [362]}, 
      "175583": {"element_in": [597], "element_out": [352]}, "1070898": {"element_in": [193], "element_out": [135]},
      "18103": {"element_in": [355], "element_out": [8]}, "32133": {"element_in": [355], "element_out": [415]}, 
      "563294": {"element_in": [355], "element_out": [343]}, "5748350": {"element_in": [509], "element_out": [303]}, 
@@ -101,7 +101,7 @@ def league_weekly_transfer():
 
 @pytest.fixture(scope = "module")
 def league_participants():
-    return [{'id': 37378749, 'event_total': 36, 'player_name': 'Emmanuel Okedele', 'rank': 1, 'last_rank': 2, 'rank_sort': 1, 'total': 1100, 'entry': 98120, 'entry_name': 'Potters Touch'},\
+    return [{'id': 37378749, 'event_total': 36, 'player_name': 'Emmanuel Okedele', 'rank': 1, 'last_rank': 2, 'rank_sort': 1, 'total': 1100, 'entry': 1802621, 'entry_name': 'Potters Touch'},\
     {'id': 38949786, 'event_total': 26, 'player_name': 'Adedapo Adedire', 'rank': 2, 'last_rank': 3, 'rank_sort': 2, 'total': 1088, 'entry': 1086398, 'entry_name': 'Sylarexx Fc'}, \
     {'id': 37386221, 'event_total': 19, 'player_name': 'Uncle Buzzey', 'rank': 3, 'last_rank': 1, 'rank_sort': 3, 'total': 1084, 'entry': 293449, 'entry_name': 'Coyg'},\
     {'id': 62483704, 'event_total': 28, 'player_name': 'Star Boy', 'rank': 4, 'last_rank': 4, 'rank_sort': 4, 'total': 1058, 'entry': 456141, 'entry_name': 'Akaza Dono'}, \
@@ -127,7 +127,7 @@ def league_participants():
 
 @pytest.fixture(scope = "module")
 def league_fill_fixture():
-    return [{'id': 37378749, 'event_total': 36, 'player_name': 'Emmanuel Okedele', 'rank': 1, 'last_rank': 2, 'rank_sort': 1, 'total': 1100, 'entry': 98120, 'entry_name': 'Potters Touch'},\
+    return [{'id': 37378749, 'event_total': 36, 'player_name': 'Emmanuel Okedele', 'rank': 1, 'last_rank': 2, 'rank_sort': 1, 'total': 1100, 'entry': 1802621, 'entry_name': 'Potters Touch'},\
     {'id': 38949786, 'event_total': 26, 'player_name': 'Adedapo Adedire', 'rank': 2, 'last_rank': 3, 'rank_sort': 2, 'total': 1088, 'entry': 1086398, 'entry_name': 'Sylarexx Fc'}, \
     {'id': 37386221, 'event_total': 19, 'player_name': 'Uncle Buzzey', 'rank': 3, 'last_rank': 1, 'rank_sort': 3, 'total': 1084, 'entry': 293449, 'entry_name': 'Coyg'}]
 
@@ -137,19 +137,19 @@ def filepath():
 
 @pytest.fixture(scope="module")
 def participant():
-    return int(98120)
+    return int(1802621)
 
 @pytest.fixture(scope="module")
 def h2h_league():
-    return int(1089000)
+    return int(1660738)
 
 @pytest.fixture(scope="module")
 def classic_league():
-    return int(1088941)
+    return int(538731)
 
 @pytest.fixture(scope="module")
 def gw_fixture():
-    return int(8)
+    return int(1)
 
 @pytest.fixture(scope="module")
 def span_fixture():
@@ -163,5 +163,5 @@ def values():
 def transfer_obj():
     return {"element_in": 5, 'element_in_cost': 76, 
            "element_out": 19, "element_out_cost": 11,
-           "entry": 98120, "event": 12, "time": 2300}
+           "entry": 1802621, "event": 12, "time": 2300}
 

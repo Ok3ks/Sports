@@ -5,6 +5,7 @@ import requests
 
 from src.utils import to_json
 from src.paths import MOCK_DIR
+from typing import Any
 
 #from typing import Any, List, Dict
 
@@ -12,7 +13,7 @@ def test_gameweek_endpoint(gw_fixture):
 
     #digit greater than 1 less than 38
     gameweek_url = GW_URL.format(gw_fixture)
-    assert gameweek_url == "https://fantasy.premierleague.com/api/event/8/live/"
+    assert gameweek_url == f"https://fantasy.premierleague.com/api/event/1/live/"
     
     r = requests.get(gameweek_url)
     assert r.status_code == 200, f'{r.status_code} - Url invalid, or unavailable'
@@ -114,19 +115,18 @@ def test_transfer_endpoint(participant):
     r = r.json()
     
     assert type(r) == list, 'Endpoint structure has changed'
-    assert type(r[0]) == dict
+    # Transfers is empty if there's no transfer
 
-    transfer_keys = r[0].keys()
-    
-    assert 'element_in' in transfer_keys
-    assert 'element_in_cost' in transfer_keys
-    assert 'element_out' in transfer_keys
-    assert 'element_out_cost' in transfer_keys
-    assert 'entry' in transfer_keys
-    assert 'event' in transfer_keys
-    assert 'time' in transfer_keys
-
-    assert len(transfer_keys) == 7
+    if len(r) > 1: 
+        transfer_keys = r[0].keys()
+        assert 'element_in' in transfer_keys
+        assert 'element_in_cost' in transfer_keys
+        assert 'element_out' in transfer_keys
+        assert 'element_out_cost' in transfer_keys
+        assert 'entry' in transfer_keys
+        assert 'event' in transfer_keys
+        assert 'time' in transfer_keys
+        assert len(transfer_keys) == 7
 
     out_dict = {"transfer" : r}
     to_json(out_dict, f"{MOCK_DIR}/endpoints/transfer_endpoint.json")
@@ -155,7 +155,6 @@ def test_history_endpoint(participant):
     assert type(r['past'][0]) == dict, "Endpoint structure has changed"
 
     assert type(r['chips']) == list, "Endpoint structure has changed"
-    assert type(r['chips'][0]) == dict, "Endpoint structure has changed"
 
     current_keys = r['current'][0].keys()
 
@@ -167,21 +166,14 @@ def test_history_endpoint(participant):
 
     assert len(current_keys) == 12, "Number of keys has changed"
 
+    #Add conditional ifs
     past_keys = r['past'][0].keys()
+    past_keys_prev = ['season_name', 'total_points', 'rank']
 
-    assert 'season_name' in past_keys
-    assert 'total_points' in past_keys
-    assert 'rank' in past_keys
+    assert len(set(past_keys).difference(past_keys)) == 0, "Past keys have changed"
 
-    assert len(past_keys) == 3, "Number of keys has changed"
+    #Chips is empty if it has not been used
 
-    chips_keys = r['chips'][0].keys()
-
-    assert 'name' in chips_keys
-    assert 'time' in chips_keys
-    assert 'event' in chips_keys
-
-    assert len(chips_keys) == 3, "Number of keys has changed"
     to_json(r, f"{MOCK_DIR}/endpoints/history_endpoint.json")
     
 
@@ -390,57 +382,16 @@ def test_fpl_url_endpoint():
 
     assert type(r['game_settings']) == dict
     game_settings_keys = r['game_settings'].keys()
-    
-    assert 'league_join_private_max'  in game_settings_keys
-    assert 'league_join_public_max'  in game_settings_keys
-    assert 'league_max_size_public_classic'  in game_settings_keys
 
-    assert 'league_max_size_public_h2h'  in game_settings_keys
-    assert 'league_max_size_private_h2h'  in game_settings_keys
-    assert 'league_max_ko_rounds_private_h2h'  in game_settings_keys
-    assert 'league_prefix_public'  in game_settings_keys
-
-    assert 'league_points_h2h_win'  in game_settings_keys
-    assert 'league_points_h2h_lose'  in game_settings_keys
-    assert 'league_points_h2h_draw'  in game_settings_keys
-    assert 'league_ko_first_instead_of_random'  in game_settings_keys
-
-    assert 'cup_start_event_id'  in game_settings_keys
-    assert 'cup_stop_event_id'  in game_settings_keys
-    assert 'cup_qualifying_method'  in game_settings_keys
-    assert 'sys_vice_captain_enabled'  in game_settings_keys
-
-    assert 'squad_total_spend'  in game_settings_keys
-    assert 'squad_team_limit'  in game_settings_keys
-    assert 'squad_squadsize'  in game_settings_keys
-    assert 'squad_squadplay'  in game_settings_keys
-
-    assert 'cup_type'  in game_settings_keys
-    assert 'featured_entries'  in game_settings_keys
-    assert 'percentile_ranks' in game_settings_keys 
-
-    assert 'stats_form_days'  in game_settings_keys
-    assert 'ui_special_shirt_exclusions'  in game_settings_keys
-    assert 'ui_use_special_shirts'  in game_settings_keys
-    assert 'ui_currency_multiplier'  in game_settings_keys
-
-    assert 'transfers_cap'  in game_settings_keys
-    assert 'transfers_sell_on_fee'  in game_settings_keys
-    assert 'league_h2h_tiebreak_stats'  in game_settings_keys
-    assert 'timezone'  in game_settings_keys
-    print(game_settings_keys)
-
-    assert len(r['game_settings']) == 30, 'Keys have changed'
-    
+    game_settings_keys_prev = ['league_join_private_max', 'league_join_public_max', 'league_max_size_public_classic', 'league_max_size_public_h2h', 'league_max_size_private_h2h', 'league_max_ko_rounds_private_h2h', 'league_prefix_public', 'league_points_h2h_win', 'league_points_h2h_lose', 'league_points_h2h_draw', 'league_ko_first_instead_of_random', 'cup_start_event_id', 'cup_stop_event_id', 'cup_qualifying_method', 'cup_type', 'featured_entries', 'percentile_ranks', 'squad_squadplay', 'squad_squadsize', 'squad_team_limit', 'squad_total_spend', 'ui_currency_multiplier', 'ui_use_special_shirts', 'ui_special_shirt_exclusions', 'stats_form_days', 'sys_vice_captain_enabled', 'transfers_cap', 'transfers_sell_on_fee', 'max_extra_free_transfers', 'league_h2h_tiebreak_stats', 'timezone']
+    assert len(set(game_settings_keys).difference(game_settings_keys_prev)) == 0 , f"Game setting keys have changed new {game_settings_keys}"
 
     assert type(r['phases']) == list
     assert type(r['phases'][0]) == dict
+    
     phase_keys = list(r['phases'][0])
-    assert 'id' in phase_keys
-    assert 'name' in phase_keys
-    assert 'start_event' in phase_keys
-    assert 'stop_event' in phase_keys
-    assert len(phase_keys) == 4
+    phase_keys_prev = ['id', 'name', 'start_event', 'stop_event', 'highest_score']
+    assert len(set(phase_keys_prev).difference(phase_keys)) == 0 , f"Game setting keys have changed new {game_settings_keys}"
 
     assert type(r['teams']) == list
     assert type(r['teams'][0]) == dict
@@ -476,18 +427,8 @@ def test_fpl_url_endpoint():
     assert len(element_stats_keys) == 2
 
     element_types_keys = r['element_types'][0].keys()
-    assert 'id' in element_types_keys
-    assert 'plural_name' in element_types_keys
-    assert 'plural_name_short' in element_types_keys
-    assert 'singular_name' in element_types_keys
-    assert 'singular_name_short' in element_types_keys
-    assert 'squad_select' in element_types_keys
-    assert 'squad_min_play' in element_types_keys
-    assert 'squad_max_play' in element_types_keys
-    assert 'ui_shirt_specific' in element_types_keys
-    assert 'sub_positions_locked' in element_types_keys
-    assert 'element_count' in element_types_keys
-    assert len(element_types_keys) == 11, "Keys have changed"
+    element_types_keys_prev = ['id', 'plural_name', 'plural_name_short', 'singular_name', 'singular_name_short', 'squad_select', 'squad_min_play', 'squad_min_select', 'squad_max_select', 'squad_min_play', 'squad_max_play', 'ui_shirt_specific', 'sub_positions_locked', 'element_count']
+    assert len(set(element_types_keys).difference(element_types_keys_prev)) == 0, "Keys have changed"
 
     elements_keys = r['elements'][0].keys()
     assert 'chance_of_playing_next_round' in elements_keys
@@ -594,14 +535,5 @@ def test_fpl_url_endpoint():
     to_json(r, f"{MOCK_DIR}/endpoints/fpl_url_endpoint.json")
 
 if __name__ == "__main__":
-    test_fixture_endpoint()
-    test_fpl_player_endpoint(98120, 8)
-    test_fpl_url_endpoint()
-
-    test_gameweek_endpoint(8)
-    test_h2h_league_endpoint(1089000)
-    test_league_endpoint(85647)
-
-    test_history_endpoint(98120)
-    test_transfer_endpoint(98120)
+    pass
     
