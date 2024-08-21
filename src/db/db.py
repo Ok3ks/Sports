@@ -100,11 +100,13 @@ def get_teams(session=sessionmaker(create_connection_engine("fpl"))):
         obj = session.execute(statement).all()
         return obj
 
+#raw sql queries make it hard to switch databases
+#tests are good 
 
 def get_entry_ids(session=sessionmaker(create_connection_engine("fpl")), table_name=""):
     with session() as session:
-        statement_1 = text(f"""SELECT id FROM {table_name}""")
-        statement_2 = text(f"""SELECT count(id) FROM {table_name}""")
+        statement_1 = text(f"""SELECT id FROM public.'{table_name}'""")
+        statement_2 = text(f"""SELECT count(id) FROM public.'{table_name}'""")
         obj = session.execute(statement_1).all()
         obj_2 = session.execute(statement_2).one()
         return (i.id for i in obj), obj_2[0]
@@ -112,7 +114,7 @@ def get_entry_ids(session=sessionmaker(create_connection_engine("fpl")), table_n
 
 # ORM for each gameweek
 def get_player_stats_from_db(gw, session=session):
-    stmt = text(f"SELECT player_id, total_points FROM Player_Gameweek_Scores WHERE gameweek = {gw}")
+    stmt = text(f'SELECT player_id, total_points FROM public."Player_gameweek_score" WHERE gameweek = {gw}')
     # stmt = select(PlayerGameweekScores.total_points).where((PlayerGameweekScores.player_id == id)&(PlayerGameweekScores.gameweek == gw))
     with session() as session:
         c = session.execute(stmt).all()
@@ -122,7 +124,7 @@ def get_player_stats_from_db(gw, session=session):
 
 def check_minutes(id, gw, session=session):
     "Checks DB for captain's minutes"
-    stmt = text(f"SELECT minutes FROM Player_Gameweek_Scores WHERE player_id={id} and gameweek = {gw}")
+    stmt = text(f'SELECT minutes FROM public."Player_gameweek_score" WHERE player_id={id} and gameweek = {gw}')
     with session() as session:
         c = session.execute(stmt)
     return c.fetchone()
@@ -132,7 +134,7 @@ def get_available_gameweek_scores(
     session=sessionmaker(create_connection_engine("fpl")),
 ):
     # can be refactored to get_distinct of any column
-    stmt = text(f"SELECT distinct(gameweek) FROM Player_Gameweek_Scores")
+    stmt = text(f'SELECT distinct(gameweek) FROM public."Player_gameweek_score"')
     with session() as session:
         c = session.execute(stmt)
     return c.fetchall()
