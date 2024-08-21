@@ -366,7 +366,7 @@ def test_fpl_player_endpoint(participant, gw_fixture):
         "is_vice_captain"
     }
 
-    assert len(set(picks_keys).difference(picks_keys_prev)) == 0, "Picks Keys have changed"
+    assert len(set(picks_keys).difference(picks_keys_prev)) == 0, "Picks Keys changed"
     assert type(r["automatic_subs"]) is list
     to_json(r, f"{MOCK_DIR}/endpoints/player_endpoint.json")
 
