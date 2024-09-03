@@ -1,0 +1,51 @@
+"""
+GraphQL schema definitions.
+"""
+
+type Query {
+
+  player(id: ID!, half: Int!): Player
+  players: [Player!]!
+  playerGameweekScore(id: ID!): PlayerGameweekScore
+  gameweekScore(gameweek: Int!): [PlayerGameweekScore!]!
+
+}
+
+type PlayerGameweekScore {
+    index: Int!
+    player_id: Int!
+    minutes: Int!
+    goals_scored: Int!
+    assists: Int!
+    clean_sheets: Int!
+    goals_conceded: Int!
+    own_goals: Int!
+    penalties_saved: Int!
+    penalties_missed: Int!
+    yellow_cards: Int!
+    red_cards: Int!
+    saves: Int!
+    bonus: Int!
+    bps: Int!
+    influence: Int!
+    creativity: Int!
+    threat: Int!
+    ict_index: Int!
+    starts: Int!
+    expected_goals: Int!
+    expected_assists: Int!
+    expected_goal_involvements: Int!
+    expected_goals_conceded: Int!
+    total_points: Int!
+    in_dreamteam: Int!
+    gameweek: Int!
+}
+
+type Player {
+    index: Int!
+    player_id: String!
+    player_name: String!
+    position: String!
+    team:  String!
+    half:  Int!
+}
