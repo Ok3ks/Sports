@@ -48,7 +48,7 @@ def create_table(conn, table_name="EPL_PLAYERS_2024_1ST_HALF"):
     return conn
 
 
-def update_db_player_info(engine, table_name="EPL_PLAYERS_2024_1ST_HALF"):
+def update_db_player_info(engine, table_name="EPL_PLAYERS_2024", half=1):
     """This function retrieves current information of players
     from the API"""
 
@@ -68,11 +68,12 @@ def update_db_player_info(engine, table_name="EPL_PLAYERS_2024_1ST_HALF"):
         for item in home["elements"]
     )
     data = pd.DataFrame(data)
-    data.columns = ["player_id", "team", "position", "player_name"]
+    data['half'] = half
+    data.columns = ["player_id", "team", "position", "player_name", "half"]
 
     print(f"{len(data)} is ready to be added to database table")
-    data.to_sql(f"{table_name}", engine, if_exists="replace", method="multi", index=False)
-    print(f"success adding data")
+    data.to_sql(f"{table_name}", engine, if_exists="replace", method="multi", index=True)
+    print(f"success adding {len(data)}")
 
 
 if __name__ == "__main__":
@@ -80,15 +81,20 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser("Update Player information, this happens twice a year")
 
-    parser.add_argument("-t", "--table_name", type=str, help="Table name", required=False)
-    parser.add_argument("-db", "--db_name", type=str, help="Database name", required=True)
+    parser.add_argument("-t", "--table_name", type=str, help="Table name",
+                        required=False)
+    parser.add_argument("-db", "--db_name", type=str, help="Database name",
+                        required=True)
+    parser.add_argument("-ha", "--half", type=int, choices=[1, 2],
+                        help="Half of the season", required=True)
 
     args = parser.parse_args()
     engine = create_connection_engine(args.db_name)
 
     if args.table_name:
         create_table(engine, table_name=args.table_name)
-        update_db_player_info(engine, table_name=args.table_name)
+        update_db_player_info(engine, table_name=args.table_name,
+                              half=args.half)
     else:
         create_table(engine)
         update_db_player_info(engine)

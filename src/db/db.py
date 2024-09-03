@@ -10,6 +10,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 from sqlalchemy import URL
 import os
+# from update_gameweek_score import PlayerGameweekScores #decide which to remove on refactor
 
 
 class Base(DeclarativeBase):
@@ -17,15 +18,51 @@ class Base(DeclarativeBase):
 
 
 class Player(Base):
-    __tablename__ = "EPL_PLAYERS_2024_1ST_HALF"
+    __tablename__ = "EPL_2024_PLAYER_INFO"
 
     player_id: Mapped[int] = mapped_column(Integer, primary_key=True)
     team: Mapped[str] = mapped_column(String)
     position: Mapped[str] = mapped_column(String)
     player_name: Mapped[str] = mapped_column(String)
+    half: Mapped[str] = mapped_column(Integer)
 
     def __repr__(self) -> str:
-        return f"Player(player_id={self.player_id}, team={self.team}, position ={self.position}, player_name={self.player_name})"
+        return f"Player(player_id={self.player_id}, team={self.team}, position={self.position}, player_name={self.player_name}, half={self.half})"
+
+
+class GameweekScore(Base):
+    __tablename__ = "Player_gameweek_score"
+
+    index: Mapped[int] = mapped_column(Integer)
+    player_id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    minutes: Mapped[int] = mapped_column(Integer)
+    goals_scored: Mapped[int] = mapped_column(Integer)
+    assists: Mapped[int] = mapped_column(Integer)
+    clean_sheets: Mapped[int] = mapped_column(Integer)
+    goals_conceded: Mapped[int] = mapped_column(Integer)
+    own_goals: Mapped[int] = mapped_column(Integer)
+    penalties_saved: Mapped[int] = mapped_column(Integer)
+    penalties_missed: Mapped[int] = mapped_column(Integer)
+    yellow_cards: Mapped[int] = mapped_column(Integer)
+    red_cards: Mapped[int] = mapped_column(Integer)
+    saves: Mapped[int] = mapped_column(Integer)
+    bonus: Mapped[int] = mapped_column(Integer)
+    bps: Mapped[int] = mapped_column(Integer)
+    influence: Mapped[int] = mapped_column(Integer)
+    creativity: Mapped[int] = mapped_column(Integer)
+    threat: Mapped[int] = mapped_column(Integer)
+    ict_index: Mapped[int] = mapped_column(Integer)
+    starts: Mapped[int] = mapped_column(Integer)
+    expected_goals: Mapped[String] = mapped_column(String)
+    expected_assists: Mapped[String] = mapped_column(String)
+    expected_goal_involvements: Mapped[String] = mapped_column(String)
+    expected_goals_conceded: Mapped[String] = mapped_column(String)
+    total_points: Mapped[String] = mapped_column(String)
+    in_dreamteam: Mapped[int] = mapped_column(Integer)
+    gameweek: Mapped[int] = mapped_column(Integer)
+
+    def __repr__(self) -> str:
+        return f"GameweekScore(player_id={self.player_id}, goals_scored={self.goals_scored}, total_points={self.total_points}, gameweek={self.gameweek}, dreamteam={self.in_dreamteam})"
 
 
 def create_connection(db, db_type="postgres"):
@@ -79,19 +116,20 @@ def create_connection_engine(db):
 session = sessionmaker(create_connection_engine("fpl"))
 
 
-def get_player(id, session=session):
+def get_player(id, half, session=session):
     out = []
     with session() as session:
         if isinstance(id, list):
             for item in id:
-                stmt = select(Player.player_name).where(Player.player_id == int(item))
+                stmt = select(Player).where(Player.player_id == int(item))
                 obj = session.scalars(stmt).all()
                 out.append(obj[0])
             return out
         else:
-            stmt = select(Player.player_name).where(Player.player_id == int(id))
-            obj = session.scalars(stmt).one()
-            return obj
+            stmt = select(Player).where(Player.player_id == int(id)).where(Player.half == int(half))
+            obj = session.scalars(stmt).all()
+            print(obj[0])
+            return obj[0]
 
 
 def get_teams(session=sessionmaker(create_connection_engine("fpl"))):
@@ -99,7 +137,7 @@ def get_teams(session=sessionmaker(create_connection_engine("fpl"))):
         statement = select(distinct(Player.team))
         obj = session.execute(statement).all()
         return obj
-
+    
 #raw sql queries make it hard to switch databases
 #tests are good 
 
@@ -113,13 +151,13 @@ def get_entry_ids(session=sessionmaker(create_connection_engine("fpl")), table_n
 
 
 # ORM for each gameweek
-def get_player_stats_from_db(gw, session=session):
-    stmt = text(f'SELECT player_id, total_points FROM public."Player_gameweek_score" WHERE gameweek = {gw}')
-    # stmt = select(PlayerGameweekScores.total_points).where((PlayerGameweekScores.player_id == id)&(PlayerGameweekScores.gameweek == gw))
+def get_player_stats_from_db(id, gw, session=session):
     with session() as session:
-        c = session.execute(stmt).all()
-        # c = session.scalars(stmt).all()
-    return {i.player_id: i.total_points for i in c}
+        stmt = select(GameweekScore).where((GameweekScore.player_id == id)
+                                           & (GameweekScore.gameweek == gw))
+        c = session.scalars(stmt).one()
+        print(c)
+        return c
 
 
 def check_minutes(id, gw, session=session):
