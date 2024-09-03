@@ -3,12 +3,10 @@ GraphQL schema definitions.
 """
 
 type Query {
-
   player(id: ID!, half: Int!): Player
   players: [Player!]!
-  playerGameweekScore(id: ID!): PlayerGameweekScore
+  playerGameweekScore(id: ID!, gameweek:Int!): PlayerGameweekScore
   gameweekScore(gameweek: Int!): [PlayerGameweekScore!]!
-
 }
 
 type PlayerGameweekScore {
@@ -32,11 +30,11 @@ type PlayerGameweekScore {
     threat: Int!
     ict_index: Int!
     starts: Int!
-    expected_goals: Int!
-    expected_assists: Int!
-    expected_goal_involvements: Int!
-    expected_goals_conceded: Int!
-    total_points: Int!
+    expected_goals: String!
+    expected_assists: String!
+    expected_goal_involvements: String!
+    expected_goals_conceded: String!
+    total_points: String!
     in_dreamteam: Int!
     gameweek: Int!
 }
