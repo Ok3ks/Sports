@@ -87,7 +87,7 @@ def create_connection(db, db_type="postgres"):
         try:
             conn = pymysql.connect(
                 dbname=os.getenv("DB_NAME"),
-                user=os.getenv("DB_USERNAME"), #confirm? May lead to bug
+                user=os.getenv("DB_USERNAME"),#confirm? May lead to bug
                 password=os.getenv("DB_PASSWORD"),
                 host=os.getenv("DB_HOST"),
                 port=os.getenv("DB_PORT"),
@@ -116,7 +116,7 @@ def create_connection_engine(db):
 session = sessionmaker(create_connection_engine("fpl"))
 
 
-def get_player(id, half, session=session):
+def get_player_gql(id, half, session=session):
     out = []
     with session() as session:
         if isinstance(id, list):
@@ -130,6 +130,21 @@ def get_player(id, half, session=session):
             obj = session.scalars(stmt).all()
             print(obj[0])
             return obj[0]
+
+def get_player(id, session=session):
+    out = []
+    with session() as session:
+        if isinstance(id, list):
+            for item in id:
+                stmt = select(Player.player_name).where(Player.player_id == int(item))
+                obj = session.scalars(stmt).all()
+                out.append(obj[0])
+            return out
+        else:
+            stmt = select(Player.player_name).where(Player.player_id == int(id))
+            obj = session.scalars(stmt).one()
+            return obj
+
 
 
 def get_teams(session=sessionmaker(create_connection_engine("fpl"))):
@@ -151,13 +166,21 @@ def get_entry_ids(session=sessionmaker(create_connection_engine("fpl")), table_n
 
 
 # ORM for each gameweek
-def get_player_stats_from_db(id, gw, session=session):
+def get_player_stats_from_db_gql(id, gw, session=session):
     with session() as session:
         stmt = select(GameweekScore).where((GameweekScore.player_id == id)
                                            & (GameweekScore.gameweek == gw))
         c = session.scalars(stmt).one()
         print(c)
         return c
+
+def get_player_stats_from_db(gw, session=session):
+    stmt = text(f'SELECT player_id, total_points FROM public."Player_gameweek_score" WHERE gameweek = {gw}')
+    # stmt = select(PlayerGameweekScores.total_points).where((PlayerGameweekScores.player_id == id)&(PlayerGameweekScores.gameweek == gw))
+    with session() as session:
+        c = session.execute(stmt).all()
+        # c = session.scalars(stmt).all()
+    return {i.player_id: i.total_points for i in c}
 
 
 def check_minutes(id, gw, session=session):
