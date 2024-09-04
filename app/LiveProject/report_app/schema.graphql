@@ -7,6 +7,7 @@ type Query {
   players: [Player!]!
   playerGameweekScore(id: ID!, gameweek:Int!): PlayerGameweekScore
   gameweekScore(gameweek: Int!): [PlayerGameweekScore!]!
+  leagueWeeklyReport(leagueId: Int!, gameweek:Int!): LeagueWeeklyReport!
 }
 
 type PlayerGameweekScore {
@@ -47,3 +48,68 @@ type Player {
     team:  String!
     half:  Int!
 }
+
+type LeagueWeeklyReport {
+  captain: CaptainStats!
+  promotedVice: [ID!]!
+  chips: ChipStats
+  exceptional: [TeamPerformance]!
+  abysmal: [TeamPerformance]!
+  leagueAverage: Float!
+  rise: [PerformanceChange]!
+  fall: [PerformanceChange]!
+  mostTransferredOut: [ID!]!
+  leastTransferredOut: [ID!]!
+  mostTransferredIn: [ID!]!
+  leastTransferredIn: [ID!]!
+  bestTransferIn: [ID]!
+  worstTransferIn: [ID]!
+  mostPointsOnBench: [BenchPerformance]!
+  jammyPoints: [JammyPoints]!
+}
+
+type ChipStats { 
+  chip: String!
+  count: Int!
+}
+
+type CaptainStats {
+  "The key is a player ID and the value is a score or statistic"
+  stats: [CaptainStat!]!
+}
+
+type CaptainStat {
+  playerId: ID!
+  count: Int!
+}
+
+type TeamPerformance {
+  name: String
+  score: Int
+}
+
+type PerformanceChange {
+  rank: Int!
+  change: Int!
+  name: String!
+}
+
+type BenchPerformance {
+  name: String!
+  players: [PlayerPerformance!]!
+  totalPoints: Int!
+}
+
+type PlayerPerformance {
+  name: String!
+  points: Int!
+}
+
+type JammyPoints {
+  teamName: String!
+  goodPlayers: [String!]!
+  badPlayers: [String!]!
+  points: Int!
+}
+
+
