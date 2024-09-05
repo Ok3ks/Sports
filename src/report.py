@@ -122,10 +122,7 @@ class LeagueWeeklyReport(League):
         if 'active_chip' in self.f.columns:
             
             self.chips = self.f["active_chip"].value_counts().to_dict()  #More report based on this 
-            print(self.chips)
-
             self.no_chips = self.f[self.f["active_chip"].isna()]
-            print(self.no_chips)
 
         self.participants = self.obtain_league_participants()
         self.participants_name = self.get_participant_name()
@@ -329,6 +326,23 @@ class LeagueWeeklyReport(League):
                         'points': auto_sub_points,
                     })
             return {"jammy_points": jammy_points}
+        
+        def most_benched():
+
+            player_on_bench = self.f["bench"].to_list()
+            player_on_bench = ",".join(player_on_bench)
+            player_on_bench= player_on_bench.split(',')
+
+            resultDict = {}
+            for i in player_on_bench:
+                resultDict[i] = resultDict.get(i, 0) + 1 
+
+            resultDict = dict(sorted(resultDict.items(), key=operator.itemgetter(1), reverse=True))
+            print(resultDict)
+            
+            #most scoring bench player?
+            return {"most_benched": resultDict}
+
 
         @profile
         def most_points_on_bench():
@@ -338,6 +352,7 @@ class LeagueWeeklyReport(League):
 
             n = min(len(self.f), 3)
             for i in range(n):
+
                 player_on_bench = self.f.iloc[i, :]["bench"].split(",")
                 point_player = {get_player(id=i): self.player_points[int(i)] for i in player_on_bench}
                 points_on_bench = int(self.f.iloc[i, :]["points_on_bench"])
@@ -370,6 +385,7 @@ class LeagueWeeklyReport(League):
 
         output.update(most_points_on_bench())
         output.update(jammy_points())
+        output.update(most_benched())
 
         if display:
             print(output)
