@@ -50,54 +50,72 @@ type Player {
 }
 
 type LeagueWeeklyReport {
-  captain: CaptainStats!
-  promotedVice: [ID!]!
+  captain: [CaptainStat!]!
   chips: ChipStats
-  exceptional: [TeamPerformance]!
-  abysmal: [TeamPerformance]!
+  promotedVice: [promotedViceInfo]
+  exceptional: TeamPerformance
+  abysmal: TeamPerformance
   leagueAverage: Float!
   rise: [PerformanceChange]!
   fall: [PerformanceChange]!
-  mostTransferredOut: [ID!]!
-  leastTransferredOut: [ID!]!
-  mostTransferredIn: [ID!]!
-  leastTransferredIn: [ID!]!
-  bestTransferIn: [ID]!
-  worstTransferIn: [ID]!
+  mostTransferredOut: [outTransfer]
+  mostTransferredIn: [inTransfer]
+  bestTransferIn: [transferImpact]!
+  worstTransferIn: [transferImpact]!
   mostPointsOnBench: [BenchPerformance]!
-  jammyPoints: [JammyPoints]!
+  jammyPoints: [JammyPoints]
+  mostBenched: mostBenched!
 }
 
-type ChipStats { 
-  chip: String!
-  count: Int!
+type promotedViceInfo {
+  promotedVicePoints: Int!
+  participantsName: String!
+  captainName: String!
+  viceCaptainName : String!
 }
 
-type CaptainStats {
-  "The key is a player ID and the value is a score or statistic"
-  stats: [CaptainStat!]!
+type inTransfer {
+  player: String
+  in: Int
+}
+
+type outTransfer {
+  player: String
+  out: Int
 }
 
 type CaptainStat {
-  playerId: ID!
+  player: Int!
   count: Int!
 }
 
+type ChipStats { 
+  chip: String
+  count: Int
+}
+
 type TeamPerformance {
-  name: String
+  teamName: String
   score: Int
 }
 
 type PerformanceChange {
-  rank: Int!
-  change: Int!
-  name: String!
+  currentRank: Int!
+  prevRank: Int!
+  participantName: String!
+}
+
+type transferImpact {
+  teamName: String
+  playerIn: String
+  playerOut: String
+  pointsDelta: Int
 }
 
 type BenchPerformance {
-  name: String!
-  players: [PlayerPerformance!]!
-  totalPoints: Int!
+  teamName: String!
+  players: [String!]
+  pointOnBench: Int!
 }
 
 type PlayerPerformance {
@@ -106,10 +124,15 @@ type PlayerPerformance {
 }
 
 type JammyPoints {
-  teamName: String!
-  goodPlayers: [String!]!
-  badPlayers: [String!]!
-  points: Int!
+  teamName: String
+  subIn: [String]
+  subOut: [String]
+  points: Int
 }
 
+type mostBenched {
+  player: [String!]
+  count: [Int!]
+  points: [Int!]
+}
 
