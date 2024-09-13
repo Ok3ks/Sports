@@ -13,6 +13,7 @@ from src.db.db import (
     check_minutes,
     create_connection,
 )
+import math
 
 
 if "line_profiler" not in dir() and "profile" not in dir():
@@ -49,14 +50,12 @@ class LeagueWeeklyReport(League):
         # del player_set
 
         self.o_df["points_breakdown"] = self.o_df["players"].map(
-            lambda x: [self.player_points[int(y)] for y in x.split(",")]
-        )
-        self.o_df["captain_points"] = self.o_df["captain"].map(lambda x: self.player_points[x] * 2)
-        self.o_df["vice_captain_points"] = self.o_df["vice_captain"].map(lambda x: self.player_points[x])
-
-        # self.o_df['points_breakdown'] = self.o_df['players'].map(lambda x: [get_player_stats_from_db(y, self.gw)[0] for y in x.split(",")])
-        # self.o_df['captain_points'] = self.o_df['captain'].map(lambda x: get_player_stats_from_db(x, self.gw)[0] * 2)
-        # self.o_df['vice_captain_points'] = self.o_df['vice_captain'].map(lambda x: get_player_stats_from_db(x, self.gw)[0])
+            lambda x: [self.player_points[int(y)] for y in x.split(",") 
+                       if len(y.strip()) >= 1])
+        
+        # print(self.o_df['captain'].isna())
+        self.o_df["captain_points"] = self.o_df["captain"].map(lambda x: self.player_points[int(x)] * 2 if math.isnan(x) != True else 0)
+        self.o_df["vice_captain_points"] = self.o_df["vice_captain"].map(lambda x: self.player_points[x] if math.isnan(x) != True else 0)
 
         # optimization 3
         self.o_df = self.o_df.sort_values(by="total_points", ascending=False).reset_index(drop=True)
@@ -76,10 +75,8 @@ class LeagueWeeklyReport(League):
             self.f["transfer_points_out"] = self.f["element_out"].map(
                 lambda x: sum([self.player_points[y] for y in x])
             )
-            self.f["transfers"] = self.f["element_out"].map(lambda x: len(x))
-            
+            self.f["transfers"] = self.f["element_out"].map(lambda x: len(x))  
             self.f["delta"] = self.f["transfer_points_in"] - self.f["transfer_points_out"]
-            print(self.f['delta'])
 
             self.f.reset_index(inplace=True)
             self.f.rename(columns={"index": "entry_id"}, inplace=True)
@@ -93,7 +90,6 @@ class LeagueWeeklyReport(League):
         return self.f
 
     def captain_minutes(self):
-        self.o_df["captain"] = self.o_df["captain"].astype(int)
         self.o_df["cap_minutes"] = [check_minutes(x, self.gw)[0] for x in self.o_df["captain"]]
 
 
@@ -287,8 +283,8 @@ class LeagueWeeklyReport(League):
 
             best_transfer_in = []
             if len(self.no_chips) > 2: 
-                
                 self.no_chips = self.no_chips.sort_values(by="delta", ascending=False)
+                print(self.no_chips['delta'])
                 n = min(len(self.f), 3)
 
                 if 'element_in' in self.f.keys() and 'element_out' in self.f.keys():
@@ -350,7 +346,6 @@ class LeagueWeeklyReport(League):
             resultDictGraph['count'] = [resultDict[player] for player in resultDictGraph['player']]
             resultDictGraph['points'] = [points for points in pointsDict.values()]
 
-            print(resultDictGraph)
             # resultDict = dict(sorted(resultDictGraph.items(), key=operator.itemgetter('points'), reverse=True))
             #most scoring bench player?
             return {"most_benched": resultDictGraph}

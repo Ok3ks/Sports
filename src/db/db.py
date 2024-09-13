@@ -10,6 +10,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 from sqlalchemy import URL
 import os
+import math
 # from update_gameweek_score import PlayerGameweekScores #decide which to remove on refactor
 
 
@@ -184,11 +185,15 @@ def get_player_stats_from_db(gw, session=session):
 
 
 def check_minutes(id, gw, session=session):
-    "Checks DB for captain's minutes"
-    stmt = text(f'SELECT minutes FROM public."Player_gameweek_score" WHERE player_id={id} and gameweek = {gw}')
-    with session() as session:
-        c = session.execute(stmt)
-    return c.fetchone()
+    """Checks DB for captain's minutes"""
+
+    if not math.isnan(id):
+        stmt = text(f'SELECT minutes FROM public."Player_gameweek_score" WHERE player_id={id} and gameweek = {gw}')
+        with session() as session:
+            c = session.execute(stmt)
+        return c.fetchone()
+    else:
+        return [0]
 
 
 def get_available_gameweek_scores(
