@@ -17,7 +17,7 @@ Including another URLconf
 from ariadne_django.views import GraphQLView
 from django.contrib import admin
 from django.urls import path
-from report_app import views
+# from report_app import views
 from report_app.resolvers import schema
 
 
