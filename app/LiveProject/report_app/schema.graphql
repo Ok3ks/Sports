@@ -85,8 +85,8 @@ type outTransfer {
 }
 
 type CaptainStat {
-  player: Int!
-  count: Int!
+  player: Int
+  count: Int
 }
 
 type ChipStats { 
