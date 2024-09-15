@@ -97,12 +97,13 @@ class LeagueWeeklyReport(League):
     def add_auto_sub(self):
         if 'auto_sub_in' in self.f.columns:
             print(self.f["auto_sub_in"].tolist())
+
         # optimization 1 - switching dictionaries to tuples
             self.f["auto_sub_in_player"] = self.f["auto_sub_in"].map(lambda x: [y for y in x.split(",") if len(x) > 3])
             self.f["auto_sub_out_player"] = self.f["auto_sub_out"].map(lambda x: [y for y in x.split(",") if len(x) > 3])
 
             self.f["auto_sub_in_points"] = self.f["auto_sub_in_player"].map(
-                lambda x: sum([self.player_points[int(y)] for y in x ])
+                lambda x: sum([self.player_points[int(y)] for y in x])
             )
 
     @profile
@@ -164,25 +165,25 @@ class LeagueWeeklyReport(League):
                 fall.append(temp)
             return {"rise": rise, "fall": fall}
 
-        @profile
-        def promoted_vice():
-            self.o_df["promoted_vice"] = self.o_df["cap_minutes"].map(lambda x: True if x == 0 else False)
-            promoted_vice = (
-                self.o_df[self.o_df["promoted_vice"] == True]
-                .sort_values(by="vice_captain_points", ascending=False)
-                .reset_index(drop=True)
-                .iloc[:3, :]
-            )
+        # @profile
+        # def promoted_vice():
+        #     self.o_df["promoted_vice"] = self.o_df["cap_minutes"].map(lambda x: True if x == 0 else False)
+        #     promoted_vice = (
+        #         self.o_df[self.o_df["promoted_vice"] == True]
+        #         .sort_values(by="vice_captain_points", ascending=False)
+        #         .reset_index(drop=True)
+        #         .iloc[:3, :]
+        #     )
 
-            return [
-                {
-                    'promoted_vice_points': i.vice_captain_points * 2,
-                    'participants_name': self.participants_name[str(i.entry_id)],
-                    'captain_name': i.captain,
-                    'vice_captain_name':i.vice_captain,
-                }
-                for i in promoted_vice.itertuples()
-            ]
+        #     return [
+        #         {
+        #             'promoted_vice_points': i.vice_captain_points * 2,
+        #             'participants_name': self.participants_name[str(i.entry_id)],
+        #             'captain_name': i.captain,
+        #             'vice_captain_name': i.vice_captain,
+        #         }
+        #         for i in promoted_vice.itertuples()
+        #     ]
 
         @profile
         def outliers():
@@ -292,7 +293,8 @@ class LeagueWeeklyReport(League):
                         player_in = self.no_chips.iloc[i, :]["element_in"][0]
                         player_out = self.f.iloc[i, :]["element_out"][0]
                         points_gained = int(self.f.iloc[i, :]["delta"])
-                        participant_id = str(self.no_chips.iloc[i, :]["entry_id"])
+                        participant_id = str(self.no_chips.iloc[i, :]
+                                             ["entry_id"])
 
                         best_transfer_in.append({
                             'team_name': self.participants_name[participant_id],
@@ -309,7 +311,6 @@ class LeagueWeeklyReport(League):
 
             jammy_points = []
             self.f = self.f.sort_values(by="auto_sub_in_points", ascending=False)
-            # print(self.f)
 
             n = min(len(self.f), 3)
             for i in range(n):
@@ -331,10 +332,13 @@ class LeagueWeeklyReport(League):
             player_on_bench = self.f["bench"].to_list()
             player_on_bench = ",".join(player_on_bench)
             player_on_bench = player_on_bench.split(',')
+            print(player_on_bench)
 
             resultDict = {}
             for i in player_on_bench:
-                resultDict[i] = resultDict.get(i, 0) + 1 
+                if len(i.strip()) >= 1:
+                    resultDict[i] = resultDict.get(i, 0) + 1 
+            print(resultDict)
 
             # resultDict = dict(sorted(resultDict.items(), key=operator.itemgetter(1), reverse=True))
             pointsDict = {player: self.player_points[int(player)] for player, _ in resultDict.items()}
@@ -359,7 +363,6 @@ class LeagueWeeklyReport(League):
 
             n = min(len(self.f), 3)
             for i in range(n):
-
                 player_on_bench = self.f.iloc[i, :]["bench"].split(",")
                 # point_player = {i: self.player_points[int(i)] for i in player_on_bench}
                 points_on_bench = int(self.f.iloc[i, :]["points_on_bench"])
@@ -373,11 +376,11 @@ class LeagueWeeklyReport(League):
                 )
             return {"most_points_on_bench": most_points}
 
-        self.vice_to_cap = promoted_vice()
+        # self.vice_to_cap = promoted_vice()
 
         output = {
             "captain": self.captain,
-            "promoted_vice": self.vice_to_cap,
+            # "promoted_vice": self.vice_to_cap,
             "chips": self.chips,
         }
 
@@ -404,9 +407,7 @@ class LeagueWeeklyReport(League):
 # Output of report page should be a json for a django template
 if __name__ == "__main__":
     from multiprocessing import Pool
-
     import argparse
-
     parser = argparse.ArgumentParser(prog="weeklyreport", description="Provide Gameweek ID and League ID")
 
     parser.add_argument(
@@ -441,6 +442,7 @@ if __name__ == "__main__":
         test = LeagueWeeklyReport(args.gameweek_id, args.league_id)
 
         test.get_data()
+
         # test.get_all_participant_entries(args.gameweek_id, thread = args.thread)
         # print(test.get_all_participant_entries(args.gameweek_id))
         # print(test.res)
