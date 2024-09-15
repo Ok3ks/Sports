@@ -67,7 +67,6 @@ class GameweekScore(Base):
 
 
 def create_connection(db, db_type="postgres"):
-
     """Use either postgresql or mysql"""
     conn = None
 
@@ -88,7 +87,7 @@ def create_connection(db, db_type="postgres"):
         try:
             conn = pymysql.connect(
                 dbname=os.getenv("DB_NAME"),
-                user=os.getenv("DB_USERNAME"),#confirm? May lead to bug
+                user=os.getenv("DB_USERNAME"),  # confirm? May lead to bug
                 password=os.getenv("DB_PASSWORD"),
                 host=os.getenv("DB_HOST"),
                 port=os.getenv("DB_PORT"),
@@ -127,10 +126,15 @@ def get_player_gql(id, half, session=session):
                 out.append(obj[0])
             return out
         else:
-            stmt = select(Player).where(Player.player_id == int(id)).where(Player.half == int(half))
+            stmt = (
+                select(Player)
+                .where(Player.player_id == int(id))
+                .where(Player.half == int(half))
+            )
             obj = session.scalars(stmt).all()
             print(obj[0])
             return obj[0]
+
 
 def get_player(id, session=session):
     out = []
@@ -147,15 +151,16 @@ def get_player(id, session=session):
             return obj
 
 
-
 def get_teams(session=sessionmaker(create_connection_engine("fpl"))):
     with session() as session:
         statement = select(distinct(Player.team))
         obj = session.execute(statement).all()
         return obj
-    
-#raw sql queries make it hard to switch databases
-#tests are good 
+
+
+# raw sql queries make it hard to switch databases
+# tests are good
+
 
 def get_entry_ids(session=sessionmaker(create_connection_engine("fpl")), table_name=""):
     with session() as session:
@@ -169,14 +174,18 @@ def get_entry_ids(session=sessionmaker(create_connection_engine("fpl")), table_n
 # ORM for each gameweek
 def get_player_stats_from_db_gql(id, gw, session=session):
     with session() as session:
-        stmt = select(GameweekScore).where((GameweekScore.player_id == id)
-                                           & (GameweekScore.gameweek == gw))
+        stmt = select(GameweekScore).where(
+            (GameweekScore.player_id == id) & (GameweekScore.gameweek == gw)
+        )
         c = session.scalars(stmt).one()
         print(c)
         return c
 
+
 def get_player_stats_from_db(gw, session=session):
-    stmt = text(f'SELECT player_id, total_points FROM public."Player_gameweek_score" WHERE gameweek = {gw}')
+    stmt = text(
+        f'SELECT player_id, total_points FROM public."Player_gameweek_score" WHERE gameweek = {gw}'
+    )
     # stmt = select(PlayerGameweekScores.total_points).where((PlayerGameweekScores.player_id == id)&(PlayerGameweekScores.gameweek == gw))
     with session() as session:
         c = session.execute(stmt).all()
@@ -188,7 +197,10 @@ def check_minutes(id, gw, session=session):
     """Checks DB for captain's minutes"""
 
     if not math.isnan(id):
-        stmt = text(f'SELECT minutes FROM public."Player_gameweek_score" WHERE player_id={id} and gameweek = {gw}')
+        stmt = text(
+            f'SELECT minutes FROM public."Player_gameweek_score" 
+            WHERE player_id={id} and gameweek = {gw}'
+        )
         with session() as session:
             c = session.execute(stmt)
         return c.fetchone()

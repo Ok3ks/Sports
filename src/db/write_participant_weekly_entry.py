@@ -51,7 +51,9 @@ if __name__ == "__main__":
     parser.add_argument("-g", "--gameweek_id", type=int, help="Gameweek entry")
     parser.add_argument("-t", "--processes", type=int, help="Number of processes")
     parser.add_argument("-ta", "--table_name", default="Overall", type=int)
-    parser.add_argument("-db", "--db_name", type=str, help="Database name", required=True)
+    parser.add_argument(
+        "-db", "--db_name", type=str, help="Database name", required=True
+    )
     args = parser.parse_args()
 
     TABLE_NAME = f"Entries_Gameweek_{args.gameweek_id}"
