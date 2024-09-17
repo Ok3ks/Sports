@@ -3,47 +3,49 @@ GraphQL schema definitions.
 """
 
 type Query {
-  player(id: ID!, half: Int!): Player
-  players: [Player!]!
-  playerGameweekScore(id: ID!, gameweek:Int!): PlayerGameweekScore
+  player(id: Int!, gameweek: Int!): Player!
   gameweekScore(gameweek: Int!): [PlayerGameweekScore!]!
   leagueWeeklyReport(leagueId: Int!, gameweek:Int!): LeagueWeeklyReport!
 }
 
+type Player {
+  playerId: Int!
+  info: PlayerInfo!
+  gameweekScore: PlayerGameweekScore!
+}
+
 type PlayerGameweekScore {
-    index: Int!
-    player_id: Int!
+    playerId: Int!
     minutes: Int!
-    goals_scored: Int!
+    goalsScored: Int!
     assists: Int!
-    clean_sheets: Int!
-    goals_conceded: Int!
-    own_goals: Int!
-    penalties_saved: Int!
-    penalties_missed: Int!
-    yellow_cards: Int!
-    red_cards: Int!
+    cleanSheets: Int!
+    goalsConceded: Int!
+    ownGoals: Int!
+    penaltiesSaved: Int!
+    penaltiesMissed: Int!
+    yellowCards: Int!
+    redCards: Int!
     saves: Int!
     bonus: Int!
     bps: Int!
-    influence: Int!
-    creativity: Int!
-    threat: Int!
-    ict_index: Int!
+    influence: Float!
+    creativity: Float!
+    threat: Float!
+    ictIndex: Float!
     starts: Int!
-    expected_goals: String!
-    expected_assists: String!
-    expected_goal_involvements: String!
-    expected_goals_conceded: String!
-    total_points: String!
-    in_dreamteam: Int!
+    expectedGoals: Float!
+    expectedAssists: Float!
+    expectedGoalInvolvements: Float!
+    expectedGoalsConceded: Float!
+    totalPoints: Int!
+    inDreamteam: Int!
     gameweek: Int!
 }
 
-type Player {
-    index: Int!
-    player_id: String!
-    player_name: String!
+type PlayerInfo {
+    playerId: String!
+    playerName: String!
     position: String!
     team:  String!
     half:  Int!
