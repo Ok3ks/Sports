@@ -35,7 +35,7 @@ class GameweekScore(Base):
     __tablename__ = "Player_gameweek_score"
 
     index: Mapped[int] = mapped_column(Integer)
-    player_id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    player_id: Mapped[int] = mapped_column(Integer, primary_key=True) #there should be a foreign key here
     minutes: Mapped[int] = mapped_column(Integer)
     goals_scored: Mapped[int] = mapped_column(Integer)
     assists: Mapped[int] = mapped_column(Integer)
@@ -116,14 +116,16 @@ def create_connection_engine(db):
 session = sessionmaker(create_connection_engine("fpl"))
 
 
-def get_player_gql(id, half, session=session):
+def get_player_gql(id, gameweek, session=session):
+    
     out = []
+    half = 1 if gameweek < 19 else 2
     with session() as session:
         if isinstance(id, list):
             for item in id:
                 stmt = select(Player).where(Player.player_id == int(item))
-                obj = session.scalars(stmt).all()
-                out.append(obj[0])
+                player_info = session.scalars(stmt).all()
+                out.append(player_info[0])
             return out
         else:
             stmt = (
@@ -131,9 +133,22 @@ def get_player_gql(id, half, session=session):
                 .where(Player.player_id == int(id))
                 .where(Player.half == int(half))
             )
-            obj = session.scalars(stmt).all()
-            print(obj[0])
-            return obj[0]
+            player_info = session.scalars(stmt).all()[0].__dict__
+            player_info.pop("_sa_instance_state")
+
+        stmt = select(GameweekScore).where(
+            (GameweekScore.player_id == id) & (GameweekScore.gameweek == gameweek)
+        )
+        
+        #Add fixture later 
+        gameweek_score = session.scalars(stmt).one().__dict__
+        gameweek_score.pop("_sa_instance_state")
+
+        return {
+                "player_id": id,
+                "info": player_info,
+                "gameweek_score": gameweek_score
+                }
 
 
 def get_player(id, session=session):
@@ -178,7 +193,7 @@ def get_player_stats_from_db_gql(id, gw, session=session):
             (GameweekScore.player_id == id) & (GameweekScore.gameweek == gw)
         )
         c = session.scalars(stmt).one()
-        print(c)
+
         return c
 
 
@@ -198,8 +213,7 @@ def check_minutes(id, gw, session=session):
 
     if not math.isnan(id):
         stmt = text(
-            f'SELECT minutes FROM public."Player_gameweek_score" 
-            WHERE player_id={id} and gameweek = {gw}'
+            f'SELECT minutes FROM public."Player_gameweek_score" WHERE player_id={id} and gameweek = {gw}'
         )
         with session() as session:
             c = session.execute(stmt)
