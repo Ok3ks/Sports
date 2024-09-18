@@ -112,7 +112,6 @@ def create_connection_engine(db):
 
     return create_engine(url_object)
 
-
 session = sessionmaker(create_connection_engine("fpl"))
 
 
@@ -139,7 +138,7 @@ def get_player_gql(id, gameweek, session=session):
         stmt = select(GameweekScore).where(
             (GameweekScore.player_id == id) & (GameweekScore.gameweek == gameweek)
         )
-        
+
         #Add fixture later 
         gameweek_score = session.scalars(stmt).one().__dict__
         gameweek_score.pop("_sa_instance_state")
