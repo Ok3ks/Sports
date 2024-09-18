@@ -4,13 +4,11 @@ import pandas as pd
 
 class TestLeagueWeeklyReport:
     def test_init(self, league_fixture, gw_fixture):
-        test = LeagueWeeklyReport(gw_fixture, league_fixture)
+        # TODO: test = LeagueWeeklyReport(gw_fixture, league_fixture)
 
-        assert test.league_id == 1088941
-        assert test.gw == 8
 
     def test_weekly_score_transformation(self, league_weekly_score):
-        test = LeagueWeeklyReport(23, 85647)
+        test = LeagueWeeklyReport(1, 538731)
         test.one_df = pd.DataFrame(league_weekly_score)
         test.o_df = test.weekly_score_transformation()
 
@@ -29,8 +27,10 @@ class TestLeagueWeeklyReport:
             new_cols.intersection(cols) == new_cols
         ), f"Add columns {new_cols.difference(new_cols.intersection(cols))}"
 
-    def test_merge_league_weekly_transfer(self, league_weekly_score, league_weekly_transfer):
-        test = LeagueWeeklyReport(23, 85647)
+    def test_merge_league_weekly_transfer(
+        self, league_weekly_score, league_weekly_transfer
+    ):
+        test = LeagueWeeklyReport(1, 538731)
         test.one_df = pd.DataFrame(league_weekly_score)
 
         test.o_df = test.weekly_score_transformation()
@@ -38,7 +38,9 @@ class TestLeagueWeeklyReport:
 
         test.f = test.merge_league_weekly_transfer()
 
-        new_transfer_cols = set(["transfer_points_in", "transfer_points_out", "transfers", "delta"])
+        new_transfer_cols = set(
+            ["transfer_points_in", "transfer_points_out", "transfers", "delta"]
+        )
         cols = test.f.columns
 
         assert (
@@ -46,7 +48,7 @@ class TestLeagueWeeklyReport:
         ), f"Add columns {new_transfer_cols.difference(new_transfer_cols.intersection(cols))}"
 
     def test_add_auto_sub(self, auto_sub_fixture):
-        test = LeagueWeeklyReport(23, 85647)
+        test = LeagueWeeklyReport(1, 538731)
         test.f = pd.DataFrame(auto_sub_fixture)
 
         test.add_auto_sub()

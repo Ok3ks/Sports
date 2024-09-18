@@ -92,7 +92,6 @@ class LeagueWeeklyReport(League):
     def captain_minutes(self):
         self.o_df["cap_minutes"] = [check_minutes(x, self.gw)[0] for x in self.o_df["captain"]]
 
-
     @profile
     def add_auto_sub(self):
         if 'auto_sub_in' in self.f.columns:
