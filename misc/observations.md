@@ -17,3 +17,5 @@ Issue was generators have to be fully loaded into memory by pandas before execut
 - Difference between multithreading and multiprocessing is that multithreading shares same memory space, which can sometimes not lead to speed gains for large datasets as memory per core is limited. Multiprocesses, each memory has its own memory space but shared memory can be instantiated with these frameworks.
 
 - For cython optimized code, OpenMp can be used for immediate parallelism.
+
+- Requirements.txt may contain some packages that are unneeded so trim before Dockerfile is created
