@@ -344,6 +344,7 @@ class League:
         self.league_id = league_id
         self.participants = []
         self.res = None
+        self.league_name = ""
 
     def obtain_league_participants(self, refresh=False):
         """This function uses the league url as an endpoint to query for participants of a league at a certain date.
@@ -357,6 +358,9 @@ class League:
                 obj = r.json()
                 assert r.status_code == 200, "error connecting to the endpoint"
                 del r
+            
+                self.league_name = obj["league"]["name"]
+            
                 self.participants.extend(obj["standings"]["results"])
                 has_next = obj["standings"]["has_next"]
                 PAGE_COUNT += 1

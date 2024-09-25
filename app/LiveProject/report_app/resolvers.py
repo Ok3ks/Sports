@@ -43,6 +43,11 @@ def resolve_player(*_, id, gameweek):
     """Retrieve a Player's information by ID or return None if not found."""
     return get_player_gql(id, gameweek)
 
+@query.field("players")
+def resolve_players(*_, ids, gameweek):
+    """Retrieve a Player's information by ID or return None if not found."""
+    return [get_player_gql(id, gameweek) for id in ids]
+
 
 @query.field("leagueWeeklyReport")
 def resolve_league_gameweek_report(*_, league_id, gameweek):
@@ -57,7 +62,6 @@ def resolve_league_gameweek_report(*_, league_id, gameweek):
     output = report.create_report(display=False) #replace this with caching? 
     print(output)
     return output
-
 
 # Combine the defined schema and resolvers
 type_defs = load_schema_from_path("./report_app/schema.graphql")

@@ -37,7 +37,7 @@ class LeagueWeeklyReport(League):
         self.f = pd.DataFrame(self.get_gw_transfers(self.gw))
         self.f = self.f.T
         print(self.f.columns)
-
+    
     @lru_cache(10)
     @profile
     def weekly_score_transformation(self):
@@ -122,6 +122,9 @@ class LeagueWeeklyReport(League):
 
         self.participants = self.obtain_league_participants()
         self.participants_name = self.get_participant_name()
+
+        def get_league_name(self):
+            return {"league_name": self.league_name}
 
         @profile
         def rise_and_fall():
@@ -271,8 +274,8 @@ class LeagueWeeklyReport(League):
                         worst_transfer_in.append(
                             {
                                 'team_name': self.participants_name[participant_id],
-                                'player_in': player_in,
-                                'player_out': player_out,
+                                'player_in': int(player_in),
+                                'player_out': int(player_out),
                                 'points_delta': points_lost,
                             }
                         )
@@ -297,8 +300,8 @@ class LeagueWeeklyReport(League):
 
                         best_transfer_in.append({
                             'team_name': self.participants_name[participant_id],
-                            'player_in': player_in,
-                            'player_out': player_out,
+                            'player_in': int(player_in),
+                            'player_out': int(player_out),
                             'points_delta': points_gained,
                         })
 
@@ -395,6 +398,8 @@ class LeagueWeeklyReport(League):
         output.update(most_points_on_bench())
         output.update(jammy_points())
         output.update(most_benched())
+        
+        output.update(get_league_name())
 
         if display:
             print(output)

@@ -4,6 +4,7 @@ GraphQL schema definitions.
 
 type Query {
   player(id: Int!, gameweek: Int!): Player!
+  players(ids: [Int!]!, gameweek: Int!): [Player!]
   gameweekScore(gameweek: Int!): [PlayerGameweekScore!]!
   leagueWeeklyReport(leagueId: Int!, gameweek:Int!): LeagueWeeklyReport!
 }
@@ -67,6 +68,7 @@ type LeagueWeeklyReport {
   mostPointsOnBench: [BenchPerformance]!
   jammyPoints: [JammyPoints]
   mostBenched: mostBenched!
+  leagueName: String!
 }
 
 type promotedViceInfo {
