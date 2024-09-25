@@ -123,7 +123,7 @@ class LeagueWeeklyReport(League):
         self.participants = self.obtain_league_participants()
         self.participants_name = self.get_participant_name()
 
-        def get_league_name(self):
+        def get_league_name():
             return {"league_name": self.league_name}
 
         @profile
