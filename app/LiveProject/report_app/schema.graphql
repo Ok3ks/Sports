@@ -1,0 +1,142 @@
+"""
+GraphQL schema definitions.
+"""
+
+type Query {
+  player(id: Int!, gameweek: Int!): Player!
+  players(ids: [Int!]!, gameweek: Int!): [Player!]
+  gameweekScore(gameweek: Int!): [PlayerGameweekScore!]!
+  leagueWeeklyReport(leagueId: Int!, gameweek:Int!): LeagueWeeklyReport!
+}
+
+type Player {
+  playerId: Int!
+  info: PlayerInfo!
+  gameweekScore: PlayerGameweekScore!
+}
+
+type PlayerGameweekScore {
+    playerId: Int!
+    minutes: Int!
+    goalsScored: Int!
+    assists: Int!
+    cleanSheets: Int!
+    goalsConceded: Int!
+    ownGoals: Int!
+    penaltiesSaved: Int!
+    penaltiesMissed: Int!
+    yellowCards: Int!
+    redCards: Int!
+    saves: Int!
+    bonus: Int!
+    bps: Int!
+    influence: Float!
+    creativity: Float!
+    threat: Float!
+    ictIndex: Float!
+    starts: Int!
+    expectedGoals: Float!
+    expectedAssists: Float!
+    expectedGoalInvolvements: Float!
+    expectedGoalsConceded: Float!
+    totalPoints: Int!
+    inDreamteam: Int!
+    gameweek: Int!
+}
+
+type PlayerInfo {
+    playerId: String!
+    playerName: String!
+    position: String!
+    team:  String!
+    half:  Int!
+}
+
+type LeagueWeeklyReport {
+  captain: [CaptainStat!]!
+  chips: ChipStats
+  promotedVice: [promotedViceInfo]
+  exceptional: TeamPerformance
+  abysmal: TeamPerformance
+  leagueAverage: Float!
+  rise: [PerformanceChange]!
+  fall: [PerformanceChange]!
+  mostTransferredOut: [outTransfer]
+  mostTransferredIn: [inTransfer]
+  bestTransferIn: [transferImpact]!
+  worstTransferIn: [transferImpact]!
+  mostPointsOnBench: [BenchPerformance]!
+  jammyPoints: [JammyPoints]
+  mostBenched: mostBenched!
+  leagueName: String!
+}
+
+type promotedViceInfo {
+  promotedVicePoints: Int!
+  participantsName: String!
+  captainName: String!
+  viceCaptainName : String!
+}
+
+type inTransfer {
+  player: String
+  in: Int
+}
+
+type outTransfer {
+  player: String
+  out: Int
+}
+
+type CaptainStat {
+  player: Int
+  count: Int
+}
+
+type ChipStats { 
+  chip: String
+  count: Int
+}
+
+type TeamPerformance {
+  teamName: String
+  score: Int
+}
+
+type PerformanceChange {
+  currentRank: Int!
+  prevRank: Int!
+  participantName: String!
+}
+
+type transferImpact {
+  teamName: String
+  playerIn: String
+  playerOut: String
+  pointsDelta: Int
+}
+
+type BenchPerformance {
+  teamName: String!
+  players: [String!]
+  pointOnBench: Int!
+}
+
+type PlayerPerformance {
+  name: String!
+  points: Int!
+}
+
+type JammyPoints {
+  teamName: String
+  subIn: [String]
+  subOut: [String]
+  points: Int
+}
+
+type mostBenched {
+  player: [String!]
+  count: [Int!]
+  points: [Int!]
+}
+
