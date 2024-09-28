@@ -14,11 +14,16 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from ariadne_django.views import GraphQLView
 from django.contrib import admin
 from django.urls import path
-from report_app import views
+# from report_app import views
+from report_app.resolvers import schema
 
-urlpatterns = [ #path('admin/', admin.site.urls),
-    path('report/<int:id>', views.reportView.as_view(), name = 'report'),
-    path('',views.display)
+
+urlpatterns = [  # path('admin/', admin.site.urls),
+    # path("report/<int:id>", views.reportView.as_view(), name="report"),
+    # path("", views.display),
+    # "",
+    path("graphql/", GraphQLView.as_view(schema=schema), name="graphql"),
 ]
