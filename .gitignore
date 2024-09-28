@@ -1,6 +1,8 @@
-\env
-*.txt
-\json_data
-*_venv
-\reports
+#cache
+*cache
+**/__pycache__/*
+*.pyc
+*auth.sh
 
+fpl-frontend/
+reports/weekly_report
