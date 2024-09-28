@@ -855,6 +855,20 @@ asgiref = ">=3.6"
 django = ">=3.2"
 
 [[package]]
+name = "django-livereload"
+version = "1.7"
+description = "LiveReload with the Django development server"
+optional = false
+python-versions = "*"
+files = [
+    {file = "django-livereload-1.7.tar.gz", hash = "sha256:4e660863a2901cbda49bbc858f5a890791329453eb4743f2b57aa8a7cd35148e"},
+    {file = "django_livereload-1.7-py2.py3-none-any.whl", hash = "sha256:b64bb1fc8fa9a99c2386a180d5723bf18024c66174f7d33d5071b628ba029e83"},
+]
+
+[package.dependencies]
+beautifulsoup4 = ">=4.3.2"
+
+[[package]]
 name = "entrypoints"
 version = "0.4"
 description = "Discover and load entry points from installed packages."
@@ -4946,4 +4960,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "8e99b500cce2f543c1299db20a955219106b65f0e2a7543d005130fc8f71aa13"
+content-hash = "ed3c4cddec47ede2d45582feee9254a842203ead74cd3aa193116418ef1bb55d"

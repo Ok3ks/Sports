@@ -189,7 +189,7 @@ def get_curr_event():
 
 
 class Gameweek:
-    def __init__(self, gw=get_curr_event()[0]):
+    def __init__(self, gw=1):
         self.gw = gw
 
     def get_payload(self):
