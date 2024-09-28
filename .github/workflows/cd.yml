@@ -1,9 +1,9 @@
-# name: continuous deployment
+name: continuous deployment
 
-#   push:
-#     paths:
-#       - 'deploy'
-#     branches: [main]
+  push:
+    paths:
+      - 'deploy'
+    branches: [main]
 
 env:
   PROJECT_ID: fpl-analysis-tools
