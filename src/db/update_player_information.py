@@ -6,7 +6,9 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text
 from pymysql import Error
 
-from sqlalchemy import Integer, String, create_engine, select, text, distinct
+from sqlalchemy import Integer, Boolean, Float, String
+
+from sqlalchemy import  create_engine, select, text, distinct
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import Session, DeclarativeBase, sessionmaker
 
@@ -103,7 +105,7 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    engine = create_connection_engine(args.db_name)
+    engine = create_connection_engine("temp")
 
     if args.table_name:
         create_table(engine, table_name=args.table_name)
