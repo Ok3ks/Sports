@@ -105,7 +105,7 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    engine = create_connection_engine("temp")
+    engine = create_connection_engine()
 
     if args.table_name:
         create_table(engine, table_name=args.table_name)

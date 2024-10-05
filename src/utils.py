@@ -370,6 +370,13 @@ class League:
         self.entry_ids = [participant["entry"] for participant in self.participants]
         return self.participants
 
+    def get_league_count(self):
+        if len(self.participants > 1): 
+            return len(self.participants)
+        else:
+            print("Obtain league participants first before getting league count")
+            
+    
     def get_participant_name(self, refresh=False) -> dict:
         """Creates participant id to name hash table"""
         if refresh or len(self.participants) == 0:

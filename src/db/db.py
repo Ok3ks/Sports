@@ -98,7 +98,7 @@ def create_connection(db, db_type="postgres"):
         return conn
 
 
-def create_connection_engine(db):
+def create_connection_engine():
     """Creates a SQLAlchemy engine with a mysql database"""
 
     url_object = URL.create(
@@ -112,7 +112,8 @@ def create_connection_engine(db):
 
     return create_engine(url_object)
 
-session = sessionmaker(create_connection_engine("fpl"))
+
+session = sessionmaker(create_connection_engine())
 
 
 def get_player_gql(id, gameweek, session=session):
@@ -165,7 +166,7 @@ def get_player(id, session=session):
             return obj
 
 
-def get_teams(session=sessionmaker(create_connection_engine("fpl"))):
+def get_teams(session=sessionmaker(create_connection_engine())):
     with session() as session:
         statement = select(distinct(Player.team))
         obj = session.execute(statement).all()
@@ -176,7 +177,7 @@ def get_teams(session=sessionmaker(create_connection_engine("fpl"))):
 # tests are good
 
 
-def get_entry_ids(session=sessionmaker(create_connection_engine("fpl")), table_name=""):
+def get_entry_ids(session=sessionmaker(create_connection_engine()), table_name=""):
     with session() as session:
         statement_1 = text(f"""SELECT id FROM public.'{table_name}'""")
         statement_2 = text(f"""SELECT count(id) FROM public.'{table_name}'""")
@@ -222,7 +223,7 @@ def check_minutes(id, gw, session=session):
 
 
 def get_available_gameweek_scores(
-    session=sessionmaker(create_connection_engine("fpl")),
+    session=sessionmaker(create_connection_engine()),
 ):
     # can be refactored to get_distinct of any column
     stmt = text(f'SELECT distinct(gameweek) FROM public."Player_gameweek_score"')

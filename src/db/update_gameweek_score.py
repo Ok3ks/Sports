@@ -103,7 +103,7 @@ if __name__ == "__main__":
         help="Gameweek you are trying to get a report of",
     )
     args = parser.parse_args()
-    connection = create_connection_engine("fpl")  # Add database directory as constant
+    connection = create_connection_engine()  # Add database directory as constant
 
     try:
         update_db_gameweek_score(connection, args.gameweek_id)

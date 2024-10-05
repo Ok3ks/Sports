@@ -62,4 +62,4 @@ def update_season_fixture(engine, table_name ="2024_2025_FIXTURES"):
 
 if __name__ == "__main__":
 
-    update_season_fixture(create_connection_engine("temp"))
+    update_season_fixture(create_connection_engine())
