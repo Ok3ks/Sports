@@ -167,6 +167,7 @@ ariadne-django = "^0.3.0"
 django-cors-headers = "^4.4.0"
 gunicorn = "^23.0.0"
 django-livereload = "^1.7"
+redis = "^5.1.1"
 
 
 [build-system]

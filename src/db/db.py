@@ -1,10 +1,12 @@
 # from utils import Gameweek, Player, League
 import pymysql  # type: ignore
 import psycopg2  # type: ignore
+import redis
 
 from sqlite3 import Error  # type: ignore
 
 
+import redis.connection
 from sqlalchemy import Integer, String, create_engine, select, text, distinct
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
@@ -113,8 +115,17 @@ def create_connection_engine():
     return create_engine(url_object)
 
 
-session = sessionmaker(create_connection_engine())
+def create_cache_engine():
+    """Ensure Redis Instance is running, either docker image or cloud"""
 
+    return redis.Redis(
+                host=os.getenv("REDIS_HOST"), 
+                port=os.getenv("REDIS_PORT"), 
+                password=os.getenv("REDIS_PASSWORD"),
+                db=0).from_pool(redis.connection.ConnectionPool(
+                    ))
+
+session = sessionmaker(create_connection_engine())
 
 def get_player_gql(id, gameweek, session=session):
     

@@ -11,6 +11,7 @@ from src.db.db import (
     get_player,
     get_player_stats_from_db,
     check_minutes,
+    create_cache_engine,
     create_connection,
 )
 import math
@@ -403,9 +404,14 @@ class LeagueWeeklyReport(League):
         
         output.update(get_league_name())
 
+        #Save to redis 
+        r = create_cache_engine()     # save to cache
+        r.set(f"{self.league_id}_{self.gw}", json.dumps(output))
+
         if display:
             print(output)
             to_json(output, f"{WEEKLY_REPORT_DIR}/{str(self.league_id)}_{str(self.gw)}.json")
+
 
         return output
 
@@ -446,9 +452,7 @@ if __name__ == "__main__":
 
     else:
         test = LeagueWeeklyReport(args.gameweek_id, args.league_id)
-
         test.get_data()
-
         # test.get_all_participant_entries(args.gameweek_id, thread = args.thread)
         # print(test.get_all_participant_entries(args.gameweek_id))
         # print(test.res)

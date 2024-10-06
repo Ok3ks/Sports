@@ -14,7 +14,8 @@ from src.db.db import get_player_gql, get_player_stats_from_db_gql
 from src.report import LeagueWeeklyReport
 from src.utils import get_curr_event
 # from .shortcuts import get_object_or_none
-
+from src.db.db import create_cache_engine
+import json
 query = QueryType()
 _document = ObjectType("Document")
 
@@ -52,16 +53,25 @@ def resolve_players(*_, ids, gameweek):
 @query.field("leagueWeeklyReport")
 def resolve_league_gameweek_report(*_, league_id, gameweek):
     """Retrieve a Player's gameweek score based on player_id"""
-    # return get_player_stats_from_db(id, gameweek)
-    report = LeagueWeeklyReport(gameweek, league_id)
-    report.get_data()
-    report.weekly_score_transformation()
-    report.merge_league_weekly_transfer()
-    report.add_auto_sub()
-    report.captain_minutes()
-    output = report.create_report(display=False) #replace this with caching? 
-    print(output)
-    return output
+    
+    # check cache
+    r = create_cache_engine()
+    output = r.get(f"{league_id}_{gameweek}") #Currently loading it all into memory
+    
+    if output:
+        print("Obtained from cache")
+        return json.loads(output)
+    else:
+        report = LeagueWeeklyReport(gameweek, league_id)
+        report.get_data()
+        report.weekly_score_transformation()
+        report.merge_league_weekly_transfer()
+        report.add_auto_sub()
+        report.captain_minutes()
+        output = report.create_report(display=False) #replace this with caching? 
+        print("Recomputed")
+    
+        return output
 
 # Combine the defined schema and resolvers
 type_defs = load_schema_from_path("./report_app/schema.graphql")
