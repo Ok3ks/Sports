@@ -4,8 +4,6 @@ import psycopg2  # type: ignore
 import redis
 
 from sqlite3 import Error  # type: ignore
-
-
 import redis.connection
 from sqlalchemy import Integer, String, create_engine, select, text, distinct
 from sqlalchemy.orm import Mapped, mapped_column
@@ -115,6 +113,15 @@ def create_connection_engine():
     return create_engine(url_object)
 
 
+redis_connection_pool = redis.connection.ConnectionPool(
+    connection_class=redis.connection.Connection(
+        host=os.getenv("REDIS_HOST"),
+        port=os.getenv("REDIS_PORT"),
+        socket_keepalive=False,
+        socket_keepalive_options=None,
+    )
+)
+
 def create_cache_engine():
     """Ensure Redis Instance is running, either docker image or cloud"""
 
@@ -122,8 +129,10 @@ def create_cache_engine():
                 host=os.getenv("REDIS_HOST"), 
                 port=os.getenv("REDIS_PORT"), 
                 password=os.getenv("REDIS_PASSWORD"),
-                db=0).from_pool(redis.connection.ConnectionPool(
-                    ))
+                db=0).from_pool(
+                    redis.connection.ConnectionPool.from_url(
+                        f"redis://{os.getenv("REDIS_HOST")}:{os.getenv("REDIS_PORT")}/0"
+                        ))
 
 session = sessionmaker(create_connection_engine())
 

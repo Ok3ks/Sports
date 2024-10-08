@@ -55,9 +55,9 @@ def resolve_league_gameweek_report(*_, league_id, gameweek):
     """Retrieve a Player's gameweek score based on player_id"""
     
     # check cache
-    r = create_cache_engine()
-    output = r.get(f"{league_id}_{gameweek}") #Currently loading it all into memory
-    
+    # r = create_cache_engine()
+    # output = r.get(f"{league_id}_{gameweek}") #Currently loading it all into memory
+    output = None
     if output:
         print("Obtained from cache")
         return json.loads(output)
