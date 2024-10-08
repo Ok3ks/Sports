@@ -90,7 +90,7 @@ WSGI_APPLICATION = "LiveProject.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
+PASSWORD = os.getenv("DB_PASSWORD")
 DATABASES = {
 
     "default": {
@@ -100,6 +100,7 @@ DATABASES = {
         "PASSWORD": os.getenv("DB_PASSWORD"),
         "HOST": os.getenv("DB_HOST"),
         "PORT": os.getenv("DB_PORT"),
+        'OPTIONS': {'sslmode': 'require'},
     },
 }
 

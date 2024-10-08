@@ -32,9 +32,6 @@ FROM base
 WORKDIR /sports
 COPY src/ ./src/ 
 
-COPY auth.sh .
-RUN chmod +x auth.sh
-
 # ENV DJANGO_SECRET_KEY="django-insecure-f&xs472(b!o6_b$5l*--ea1*m^*_=y))edubhvkol3t4%2*#a_"
 ENV PYTHONPATH="$PYTHONPATH:/sports"
 
