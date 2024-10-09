@@ -17,10 +17,10 @@ pandas = "^2.2.3"
 numpy = "^2.1.2"
 redis = "^5.1.1"
 sqlalchemy = "2.0.20"
-psycopg2 = "2.9.9"
 pymysql = "^1.1.1"
 requests = "^2.32.3"
 argparse = "^1.4.0"
+psycopg2-binary = "^2.9.9"
 
 
 [build-system]
