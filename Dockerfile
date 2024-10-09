@@ -18,8 +18,6 @@ ARG DB_PASSWORD
 ARG DB_HOST
 ARG DB_DATABASE
 ARG DB_DRIVER_NAME
-ARG REDIS_HOST
-ARG REDIS_PORT
 ARG DJANGO_SECRET_KEY
 #setup environments
 COPY requirements.txt .
@@ -32,7 +30,6 @@ FROM base
 WORKDIR /sports
 COPY src/ ./src/ 
 
-# ENV DJANGO_SECRET_KEY="django-insecure-f&xs472(b!o6_b$5l*--ea1*m^*_=y))edubhvkol3t4%2*#a_"
 ENV PYTHONPATH="$PYTHONPATH:/sports"
 
 # virtual environment is copied

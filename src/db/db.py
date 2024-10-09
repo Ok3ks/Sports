@@ -110,7 +110,7 @@ def create_connection_engine():
         database=os.getenv("DB_DATABASE"),
     )
 
-    return create_engine(url_object)
+    return create_engine(url_object, pool_pre_ping=True)
 
 
 redis_connection_pool = redis.connection.ConnectionPool(

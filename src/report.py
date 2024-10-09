@@ -405,8 +405,8 @@ class LeagueWeeklyReport(League):
         output.update(get_league_name())
 
         #Save to redis 
-        r = create_cache_engine()     # save to cache
-        r.set(f"{self.league_id}_{self.gw}", json.dumps(output))
+        # r = create_cache_engine()     # save to cache
+        # r.set(f"{self.league_id}_{self.gw}", json.dumps(output))
 
         if display:
             print(output)
