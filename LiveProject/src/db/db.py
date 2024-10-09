@@ -113,25 +113,25 @@ def create_connection_engine():
     return create_engine(url_object, pool_pre_ping=True)
 
 
-redis_connection_pool = redis.connection.ConnectionPool(
-    connection_class=redis.connection.Connection(
-        host=os.getenv("REDIS_HOST"),
-        port=os.getenv("REDIS_PORT"),
-        socket_keepalive=False,
-        socket_keepalive_options=None,
-    )
-)
+# redis_connection_pool = redis.connection.ConnectionPool(
+#     connection_class=redis.connection.Connection(
+#         host=os.getenv("REDISHOST"),
+#         port=os.getenv("REDISPORT"),
+#         socket_keepalive=False,
+#         socket_keepalive_options=None,
+#     )
+# )
 
 def create_cache_engine():
     """Ensure Redis Instance is running, either docker image or cloud"""
 
     return redis.Redis(
-                host=os.getenv("REDIS_HOST"), 
-                port=os.getenv("REDIS_PORT"), 
-                password=os.getenv("REDIS_PASSWORD"),
+                host=os.getenv("REDISHOST"), 
+                port=os.getenv("REDISPORT"), 
+                password=os.getenv("REDISPASSWORD"),
                 db=0).from_pool(
                     redis.connection.ConnectionPool.from_url(
-                        f"redis://{os.getenv("REDIS_HOST")}:{os.getenv("REDIS_PORT")}/0"
+                        f"redis://{os.getenv("REDISHOST")}:{os.getenv("REDISPORT")}/0"
                         ))
 
 session = sessionmaker(create_connection_engine())

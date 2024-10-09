@@ -19,6 +19,9 @@ ARG DB_HOST
 ARG DB_DATABASE
 ARG DB_DRIVER_NAME
 ARG DJANGO_SECRET_KEY
+ARG REDISHOST
+ARG REDISPORT
+
 #setup environments
 COPY requirements.txt .
 RUN python3 -m venv /venv
@@ -28,9 +31,8 @@ RUN /venv/bin/pip install -r requirements.txt
 FROM base
 
 WORKDIR /sports
-COPY src/ ./src/ 
 
-ENV PYTHONPATH="$PYTHONPATH:/sports"
+# ENV PYTHONPATH="$PYTHONPATH:/Sports"
 
 # virtual environment is copied
 COPY --from=builder /venv /venv
@@ -39,12 +41,17 @@ COPY --from=builder /venv /venv
 # RUN apt-get update && apt-get -y install bash  && rm -rf /var/lib/apt/lists/*
 
 # copy payload code only
-WORKDIR /sports/app
-COPY app/ ./
+WORKDIR /sports/LiveProject
+
+COPY src/ ./src/ 
+COPY LiveProject/ ./LiveProject/
+COPY report_app ./report_app/
 
 # RUN ["/bin/bash", "init_env.sh"]
 # RUN ["/bin/bash", "auth.sh"]
-WORKDIR /sports/app/LiveProject
+# WORKDIR /sports/app/LiveProject
+
+# ENV GOOGLE_ENTRYPOINT="/venv/bin/gunicorn --bind=8000 LiveProject.wsgi:application"
 
 EXPOSE 8000
-ENTRYPOINT ["/venv/bin/gunicorn", "--config=python:LiveProject.gunicorn"]
+# ENTRYPOINT ["/venv/bin/gunicorn", "--config=python:LiveProject.gunicorn"]
