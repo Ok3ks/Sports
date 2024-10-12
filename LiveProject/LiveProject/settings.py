@@ -57,6 +57,8 @@ CORS_ALLOW_HEADERS = [
     'authorization',
     'authorizationsource',
     'content-type',
+    'Access-Control-Allow-Origin', 
+    'Access-Control-Allow-Methods',
     # ...any other headers you want to allow...
 ]
 CORS_ALLOW_METHODS = (

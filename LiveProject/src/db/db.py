@@ -99,7 +99,7 @@ def create_connection(db, db_type="postgres"):
 
 
 def create_connection_engine():
-    """Creates a SQLAlchemy engine with a mysql database"""
+    """Creates a SQLAlchemy engine with a database"""
 
     url_object = URL.create(
         drivername=os.getenv("DB_DRIVER_NAME"),
@@ -108,6 +108,7 @@ def create_connection_engine():
         host=os.getenv("DB_HOST"),
         port=os.getenv("DB_PORT"),
         database=os.getenv("DB_DATABASE"),
+        query={"unix_sock": f"{os.getenv("INSTANCE_UNIX_SOCKET")}/.s.PGSQL.5432"}
     )
 
     return create_engine(url_object, pool_pre_ping=True)

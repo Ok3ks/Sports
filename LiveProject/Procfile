@@ -1,1 +1,1 @@
-web: gunicorn LiveProject.wsgi:application --bind 0.0.0.0:8000 
+web: gunicorn LiveProject.wsgi:application --bind :8000 --workers 6 --timeout 300 --max-requests 120 --threads 4

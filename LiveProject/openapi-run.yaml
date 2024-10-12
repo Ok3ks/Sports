@@ -1,0 +1,23 @@
+swagger: '2.0'
+info:
+  title: FPL backend Cloud Endpoints + Cloud Run
+  description: Deployed Backend 
+  version: 1.0.0
+host: fpl-backend-1054719499081.europe-west2.run.app
+schemes:
+  - https
+produces:
+  - application/json
+x-google-backend:
+  address: https://fpl-backend-1054719499081.europe-west2.run.app
+  protocol: h2
+paths:
+  /graphql:
+    post:
+      summary: Retrieve result
+      operationId: hello
+      responses:
+        '200':
+          description: A successful response
+          schema:
+            type: string
