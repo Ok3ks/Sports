@@ -4,8 +4,6 @@ import psycopg2  # type: ignore
 import redis
 
 from sqlite3 import Error  # type: ignore
-
-
 import redis.connection
 from sqlalchemy import Integer, String, create_engine, select, text, distinct
 from sqlalchemy.orm import Mapped, mapped_column
@@ -101,7 +99,7 @@ def create_connection(db, db_type="postgres"):
 
 
 def create_connection_engine():
-    """Creates a SQLAlchemy engine with a mysql database"""
+    """Creates a SQLAlchemy engine with a database"""
 
     url_object = URL.create(
         drivername=os.getenv("DB_DRIVER_NAME"),
@@ -112,18 +110,29 @@ def create_connection_engine():
         database=os.getenv("DB_DATABASE"),
     )
 
-    return create_engine(url_object)
+    return create_engine(url_object, pool_pre_ping=True)
 
+
+# redis_connection_pool = redis.connection.ConnectionPool(
+#     connection_class=redis.connection.Connection(
+#         host=os.getenv("REDISHOST"),
+#         port=os.getenv("REDISPORT"),
+#         socket_keepalive=False,
+#         socket_keepalive_options=None,
+#     )
+# )
 
 def create_cache_engine():
     """Ensure Redis Instance is running, either docker image or cloud"""
 
     return redis.Redis(
-                host=os.getenv("REDIS_HOST"), 
-                port=os.getenv("REDIS_PORT"), 
-                password=os.getenv("REDIS_PASSWORD"),
-                db=0).from_pool(redis.connection.ConnectionPool(
-                    ))
+                host=os.getenv("REDISHOST"), 
+                port=os.getenv("REDISPORT"), 
+                password=os.getenv("REDISPASSWORD"),
+                db=0).from_pool(
+                    redis.connection.ConnectionPool.from_url(
+                        f"redis://{os.getenv("REDISHOST")}:{os.getenv("REDISPORT")}/0"
+                        ))
 
 session = sessionmaker(create_connection_engine())
 

@@ -1,20 +1,29 @@
+import requests
+from urllib3.util import Retry
+from requests.adapters import HTTPAdapter
 from requests import get as wget
-import time
 import pandas as pd
 import json
 import numpy as np
-
-from os.path import join, realpath
-import os
 
 from src.urls import GW_URL, FIXTURE_URL, TRANSFER_URL, HISTORY_URL, FPL_URL
 from src.urls import H2H_LEAGUE, LEAGUE_URL, FPL_PLAYER
 from functools import lru_cache
 
 from src.paths import APP_DIR, MOCK_DIR
-
 from src.db.db import get_player, create_connection_engine
 from typing import List, Union
+import logging
+
+s = requests.Session()
+retries = Retry(
+    total=3,
+    backoff_factor=0.1,
+    status_forcelist=[502, 503, 504],
+    allowed_methods={'GET', 'POST'},
+)
+r = s.mount("https://fantasy.premierleague.com/api/", HTTPAdapter(max_retries=retries))
+LOGGER = logging.getLogger(__name__)
 
 
 def to_json(x: dict, fp):
@@ -283,6 +292,7 @@ class Participant:
 
         if all or valid:
             r = wget(TRANSFER_URL.format(self.participant))
+            LOGGER.info(r.status_code)
             if r.status_code == 200:
                 obj = r.json()
                 for item in obj:
@@ -354,8 +364,10 @@ class League:
             has_next = True
             PAGE_COUNT = 1
             while has_next:
-                r = wget(LEAGUE_URL.format(self.league_id, PAGE_COUNT))
+                r = s.get(LEAGUE_URL.format(self.league_id, PAGE_COUNT))
                 obj = r.json()
+                LOGGER.info(r.status_code)
+                LOGGER.info(r.headers)
                 assert r.status_code == 200, "error connecting to the endpoint"
                 del r
             
@@ -363,8 +375,8 @@ class League:
             
                 self.participants.extend(obj["standings"]["results"])
                 has_next = obj["standings"]["has_next"]
-                PAGE_COUNT += 1
                 print("All participants on page {} have been extracted".format(PAGE_COUNT))
+                PAGE_COUNT += 1
 
                 self.league_name = obj["league"]["name"]
         self.entry_ids = [participant["entry"] for participant in self.participants]

@@ -57,6 +57,8 @@ CORS_ALLOW_HEADERS = [
     'authorization',
     'authorizationsource',
     'content-type',
+    'Access-Control-Allow-Origin', 
+    'Access-Control-Allow-Methods',
     # ...any other headers you want to allow...
 ]
 CORS_ALLOW_METHODS = (
@@ -90,7 +92,7 @@ WSGI_APPLICATION = "LiveProject.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
+PASSWORD = os.getenv("DB_PASSWORD")
 DATABASES = {
 
     "default": {
@@ -100,6 +102,7 @@ DATABASES = {
         "PASSWORD": os.getenv("DB_PASSWORD"),
         "HOST": os.getenv("DB_HOST"),
         "PORT": os.getenv("DB_PORT"),
+        'OPTIONS': {'sslmode': 'require'},
     },
 }
 
