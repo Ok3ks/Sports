@@ -5,7 +5,7 @@ import redis
 
 from sqlite3 import Error  # type: ignore
 import redis.connection
-from sqlalchemy import Integer, String, create_engine, select, text, distinct
+from sqlalchemy import Integer, String, create_engine, select, text, distinct, delete, func
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 from sqlalchemy import URL
@@ -186,12 +186,27 @@ def get_player(id, session=session):
             return obj
 
 
-def get_teams(session=sessionmaker(create_connection_engine())):
+def get_teams(session=sessionmaker(create_connection_engine())) :
     with session() as session:
         statement = select(distinct(Player.team))
         obj = session.execute(statement).all()
         return obj
 
+
+def get_gameweek_scores(gameweek: int, session=session):
+    with session() as session:
+        stmt = select(func.count("*")).select_from(GameweekScore).where(
+            GameweekScore.gameweek == gameweek)
+        obj = session.scalars(stmt).one()
+        return obj
+
+
+def delete_gameweek_scores(gameweek: int, session=session, table_name=""):
+
+    with session() as session:
+        stmt = text(f'DELETE FROM public."{table_name}" where gameweek = {gameweek}')
+        session.execute(stmt)
+        session.commit()
 
 # raw sql queries make it hard to switch databases
 # tests are good
@@ -199,8 +214,8 @@ def get_teams(session=sessionmaker(create_connection_engine())):
 
 def get_entry_ids(session=sessionmaker(create_connection_engine()), table_name=""):
     with session() as session:
-        statement_1 = text(f"""SELECT id FROM public.'{table_name}'""")
-        statement_2 = text(f"""SELECT count(id) FROM public.'{table_name}'""")
+        statement_1 = text(f'SELECT id FROM public."{table_name}"')
+        statement_2 = text(f'SELECT count(id) FROM public."{table_name}"')
         obj = session.execute(statement_1).all()
         obj_2 = session.execute(statement_2).one()
         return (i.id for i in obj), obj_2[0]

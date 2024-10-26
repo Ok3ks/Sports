@@ -1,5 +1,5 @@
 import pandas as pd
-from src.db.db import create_connection_engine
+from src.db.db import create_connection_engine, get_gameweek_scores,delete_gameweek_scores
 
 from sqlalchemy import Integer, Boolean, Float
 from sqlalchemy.orm import Mapped, mapped_column
@@ -14,7 +14,7 @@ class Base(DeclarativeBase):
 
 
 class PlayerGameweekScores(Base):
-    __tablename__ = "Player_Gameweek_scores"
+    __tablename__ = "Player_gameweek_score"
 
     player_id: Mapped[int] = mapped_column(Integer, primary_key=True)
     minutes: Mapped[int] = mapped_column(Integer)
@@ -84,9 +84,19 @@ def update_db_gameweek_score(conn, gw):
     ]
 
     df.reset_index(level=0, names="player_id", inplace=True)
-    ##Combining all gameweeks into one database, which is why I am appending files
-    df.to_sql(f"Player_gameweek_score", conn, if_exists="append", method="multi")
-    print("Data insert successful")
+    # check if this has been created before for live updates
+
+    if get_gameweek_scores(gw) > 0:
+        print(delete_gameweek_scores(gw, 
+                                     table_name=PlayerGameweekScores.__tablename__))
+        df.to_sql("Player_gameweek_score", conn, if_exists="append", method="multi")
+        print("Data insert successful")
+
+    else:
+        # Combining all gameweeks into one database, 
+        # which is why I am appending files
+        df.to_sql("Player_gameweek_score", conn, if_exists="append", method="multi")
+        print("Data insert successful")
 
 
 if __name__ == "__main__":
