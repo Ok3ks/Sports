@@ -25,5 +25,6 @@ urlpatterns = [  # path('admin/', admin.site.urls),
     # path("report/<int:id>", views.reportView.as_view(), name="report"),
     # path("", views.display),
     # "",
+    path('admin/', admin.site.urls),
     path("graphql/", GraphQLView.as_view(schema=schema), name="graphql"),
 ]
