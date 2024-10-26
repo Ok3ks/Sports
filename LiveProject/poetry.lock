@@ -279,6 +279,17 @@ files = [
 beautifulsoup4 = ">=4.3.2"
 
 [[package]]
+name = "docutils"
+version = "0.21.2"
+description = "Docutils -- Python Documentation Utilities"
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "docutils-0.21.2-py3-none-any.whl", hash = "sha256:dafca5b9e384f0e419294eb4d2ff9fa826435bf15f15b7bd45723e8ad76811b2"},
+    {file = "docutils-0.21.2.tar.gz", hash = "sha256:3a6b18732edf182daa3cd12775bbb338cf5691468f91eeeb109deff6ebfa986f"},
+]
+
+[[package]]
 name = "graphql-core"
 version = "3.2.4"
 description = "GraphQL implementation for Python, a port of GraphQL.js, the JavaScript reference implementation for GraphQL."
@@ -907,4 +918,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "eac3c205a2fe8083d0bc0ee627a5fa21160b9c1c6b7c09448fe9a54132c38d51"
+content-hash = "b2a5420d4d578bdfa8291507e9644c9a2b77bd9c8d9394cb2869ddeb1b157af1"
