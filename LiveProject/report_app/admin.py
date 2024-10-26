@@ -4,7 +4,7 @@ from report_app.models import GameweekScores
 @admin.register(GameweekScores)
 class GameweekScores(admin.ModelAdmin):
     list_display = (
-        # "id",
+        "index",
         # "from_user",
         # "to_user",
         # "conversation_id",
