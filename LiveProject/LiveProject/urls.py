@@ -16,7 +16,7 @@ Including another URLconf
 """
 from ariadne_django.views import GraphQLView
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
 # from report_app import views
 from report_app.resolvers import schema
 
@@ -26,5 +26,6 @@ urlpatterns = [  # path('admin/', admin.site.urls),
     # path("", views.display),
     # "",
     path('admin/', admin.site.urls),
+    path('admin/doc/', include('django.contrib.admindocs.urls')),
     path("graphql/", GraphQLView.as_view(schema=schema), name="graphql"),
 ]
