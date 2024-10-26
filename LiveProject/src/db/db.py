@@ -5,7 +5,7 @@ import redis
 
 from sqlite3 import Error  # type: ignore
 import redis.connection
-from sqlalchemy import Integer, String, create_engine, select, text, distinct, delete, func
+from sqlalchemy import Integer, String, Boolean, DateTime, create_engine, select, text, distinct, delete, func
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 from sqlalchemy import URL
@@ -18,11 +18,12 @@ class Base(DeclarativeBase):
     pass
 
 
-class Player(Base):
+class PlayerInfo(Base):
     __tablename__ = "EPL_2024_PLAYER_INFO"
 
     player_id: Mapped[int] = mapped_column(Integer, primary_key=True)
     team: Mapped[str] = mapped_column(String)
+    team_code: Mapped[int] = mapped_column(Integer)
     position: Mapped[str] = mapped_column(String)
     player_name: Mapped[str] = mapped_column(String)
     half: Mapped[str] = mapped_column(Integer)
@@ -35,7 +36,7 @@ class GameweekScore(Base):
     __tablename__ = "Player_gameweek_score"
 
     index: Mapped[int] = mapped_column(Integer)
-    player_id: Mapped[int] = mapped_column(Integer, primary_key=True) #there should be a foreign key here
+    player_id: Mapped[int] = mapped_column(Integer, primary_key=True)  # there should be a foreign key here
     minutes: Mapped[int] = mapped_column(Integer)
     goals_scored: Mapped[int] = mapped_column(Integer)
     assists: Mapped[int] = mapped_column(Integer)
@@ -64,6 +65,71 @@ class GameweekScore(Base):
 
     def __repr__(self) -> str:
         return f"GameweekScore(player_id={self.player_id}, goals_scored={self.goals_scored}, total_points={self.total_points}, gameweek={self.gameweek}, dreamteam={self.in_dreamteam})"
+
+
+class Fixtures(Base):
+
+    __tablename__ = "2024_2025_FIXTURES"
+
+    homedifficulty: Mapped[int] = mapped_column(Integer) 
+    awaydifficulty: Mapped[int] = mapped_column(Integer)
+    home: Mapped[int] = mapped_column(Integer)
+    away: Mapped[int] = mapped_column(Integer)
+    homegoals: Mapped[int] = mapped_column(Integer)
+    awaygoals: Mapped[int] = mapped_column(Integer)
+    code: Mapped[int] = mapped_column(Integer, primary_key= True)
+    gameweek: Mapped[int] = mapped_column(Integer)
+    finished: Mapped[bool] = mapped_column(Boolean)
+    date: Mapped[String] = mapped_column(DateTime)
+
+    def __repr__(self) -> str:
+        return f"""
+                Fixture({team_short_name_mapping[self.home]} {int(self.homegoals)} : {team_short_name_mapping[self.away]} {int(self.awaygoals)} 
+                        Code: {self.code},"""
+
+
+team_short_name_mapping=   {1: 'ARS',
+                            2: 'AVL',
+                            3: 'BOU',
+                            4: 'BRE',
+                            5: 'BHA',
+                            6: 'CHE',
+                            7: 'CRY',
+                            8: 'EVE',
+                            9: 'FUL',
+                            10: 'IPS',
+                            11: 'LEI',
+                            12: 'LIV',
+                            13: 'MCI',
+                            14: 'MUN',
+                            15: 'NEW',
+                            16: 'NFO',
+                            17: 'SOU',
+                            18: 'TOT',
+                            19: 'WHU',
+                            20: 'WOL'}
+
+
+team_name_to_code= {'Arsenal': 1,
+                    'Aston Villa': 2,
+                    'Bournemouth': 3,
+                    'Brentford': 4,
+                    'Brighton': 5,
+                    'Chelsea': 6,
+                    'Crystal Palace': 7,
+                    'Everton': 8,
+                    'Fulham': 9,
+                    'Ipswich': 10,
+                    'Leicester': 11,
+                    'Liverpool': 12,
+                    'Man City': 13,
+                    'Man Utd': 14,
+                    'Newcastle': 15,
+                    "Nott'm Forest": 16,
+                    'Southampton': 17,
+                    'Spurs': 18,
+                    'West Ham': 19,
+                    'Wolves': 20}
 
 
 def create_connection(db, db_type="postgres"):
@@ -136,6 +202,14 @@ def create_cache_engine():
 
 session = sessionmaker(create_connection_engine())
 
+# Player
+def get_player_fixture(team_code, gameweek, session=session):
+    with session() as session:
+        stmt = select(Fixtures).where(Fixtures.gameweek == gameweek).where(
+            (Fixtures.home == team_code) or (Fixtures.away == team_code))
+        obj = session.scalars(stmt).all()
+        return obj
+
 def get_player_gql(id, gameweek, session=session):
     
     out = []
@@ -143,15 +217,15 @@ def get_player_gql(id, gameweek, session=session):
     with session() as session:
         if isinstance(id, list):
             for item in id:
-                stmt = select(Player).where(Player.player_id == int(item))
+                stmt = select(PlayerInfo).where(PlayerInfo.player_id == int(item))
                 player_info = session.scalars(stmt).all()
                 out.append(player_info[0])
             return out
         else:
             stmt = (
-                select(Player)
-                .where(Player.player_id == int(id))
-                .where(Player.half == int(half))
+                select(PlayerInfo)
+                .where(PlayerInfo.player_id == int(id))
+                .where(PlayerInfo.half == int(half))
             )
             player_info = session.scalars(stmt).all()[0].__dict__
             player_info.pop("_sa_instance_state")
@@ -176,52 +250,16 @@ def get_player(id, session=session):
     with session() as session:
         if isinstance(id, list):
             for item in id:
-                stmt = select(Player.player_name).where(Player.player_id == int(item))
+                stmt = select(PlayerInfo.player_name).where(PlayerInfo.player_id == int(item))
                 obj = session.scalars(stmt).all()
                 out.append(obj[0])
             return out
         else:
-            stmt = select(Player.player_name).where(Player.player_id == int(id))
+            stmt = select(PlayerInfo.player_name).where(PlayerInfo.player_id == int(id))
             obj = session.scalars(stmt).one()
             return obj
 
 
-def get_teams(session=sessionmaker(create_connection_engine())) :
-    with session() as session:
-        statement = select(distinct(Player.team))
-        obj = session.execute(statement).all()
-        return obj
-
-
-def get_gameweek_scores(gameweek: int, session=session):
-    with session() as session:
-        stmt = select(func.count("*")).select_from(GameweekScore).where(
-            GameweekScore.gameweek == gameweek)
-        obj = session.scalars(stmt).one()
-        return obj
-
-
-def delete_gameweek_scores(gameweek: int, session=session, table_name=""):
-
-    with session() as session:
-        stmt = text(f'DELETE FROM public."{table_name}" where gameweek = {gameweek}')
-        session.execute(stmt)
-        session.commit()
-
-# raw sql queries make it hard to switch databases
-# tests are good
-
-
-def get_entry_ids(session=sessionmaker(create_connection_engine()), table_name=""):
-    with session() as session:
-        statement_1 = text(f'SELECT id FROM public."{table_name}"')
-        statement_2 = text(f'SELECT count(id) FROM public."{table_name}"')
-        obj = session.execute(statement_1).all()
-        obj_2 = session.execute(statement_2).one()
-        return (i.id for i in obj), obj_2[0]
-
-
-# ORM for each gameweek
 def get_player_stats_from_db_gql(id, gw, session=session):
     with session() as session:
         stmt = select(GameweekScore).where(
@@ -257,6 +295,8 @@ def check_minutes(id, gw, session=session):
         return [0]
 
 
+## Gameweek
+
 def get_available_gameweek_scores(
     session=sessionmaker(create_connection_engine()),
 ):
@@ -266,6 +306,52 @@ def get_available_gameweek_scores(
         c = session.execute(stmt)
     return c.fetchall()
 
+
+def get_gameweek_scores(gameweek: int, session=session):
+    with session() as session:
+        stmt = select(func.count("*")).select_from(GameweekScore).where(
+            GameweekScore.gameweek == gameweek)
+        obj = session.scalars(stmt).one()
+        return obj
+
+
+def delete_gameweek_scores(gameweek: int, session=session, table_name=""):
+
+    with session() as session:
+        stmt = text(f'DELETE FROM public."{table_name}" where gameweek = {gameweek}')
+        session.execute(stmt)
+        session.commit()
+
+# raw sql queries make it hard to switch databases
+# tests are good
+
+#Leagues
+
+
+def get_entry_ids(session=sessionmaker(create_connection_engine()), table_name=""):
+    with session() as session:
+        statement_1 = text(f'SELECT id FROM public."{table_name}"')
+        statement_2 = text(f'SELECT count(id) FROM public."{table_name}"')
+        obj = session.execute(statement_1).all()
+        obj_2 = session.execute(statement_2).one()
+        return (i.id for i in obj), obj_2[0]
+
+
+# Teams
+def get_teams(session=sessionmaker(create_connection_engine())):
+    with session() as session:
+        statement = select(distinct(PlayerInfo.team))
+        obj = session.execute(statement).all()
+        return obj
+
+
+def get_player_team_code(player_id, half,
+                         session=sessionmaker(create_connection_engine())):
+    with session() as session:
+        statement = select(PlayerInfo.team_code).where(
+            PlayerInfo.player_id == player_id).where(PlayerInfo.half == half)
+        obj = session.execute(statement).one()
+        return obj
 
 def create_id_table(conn, table_name="league_name"):
     """Creates a table with columns, player_id, position, team, and player_name"""

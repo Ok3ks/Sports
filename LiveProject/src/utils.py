@@ -11,7 +11,8 @@ from src.urls import H2H_LEAGUE, LEAGUE_URL, FPL_PLAYER
 from functools import lru_cache
 
 from src.paths import APP_DIR, MOCK_DIR
-from src.db.db import get_player, create_connection_engine
+from src.db.db import get_player,  get_player_fixture, get_player_team_code
+from src.db.db import team_short_name_mapping, team_name_to_code
 from typing import List, Union
 import logging
 
@@ -348,6 +349,19 @@ class Participant:
         else:
             raise GameweekError
 
+# class Teams:
+
+
+class Player:
+    def __init__(self, player_id, half):
+        self.player_id = player_id
+        self.half = half
+
+    def get_fixures(self):
+        team_code = get_player_team_code(self.player_id, self.half)[0]
+        obj = get_player_fixture(team_code, gameweek=5)
+        return obj
+
 
 class League:
     def __init__(self, league_id):
@@ -453,7 +467,6 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(prog="weeklyreport", description="Provide Gameweek ID and League ID")
-
     parser.add_argument(
         "-g",
         "--gameweek_id",
