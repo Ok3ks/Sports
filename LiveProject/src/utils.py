@@ -11,7 +11,7 @@ from src.urls import H2H_LEAGUE, LEAGUE_URL, FPL_PLAYER
 from functools import lru_cache
 
 from src.paths import APP_DIR, MOCK_DIR
-from src.db.db import get_player,  get_player_fixture, get_player_team_code
+from src.db.db import get_player,  get_player_fixture, get_player_fixture_range, get_player_stats_from_db_gql, get_player_team_code
 from src.db.db import team_short_name_mapping, team_name_to_code
 from typing import List, Union
 import logging
@@ -353,15 +353,40 @@ class Participant:
 
 
 class Player:
+
     def __init__(self, player_id, half):
         self.player_id = player_id
         self.half = half
 
     def get_fixures(self):
+        "Retrieve exact gameweek fixture"
         team_code = get_player_team_code(self.player_id, self.half)[0]
         obj = get_player_fixture(team_code, gameweek=5)
         return obj
 
+    def get_fixture_range(self, range=5):
+        "Get fixture range"
+        team_code = get_player_team_code(self.player_id, self.half)[0]
+        obj = get_player_fixture_range(team_code, gameweek=5)
+        return obj 
+
+    def get_stats(self, gw):
+        "Retrieve exact gameweek stats"
+        obj = get_player_stats_from_db_gql(self.player_id, gw)
+        return obj
+
+    def get_stats_range(self, range=5):
+        pass
+
+    def get_highest_points(self):
+        pass
+
+    def get_lowest_points(self):
+        pass
+
+    def get_top_performing_fixtures(self):
+        pass
+    
 
 class League:
     def __init__(self, league_id):

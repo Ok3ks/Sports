@@ -11,7 +11,6 @@ from sqlalchemy.orm import DeclarativeBase, sessionmaker
 from sqlalchemy import URL
 import os
 import math
-# from update_gameweek_score import PlayerGameweekScores #decide which to remove on refactor
 
 
 class Base(DeclarativeBase):
@@ -210,6 +209,14 @@ def get_player_fixture(team_code, gameweek, session=session):
         obj = session.scalars(stmt).all()
         return obj
 
+def get_player_fixture_range(gameweek, session=session):
+    with session() as session:
+        stmt = f"SELECT * from public.'2024_2025_FIXTURES' where {gameweek}> {gameweek -2}and {gameweek} < {gameweek+2}"
+        obj = session.scalars(stmt).all()
+        return obj
+
+# SELECT distinct(gameweek) from public."2024_2025_FIXTURES" where gameweek>1 and gameweek < 5
+
 def get_player_gql(id, gameweek, session=session):
     
     out = []
@@ -258,6 +265,7 @@ def get_player(id, session=session):
             stmt = select(PlayerInfo.player_name).where(PlayerInfo.player_id == int(id))
             obj = session.scalars(stmt).one()
             return obj
+
 
 
 def get_player_stats_from_db_gql(id, gw, session=session):
