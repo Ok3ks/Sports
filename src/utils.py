@@ -1,17 +1,13 @@
 from requests import get as wget
-import time
 import pandas as pd
 import json
 import numpy as np
 
-from os.path import join, realpath
-import os
 
-from src.urls import GW_URL, FIXTURE_URL, TRANSFER_URL, HISTORY_URL, FPL_URL
-from src.urls import H2H_LEAGUE, LEAGUE_URL, FPL_PLAYER
-from functools import lru_cache
+from src.urls import GW_URL, TRANSFER_URL, FPL_URL
+from src.urls import LEAGUE_URL, FPL_PLAYER
 
-from src.paths import APP_DIR, MOCK_DIR
+from src.paths import MOCK_DIR
 
 from src.db.db import get_player
 from typing import List, Union
@@ -99,7 +95,11 @@ def get_gw_transfers(alist: List[int], gw: Union[int, List[int]], all=False) -> 
                             if int(item["event"]) in gw:
                                 row[item["event"]] = parse_transfers(item)
             else:
-                print("{} does not exist or Transfer URL endpoint unavailable".format(entry_id))
+                print(
+                    "{} does not exist or Transfer URL endpoint unavailable".format(
+                        entry_id
+                    )
+                )
 
     return row
 
@@ -132,13 +132,17 @@ def get_participant_entry(entry_id: int, gw: int) -> dict:
         }
 
         if r.status_code == 200:
-            print("Retrieving results, participant {} for event = {}".format(entry_id, gw))
+            print(
+                "Retrieving results, participant {} for event = {}".format(entry_id, gw)
+            )
             obj = r.json()
 
             team_list["active_chip"] = obj["active_chip"]
             team_list["points_on_bench"] = obj["entry_history"]["points_on_bench"]
             team_list["total_points"] = obj["entry_history"]["points"]
-            team_list["event_transfers_cost"] = obj["entry_history"]["event_transfers_cost"]
+            team_list["event_transfers_cost"] = obj["entry_history"][
+                "event_transfers_cost"
+            ]
 
             if obj["automatic_subs"]:
                 # optimization 1
@@ -148,23 +152,31 @@ def get_participant_entry(entry_id: int, gw: int) -> dict:
                     if len(team_list["auto_sub_in"]) < 1:
                         team_list["auto_sub_in"] = str(item["element_in"])
                     else:
-                        team_list["auto_sub_in"] = team_list["auto_sub_in"] + "," + str(item["element_in"])
+                        team_list["auto_sub_in"] = (
+                            team_list["auto_sub_in"] + "," + str(item["element_in"])
+                        )
                     if len(team_list["auto_sub_out"]) < 1:
                         team_list["auto_sub_out"] = str(item["element_out"])
                     else:
-                        team_list["auto_sub_out"] = team_list["auto_sub_out"] + "," + str(item["element_out"])
+                        team_list["auto_sub_out"] = (
+                            team_list["auto_sub_out"] + "," + str(item["element_out"])
+                        )
 
             for item in obj["picks"]:
                 if item["multiplier"] != 0:
                     if len(team_list["players"]) < 1:
                         team_list["players"] = str(item["element"])
                     else:
-                        team_list["players"] = team_list["players"] + "," + str(item["element"])
+                        team_list["players"] = (
+                            team_list["players"] + "," + str(item["element"])
+                        )
                 else:
                     if len(team_list["bench"]) < 1:
                         team_list["bench"] = str(item["element"])
                     else:
-                        team_list["bench"] = team_list["bench"] + "," + str(item["element"])
+                        team_list["bench"] = (
+                            team_list["bench"] + "," + str(item["element"])
+                        )
                 if item["is_captain"]:
                     team_list["captain"] = int(item["element"])
                 if item["is_vice_captain"]:
@@ -217,7 +229,9 @@ class Gameweek:
                 self.status = item
 
     def highest_scoring_player(self):
-        highest = self.week_df.sort_values(by="total_points", ascending=False).iloc[0, :]
+        highest = self.week_df.sort_values(by="total_points", ascending=False).iloc[
+            0, :
+        ]
         print(get_player(highest["id"]).player_id)
         print(get_player(highest["id"]).team)
         del highest
@@ -229,19 +243,25 @@ class Gameweek:
             print(i[-3], get_player(i[-3]).player_name)
 
     def highest_xg(self):
-        highest_xg = self.week_df.sort_values(by="expected_goals", ascending=False).iloc[0, :]
+        highest_xg = self.week_df.sort_values(
+            by="expected_goals", ascending=False
+        ).iloc[0, :]
         print("\n Higest Xg")
         print(get_player(highest_xg["id"]).team)
         print(get_player(highest_xg["id"]).player_name)
 
     def highest_xgc(self):
-        highest_xgc = self.week_df.sort_values(by="expected_goals_conceded", ascending=False).iloc[0, :]
+        highest_xgc = self.week_df.sort_values(
+            by="expected_goals_conceded", ascending=False
+        ).iloc[0, :]
         print("\n Highest Xgc")
         print(get_player(highest_xgc["id"]).team)
         print(get_player(highest_xgc["id"]).player_name)
 
     def highest_xa(self):
-        highest_xa = self.week_df.sort_values(by="expected_assists", ascending=False).iloc[0, :]
+        highest_xa = self.week_df.sort_values(
+            by="expected_assists", ascending=False
+        ).iloc[0, :]
         print("\n Highest xA")
         print(get_player(highest_xa["id"]).team)
         print(get_player(highest_xa["id"]).player_name)
@@ -289,25 +309,45 @@ class Participant:
                 for item in obj:
                     if all:
                         row[item["event"]] = row.get(item["event"], {})
-                        row[item["event"]]["element_in"] = row[item["event"]].get("element_in", [])
-                        row[item["event"]]["element_out"] = row[item["event"]].get("element_out", [])
+                        row[item["event"]]["element_in"] = row[item["event"]].get(
+                            "element_in", []
+                        )
+                        row[item["event"]]["element_out"] = row[item["event"]].get(
+                            "element_out", []
+                        )
                         row[item["event"]]["element_in"].append(item["element_in"])
                         row[item["event"]]["element_out"].append(item["element_out"])
                     else:
                         if type(gw) == list and int(item["event"]) in gw:
                             row[item["event"]] = row.get(item["event"], {})
-                            row[item["event"]]["element_in"] = row[item["event"]].get("element_in", [])
-                            row[item["event"]]["element_out"] = row[item["event"]].get("element_out", [])
+                            row[item["event"]]["element_in"] = row[item["event"]].get(
+                                "element_in", []
+                            )
+                            row[item["event"]]["element_out"] = row[item["event"]].get(
+                                "element_out", []
+                            )
                             row[item["event"]]["element_in"].append(item["element_in"])
-                            row[item["event"]]["element_out"].append(item["element_out"])
+                            row[item["event"]]["element_out"].append(
+                                item["element_out"]
+                            )
                         elif type(gw) == int and int(item["event"]) == gw:
                             row[item["event"]] = row.get(item["event"], {})
-                            row[item["event"]]["element_in"] = row[item["event"]].get("element_in", [])
-                            row[item["event"]]["element_out"] = row[item["event"]].get("element_out", [])
+                            row[item["event"]]["element_in"] = row[item["event"]].get(
+                                "element_in", []
+                            )
+                            row[item["event"]]["element_out"] = row[item["event"]].get(
+                                "element_out", []
+                            )
                             row[item["event"]]["element_in"].append(item["element_in"])
-                            row[item["event"]]["element_out"].append(item["element_out"])
+                            row[item["event"]]["element_out"].append(
+                                item["element_out"]
+                            )
             else:
-                print("{} does not exist or Transfer URL endpoint unavailable".format(self.participant))
+                print(
+                    "{} does not exist or Transfer URL endpoint unavailable".format(
+                        self.participant
+                    )
+                )
         return row
 
     def get_span_week_transfers(self, span: List[int]) -> dict:
@@ -330,10 +370,13 @@ class Participant:
 
         if valid:
             if type(gw) == list:
-                self.all_gw_entries = [get_participant_entry(self.participant, gameweek) for gameweek in gw]
+                self.all_gw_entries = [
+                    get_participant_entry(self.participant, gameweek) for gameweek in gw
+                ]
             elif type(gw) == int:
                 self.all_gw_entries = [
-                    get_participant_entry(self.participant, gameweek) for gameweek in range(1, gw + 1)
+                    get_participant_entry(self.participant, gameweek)
+                    for gameweek in range(1, gw + 1)
                 ]
             return self.all_gw_entries
         else:
@@ -359,30 +402,34 @@ class League:
                 obj = r.json()
                 assert r.status_code == 200, "error connecting to the endpoint"
                 del r
-            
+
                 self.league_name = obj["league"]["name"]
-            
+
                 self.participants.extend(obj["standings"]["results"])
                 has_next = obj["standings"]["has_next"]
                 PAGE_COUNT += 1
-                print("All participants on page {} have been extracted".format(PAGE_COUNT))
+                print(
+                    "All participants on page {} have been extracted".format(PAGE_COUNT)
+                )
 
                 self.league_name = obj["league"]["name"]
         self.entry_ids = [participant["entry"] for participant in self.participants]
         return self.participants
 
     def get_league_count(self):
-        if len(self.participants > 1): 
+        if len(self.participants > 1):
             return len(self.participants)
         else:
             print("Obtain league participants first before getting league count")
-            
-    
+
     def get_participant_name(self, refresh=False) -> dict:
         """Creates participant id to name hash table"""
         if refresh or len(self.participants) == 0:
             self.obtain_league_participants()
-        self.participant_name = {str(participant['entry']) : participant['entry_name'] for participant in self.participants}
+        self.participant_name = {
+            str(participant["entry"]): participant["entry_name"]
+            for participant in self.participants
+        }
         self.id_participant = (
             [
                 participant["entry"],
@@ -441,7 +488,9 @@ class League:
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(prog="weeklyreport", description="Provide Gameweek ID and League ID")
+    parser = argparse.ArgumentParser(
+        prog="weeklyreport", description="Provide Gameweek ID and League ID"
+    )
 
     parser.add_argument(
         "-g",
@@ -450,7 +499,9 @@ if __name__ == "__main__":
         help="Gameweek you are trying to get a report of",
     )
     parser.add_argument("-dry", "--dry_run", type=bool, help="Dry run")
-    parser.add_argument("-l", "--league_id", type=int, help="Gameweek you are trying to get a report of")
+    parser.add_argument(
+        "-l", "--league_id", type=int, help="Gameweek you are trying to get a report of"
+    )
     parser.add_argument("-t", "--thread", type=int)
 
     args = parser.parse_args()

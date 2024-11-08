@@ -1,6 +1,8 @@
 import os
 
-BASE_DIR = os.path.realpath(os.path.dirname(os.path.dirname(__file__)))  # make this absolute
+BASE_DIR = os.path.realpath(
+    os.path.dirname(os.path.dirname(__file__))
+)  # make this absolute
 SRC_DIR = os.path.join(BASE_DIR, "src")
 APP_DIR = os.path.join(BASE_DIR, "app")
 REPORT_DIR = os.path.join(BASE_DIR, "reports")
@@ -19,5 +21,12 @@ if __name__ == "__main__":
             MISC_DIR{} \n
             WEEKLY_REPORT_DIR{}
         """.format(
-            BASE_DIR, SRC_DIR, APP_DIR, REPORT_DIR, FPL_WRAP_DIR, MISC_DIR, WEEKLY_REPORT_DIR
-            ))
+            BASE_DIR,
+            SRC_DIR,
+            APP_DIR,
+            REPORT_DIR,
+            FPL_WRAP_DIR,
+            MISC_DIR,
+            WEEKLY_REPORT_DIR,
+        )
+    )

@@ -85,7 +85,7 @@ def update_db_gameweek_score(conn, gw):
 
     df.reset_index(level=0, names="player_id", inplace=True)
     ##Combining all gameweeks into one database, which is why I am appending files
-    df.to_sql(f"Player_gameweek_score", conn, if_exists="append", method="multi")
+    df.to_sql("Player_gameweek_score", conn, if_exists="append", method="multi")
     print("Data insert successful")
 
 

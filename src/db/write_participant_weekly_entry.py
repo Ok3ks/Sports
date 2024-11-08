@@ -1,4 +1,3 @@
-from multiprocessing import Pool
 from src.utils import get_participant_entry
 
 from pymysql import Error
@@ -42,9 +41,7 @@ if __name__ == "__main__":
 
     from itertools import islice
     import pandas as pd
-    from src.utils import League
 
-    from itertools import chain
 
     parser = argparse.ArgumentParser("Writing participant entries into DB")
 

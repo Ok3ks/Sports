@@ -1,4 +1,5 @@
 "https://fantasy.premierleague.com/api/fixtures/"
+
 from src.db.db import create_connection_engine
 import requests
 from src.urls import FIXTURE_URL
@@ -8,6 +9,7 @@ from sqlalchemy import Integer, Boolean, String
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import DeclarativeBase
 import pandas as pd
+
 
 class Base(DeclarativeBase):
     pass
@@ -24,15 +26,15 @@ class Fixture(Base):
     date: Mapped[str] = mapped_column(String)
     homegoals: Mapped[str] = mapped_column(String)
     awaygoals: Mapped[str] = mapped_column(String)
-    homedifficulty:  Mapped[str] = mapped_column(String)
-    awaydifficulty:  Mapped[str] = mapped_column(String)
+    homedifficulty: Mapped[str] = mapped_column(String)
+    awaydifficulty: Mapped[str] = mapped_column(String)
 
     def __repr__(self):
         return f"""{self.home} {self.homegoals} vs {self.awaygoals} 
             {self.away}. Date {self.date}"""
 
 
-def update_season_fixture(engine=None, table_name ="2024_2025_FIXTURES"):
+def update_season_fixture(engine=None, table_name="2024_2025_FIXTURES"):
     """This function retrieves current information of players
     from the API"""
 
@@ -50,19 +52,33 @@ def update_season_fixture(engine=None, table_name ="2024_2025_FIXTURES"):
             "team_h_score": "homegoals",
             "team_a_score": "awaygoals",
             "kickoff_time": "date",
-        }, axis=1)
+        },
+        axis=1,
+    )
     # pd.set_option()
-    fixture_df = fixture_df[["homedifficulty", "awaydifficulty",
-                            "home", "away", "homegoals", "awaygoals",
-                            "code", "gameweek", "finished", "date"]]
-    
+    fixture_df = fixture_df[
+        [
+            "homedifficulty",
+            "awaydifficulty",
+            "home",
+            "away",
+            "homegoals",
+            "awaygoals",
+            "code",
+            "gameweek",
+            "finished",
+            "date",
+        ]
+    ]
+
     if engine:
-        fixture_df.to_sql(table_name, con=engine, if_exists="replace", chunksize=100, index=False)
+        fixture_df.to_sql(
+            table_name, con=engine, if_exists="replace", chunksize=100, index=False
+        )
         print(fixture_df.head())
     else:
         return fixture_df
 
 
 if __name__ == "__main__":
-
     update_season_fixture(engine=create_connection_engine())

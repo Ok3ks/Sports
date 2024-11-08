@@ -1,10 +1,6 @@
 from src.db.db import create_connection_engine
-import requests
-from src.urls import FPL_URL
 from src.utils import League
 
-from sqlalchemy import text
-from pymysql import Error
 
 
 if __name__ == "__main__":
