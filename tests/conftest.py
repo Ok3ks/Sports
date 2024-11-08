@@ -1,7 +1,6 @@
 import pytest
 from src.paths import REPORT_DIR
-import os
-from os.path import join, realpath
+from os.path import realpath
 
 
 @pytest.fixture(scope="module")

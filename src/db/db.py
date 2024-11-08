@@ -37,7 +37,9 @@ class GameweekScore(Base):
     __tablename__ = "Player_gameweek_score"
 
     index: Mapped[int] = mapped_column(Integer)
-    player_id: Mapped[int] = mapped_column(Integer, primary_key=True) #there should be a foreign key here
+    player_id: Mapped[int] = mapped_column(
+        Integer, primary_key=True
+    )  # there should be a foreign key here
     minutes: Mapped[int] = mapped_column(Integer)
     goals_scored: Mapped[int] = mapped_column(Integer)
     assists: Mapped[int] = mapped_column(Integer)
@@ -119,16 +121,17 @@ def create_cache_engine():
     """Ensure Redis Instance is running, either docker image or cloud"""
 
     return redis.Redis(
-                host=os.getenv("REDIS_HOST"), 
-                port=os.getenv("REDIS_PORT"), 
-                password=os.getenv("REDIS_PASSWORD"),
-                db=0).from_pool(redis.connection.ConnectionPool(
-                    ))
+        host=os.getenv("REDIS_HOST"),
+        port=os.getenv("REDIS_PORT"),
+        password=os.getenv("REDIS_PASSWORD"),
+        db=0,
+    ).from_pool(redis.connection.ConnectionPool())
+
 
 session = sessionmaker(create_connection_engine())
 
+
 def get_player_gql(id, gameweek, session=session):
-    
     out = []
     half = 1 if gameweek < 19 else 2
     with session() as session:
@@ -151,15 +154,11 @@ def get_player_gql(id, gameweek, session=session):
             (GameweekScore.player_id == id) & (GameweekScore.gameweek == gameweek)
         )
 
-        #Add fixture later 
+        # Add fixture later
         gameweek_score = session.scalars(stmt).one().__dict__
         gameweek_score.pop("_sa_instance_state")
 
-        return {
-                "player_id": id,
-                "info": player_info,
-                "gameweek_score": gameweek_score
-                }
+        return {"player_id": id, "info": player_info, "gameweek_score": gameweek_score}
 
 
 def get_player(id, session=session):
@@ -219,6 +218,15 @@ def get_player_stats_from_db(gw, session=session):
     return {i.player_id: i.total_points for i in c}
 
 
+def get_ind_player_stats_from_db(id, gw, session=session):
+    stmt = text(
+        f'SELECT total_points FROM public."Player_gameweek_score" WHERE gameweek = {gw} and player_id = {id}'
+    )
+    with session() as session:
+        c = session.execute(stmt).one()
+    return c
+
+
 def check_minutes(id, gw, session=session):
     """Checks DB for captain's minutes"""
 
@@ -237,7 +245,7 @@ def get_available_gameweek_scores(
     session=sessionmaker(create_connection_engine()),
 ):
     # can be refactored to get_distinct of any column
-    stmt = text(f'SELECT distinct(gameweek) FROM public."Player_gameweek_score"')
+    stmt = text('SELECT distinct(gameweek) FROM public."Player_gameweek_score"')
     with session() as session:
         c = session.execute(stmt)
     return c.fetchall()

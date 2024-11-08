@@ -7,6 +7,7 @@ type Query {
   players(ids: [Int!]!, gameweek: Int!): [Player!]
   gameweekScore(gameweek: Int!): [PlayerGameweekScore!]!
   leagueWeeklyReport(leagueId: Int!, gameweek:Int!): LeagueWeeklyReport!
+  participantReport(entryId:Int!, gameweek:Int): ParticipantReport!
 }
 
 type Player {
@@ -51,6 +52,26 @@ type PlayerInfo {
     team:  String!
     half:  Int!
 }
+
+type ParticipantReport{
+ autoSubIn: [String]
+  autoSubOut: [String]
+  gw: [Int]
+  entryId: [Int]
+  activeChip: [String] 
+  pointsOnBench: [Int]
+  totalPoints: [Int]
+  eventTransfersCost: [Int]
+  players: [String]
+  bench: [String]  
+  viceCaptain: [Int]
+  captain: [Int]
+  pointsBreakdown: [[Int]]
+  captainPoints: [Int]
+  viceCaptainPoints: [Int]
+  rank: [Int]
+}
+
 
 type LeagueWeeklyReport {
   captain: [CaptainStat!]!

@@ -6,11 +6,10 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text
 from pymysql import Error
 
-from sqlalchemy import Integer, Boolean, Float, String
+from sqlalchemy import Integer, String
 
-from sqlalchemy import  create_engine, select, text, distinct
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy.orm import Session, DeclarativeBase, sessionmaker
+from sqlalchemy.orm import DeclarativeBase
 
 import pandas as pd
 
