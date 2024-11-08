@@ -462,3 +462,16 @@ if __name__ == "__main__":
         test.add_auto_sub()
         test.captain_minutes()
         output = test.create_report(display=True)
+
+
+class CaptainAnalysis(Participant):
+
+    @profile
+    def __init__(self, entry_id: int):
+        super().__init__(entry_id)
+
+    def get_data(self):
+        self.one_df = pd.DataFrame(self.get_all_participant_entries(self.gw))
+        self.f = pd.DataFrame(self.get_gw_transfers(self.gw))
+        self.f = self.f.T
+        print(self.f.columns)

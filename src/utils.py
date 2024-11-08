@@ -13,7 +13,7 @@ from functools import lru_cache
 
 from src.paths import APP_DIR, MOCK_DIR
 
-from src.db.db import get_player, create_connection_engine
+from src.db.db import get_player
 from typing import List, Union
 
 
@@ -268,8 +268,9 @@ class Gameweek:
 
 
 class Participant:
-    def __init__(self, entry_id):
+    def __init__(self, entry_id, gw):
         self.participant = entry_id
+        self.gw = gw
 
     def get_gw_transfers(self, gw: Union[int, List[int]], all=False) -> dict:
         """Input is a list of entry_id. Gw is the gameweek number.

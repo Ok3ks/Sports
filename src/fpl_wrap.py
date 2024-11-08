@@ -16,7 +16,7 @@ import operator
 import os
 import pandas as pd
 from src.utils import get_basic_stats, get_curr_event
-from src.db.db import get_player, get_player_stats_from_db, check_minutes
+from src.db.db import get_player, get_ind_player_stats_from_db, check_minutes
 
 
 class ParticipantReport(Participant):
@@ -31,19 +31,19 @@ class ParticipantReport(Participant):
     def weekly_score_transformation(self):
         """Transforms weekly score into Dataframe, and returns weekly dataframe"""
 
-        one_df = pd.DataFrame(self.get_all_week_entries())
+        one_df = pd.DataFrame(self.get_all_week_entries(gw=self.gw, all=True))
         self.o_df = one_df[~one_df["players"].isna()]
 
         self.o_df["points_breakdown"] = [
-            [get_player_stats_from_db(y, event)[0] for y in self.o_df["players"][event - 1].split(",")]
+            [get_ind_player_stats_from_db(y, event)[0] for y in self.o_df["players"][event - 1].split(",")]
             for event in range(1, self.gw + 1)
         ]
         self.o_df["captain_points"] = [
-            get_player_stats_from_db(self.o_df["captain"][event - 1], event)[0] * 2
+            get_ind_player_stats_from_db(self.o_df["captain"][event - 1], event)[0] * 2
             for event in range(1, self.gw + 1)
         ]
         self.o_df["vice_captain_points"] = [
-            get_player_stats_from_db(self.o_df["vice_captain"][event - 1], event)[0]
+            get_ind_player_stats_from_db(self.o_df["vice_captain"][event - 1], event)[0]
             for event in range(1, self.gw + 1)
         ]
 
@@ -72,12 +72,12 @@ class ParticipantReport(Participant):
         self.f.sort_index(inplace=True)
 
         self.f["transfer_points_in"] = [
-            sum([get_player_stats_from_db(y, event)[0] for y in self.f["element_in"][event]])
+            sum([get_ind_player_stats_from_db(y, event)[0] for y in self.f["element_in"][event]])
             for event in range(1, self.gw + 1)
         ]
         # self.f['transfer_points_in'] = self.f['element_in'].map(lambda x: sum([get_player_stats_from_db(y, self.gw)[0] for y in x]))
         self.f["transfer_points_out"] = [
-            sum([get_player_stats_from_db(y, event)[0] for y in self.f["element_out"][event]])
+            sum([get_ind_player_stats_from_db(y, event)[0] for y in self.f["element_out"][event]])
             for event in range(1, self.gw + 1)
         ]
         # self.f['transfer_points_out'] = self.f['element_out'].map(lambda x:sum([get_player_stats_from_db(y, self.gw)[0]for y in x]))
@@ -90,14 +90,14 @@ class ParticipantReport(Participant):
         return self.f
 
     def add_auto_sub(self):
-        self.f["auto_sub_in_player"] = self.f["auto_subs"].map(lambda x: x["in"])
-        self.f["auto_sub_out_player"] = self.f["auto_subs"].map(lambda x: x["out"])
+        self.f["auto_sub_in_player"] = self.f["auto_sub_in"]  # .map(lambda x: x["in"])
+        self.f["auto_sub_out_player"] = self.f["auto_sub_in"]  # .map(lambda x: x["out"])
         self.f["auto_sub_in_points"] = [
-            sum([get_player_stats_from_db(y, event)[0] for y in self.f["auto_sub_in_player"][event - 1]])
+            sum([get_ind_player_stats_from_db(y, event)[0] for y in self.f["auto_sub_in_player"][event - 1]])
             for event in range(1, self.gw + 1)
         ]
         self.f["auto_sub_out_points"] = [
-            sum([get_player_stats_from_db(y, event)[0] for y in self.f["auto_sub_out_player"][event - 1]])
+            sum([get_ind_player_stats_from_db(y, event)[0] for y in self.f["auto_sub_out_player"][event - 1]])
             for event in range(1, self.gw + 1)
         ]
 
@@ -180,7 +180,7 @@ class ParticipantReport(Participant):
                 if check_minutes(int(row.captain), row.gw)[0] == 0:
                     self.vice_to_cap[get_player(row.vice_captain)] = [get_player(row.captain)]
                     self.vice_to_cap[get_player(row.vice_captain)].append(
-                        get_player_stats_from_db(row.vice_captain, row.gw)[0] * 2
+                        get_ind_player_stats_from_db(row.vice_captain, row.gw)[0] * 2
                     )
                     ben[get_player(row.vice_captain)].append(gw)
 
@@ -381,13 +381,13 @@ if __name__ == "__main__":
     test = ParticipantReport(args.gameweek, args.entry_id)
     test.weekly_score_transformation()
     test.merge_league_weekly_transfer()
-    test.add_auto_sub()
+    # test.add_auto_sub()
 
-    test.create_report(
-        f"{FPL_WRAP_DIR}/{str(args.entry_id)}/{str(args.entry_id)}_{str(args.gameweek)}.json",
-        args.entry_id,
-    )  # Move to S3
-    test.plots_2()
+    # test.create_report(
+    #     f"{FPL_WRAP_DIR}/{str(args.entry_id)}/{str(args.entry_id)}_{str(args.gameweek)}.json",
+    #     args.entry_id,
+    # )  # Move to S3
+    # test.plots_2()
 
     # all_gw_entries = [get_participant_entry(args.player_id, i) for i in range(args.gameweek)]
     # all_df = pd.DataFrame(all_gw_entries[1:])

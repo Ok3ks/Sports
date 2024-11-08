@@ -218,6 +218,14 @@ def get_player_stats_from_db(gw, session=session):
         # c = session.scalars(stmt).all()
     return {i.player_id: i.total_points for i in c}
 
+def get_ind_player_stats_from_db(id, gw, session=session):
+    stmt = text(
+        f'SELECT total_points FROM public."Player_gameweek_score" WHERE gameweek = {gw} and player_id = {id}'
+    )
+    with session() as session:
+        c = session.execute(stmt).one()
+    return c
+
 
 def check_minutes(id, gw, session=session):
     """Checks DB for captain's minutes"""
