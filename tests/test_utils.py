@@ -7,14 +7,13 @@ from src.utils import (
 )
 import pytest
 
-from os.path import join, realpath
+from os.path import join
 import os
 import json
 
-from tests.test_endpoints import test_fpl_url_endpoint
 from src.utils import check_gw, Participant, get_curr_event, League, GameweekError
 
-from src.urls import FPL_URL, TRANSFER_URL
+from src.urls import FPL_URL
 import requests
 
 
@@ -65,7 +64,9 @@ def test_check_gw_is_false(diff_fixture):
 
 def test_get_curr_event():
     r = requests.get(FPL_URL)
-    assert r.status_code == 200, "Endpoint unavailable, check participant_id and gameweek"
+    assert (
+        r.status_code == 200
+    ), "Endpoint unavailable, check participant_id and gameweek"
 
     r = r.json()
     assert type(r) == dict
@@ -164,7 +165,9 @@ class TestParticipant:
         assert len(test_int) == gameweek_int
 
     @pytest.mark.parametrize("gameweek_list,gameweek_int", [([1, 10, 39], [13])])
-    def test_get_all_week_entries_incl_invalid(self, participant, gameweek_list, gameweek_int):
+    def test_get_all_week_entries_incl_invalid(
+        self, participant, gameweek_list, gameweek_int
+    ):
         test = Participant(participant)
 
         with pytest.raises(GameweekError):
@@ -182,7 +185,9 @@ class TestLeague:
         # Endpoint tests validates this
         pass
 
-    def test_league_obtain_league_participants_fill(self, league_fixture, league_fill_fixture):
+    def test_league_obtain_league_participants_fill(
+        self, league_fixture, league_fill_fixture
+    ):
         test = League(league_fixture)
         test.participants = league_fill_fixture
 

@@ -23,7 +23,7 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "report_app",
     "ariadne_django",
-    "corsheaders"
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
@@ -48,7 +48,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware"
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True  # Restrict later
@@ -94,7 +94,6 @@ WSGI_APPLICATION = "LiveProject.wsgi.application"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 PASSWORD = os.getenv("DB_PASSWORD")
 DATABASES = {
-
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": os.getenv("DB_DATABASE"),

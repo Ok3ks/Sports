@@ -13,8 +13,6 @@ import requests
 
 from src.utils import to_json
 from src.paths import MOCK_DIR
-from typing import List
-
 
 
 def test_gameweek_endpoint(gw_fixture):
@@ -38,31 +36,31 @@ def test_gameweek_endpoint(gw_fixture):
 
     stats_keys = set(r["elements"][0]["stats"].keys())
     stats_keys_prev = [
-                "minutes",
-                "goals_scored",
-                "assists",
-                "clean_sheets",
-                "goals_conceded",
-                "own_goals",
-                "penalties_saved",
-                "penalties_missed",
-                "yellow_cards",
-                "red_cards",
-                "saves",
-                "bonus",
-                "bps",
-                "influence",
-                "creativity",
-                "threat",
-                "ict_index",
-                "starts",
-                "expected_goals", 
-                "expected_assists",
-                "expected_goal_involvements",
-                "expected_goals_conceded",
-                "total_points",
-                "in_dreamteam"
-                ]
+        "minutes",
+        "goals_scored",
+        "assists",
+        "clean_sheets",
+        "goals_conceded",
+        "own_goals",
+        "penalties_saved",
+        "penalties_missed",
+        "yellow_cards",
+        "red_cards",
+        "saves",
+        "bonus",
+        "bps",
+        "influence",
+        "creativity",
+        "threat",
+        "ict_index",
+        "starts",
+        "expected_goals",
+        "expected_assists",
+        "expected_goal_involvements",
+        "expected_goals_conceded",
+        "total_points",
+        "in_dreamteam",
+    ]
 
     assert (
         len(stats_keys.difference(set(stats_keys_prev))) == 0
@@ -70,7 +68,7 @@ def test_gameweek_endpoint(gw_fixture):
 
     del stats_keys
     explain_key = r["elements"][0]["explain"][0].keys()
-    explain_key_prev = {'fixture', 'stats'}
+    explain_key_prev = {"fixture", "stats"}
 
     assert (
         len(set(explain_key).difference(explain_key_prev)) == 0
@@ -93,13 +91,27 @@ def test_fixture_endpoint():
 
     fixture_keys = list(r[0].keys())
     fixture_key_prev = [
-            'code', 'event', 'finished', 'finished_provisional',
-            'id', 'kickoff_time', 'minutes', 'provisional_start_time',
-            'started', 'team_a', 'team_a_score', 'team_h', 'team_h_score',
-            'stats', 'team_h_difficulty', 'team_a_difficulty',
-            'pulse_id'
-            ]
-    assert len(set(fixture_key_prev).difference(fixture_keys)) == 0, 'Fixture keys have changed'
+        "code",
+        "event",
+        "finished",
+        "finished_provisional",
+        "id",
+        "kickoff_time",
+        "minutes",
+        "provisional_start_time",
+        "started",
+        "team_a",
+        "team_a_score",
+        "team_h",
+        "team_h_score",
+        "stats",
+        "team_h_difficulty",
+        "team_a_difficulty",
+        "pulse_id",
+    ]
+    assert (
+        len(set(fixture_key_prev).difference(fixture_keys)) == 0
+    ), "Fixture keys have changed"
     assert type(r[0]["stats"]) is list  # type:ignore
     del fixture_keys
 
@@ -122,16 +134,18 @@ def test_transfer_endpoint(participant):
     if len(r) > 1:
         transfer_keys = r[0].keys()
         transfer_keys_prev = [
-                "element_in", 
-                "element_in_cost", 
-                "element_out",
-                "element_out_cost",
-                "entry",
-                "event",
-                "time"
-                ]
-        
-        assert set(transfer_keys_prev).difference(transfer_keys), "Transfer keys have changed"
+            "element_in",
+            "element_in_cost",
+            "element_out",
+            "element_out_cost",
+            "entry",
+            "event",
+            "time",
+        ]
+
+        assert set(transfer_keys_prev).difference(
+            transfer_keys
+        ), "Transfer keys have changed"
 
     out_dict = {"transfer": r}
     to_json(out_dict, f"{MOCK_DIR}/endpoints/transfer_endpoint.json")
@@ -146,14 +160,12 @@ def test_history_endpoint(participant):
 
     assert type(r) is dict, "Endpoint structure has changed"
     history_keys = list(r.keys())
-    history_keys_prev = [
-        "current",
-        "past",
-        "chips"
-    ]
+    history_keys_prev = ["current", "past", "chips"]
 
-    assert len(set(history_keys_prev).difference(set(history_keys))) == 0, 'History keys have changed'
-    
+    assert (
+        len(set(history_keys_prev).difference(set(history_keys))) == 0
+    ), "History keys have changed"
+
     assert type(r["current"]) is list, "Endpoint structure has changed"  # type: ignore
     assert type(r["current"][0]) is dict, "Endpoint structure has changed"  # type: ignore
 
@@ -179,7 +191,9 @@ def test_history_endpoint(participant):
         "points_on_bench",
     ]
 
-    assert len(set(current_keys).difference(set(current_keys_prev))) == 0, "Current keys has changed"
+    assert (
+        len(set(current_keys).difference(set(current_keys_prev))) == 0
+    ), "Current keys has changed"
 
     assert len(current_keys) == 12, "Number of keys has changed"
 
@@ -204,13 +218,11 @@ def test_h2h_league_endpoint(h2h_league):
     assert type(r) is dict, "Endpoint Structure has changed"
 
     h2h_keys = list(r.keys())
-    h2h_keys_prev = [
-        "has_next",
-        "page",
-        "results"
-    ]
+    h2h_keys_prev = ["has_next", "page", "results"]
 
-    assert len(set(h2h_keys_prev).difference(set(h2h_keys))) == 0, "H2h keys have changed"
+    assert (
+        len(set(h2h_keys_prev).difference(set(h2h_keys))) == 0
+    ), "H2h keys have changed"
 
     results_keys = list(r["results"][0].keys())
     results_keys_prev = [
@@ -238,10 +250,12 @@ def test_h2h_league_endpoint(h2h_league):
         "event",
         "tiebreak",
         "is_bye",
-        "knockout_name"
+        "knockout_name",
     ]
 
-    assert len(set(results_keys_prev).difference(results_keys)) == 0, "Results keys has changed"
+    assert (
+        len(set(results_keys_prev).difference(results_keys)) == 0
+    ), "Results keys has changed"
     to_json(r, f"{MOCK_DIR}/endpoints/h2h_league_endpoint.json")
 
 
@@ -255,12 +269,7 @@ def test_league_endpoint(classic_league):
     assert type(r) is dict
     keys = list(r.keys())
 
-    keys_prev = [
-        "new_entries",
-        "last_updated_data",
-        "league",
-        "standings"
-    ]
+    keys_prev = ["new_entries", "last_updated_data", "league", "standings"]
 
     assert len(set(keys_prev).difference(keys)) == 0, "League Keys have changed"
 
@@ -284,24 +293,22 @@ def test_league_endpoint(classic_league):
         "cup_league",
         "rank",
     ]
-    assert len(set(league_keys).difference(league_keys_prev)) == 0, "League keys have changed"
+    assert (
+        len(set(league_keys).difference(league_keys_prev)) == 0
+    ), "League keys have changed"
 
     new_entries_keys = r["new_entries"]  # type: ignore
-    new_entries_keys_prev = [
-      "has_next",
-      "page",
-      "results"
-    ]
-    assert len(set(new_entries_keys).difference(new_entries_keys_prev)) == 0, "New Entries keys have changed"
+    new_entries_keys_prev = ["has_next", "page", "results"]
+    assert (
+        len(set(new_entries_keys).difference(new_entries_keys_prev)) == 0
+    ), "New Entries keys have changed"
 
     standings_keys = r["standings"]  # type: ignore
-    standings_keys_prev = [
-        "has_next",
-        "page",
-        "results"
-    ]
+    standings_keys_prev = ["has_next", "page", "results"]
 
-    assert len(set(standings_keys).difference(standings_keys_prev)) == 0, " Standings have changed"
+    assert (
+        len(set(standings_keys).difference(standings_keys_prev)) == 0
+    ), " Standings have changed"
 
     participant_info = r["standings"]["results"][0]  # type: ignore
     participant_info_keys = [
@@ -313,9 +320,11 @@ def test_league_endpoint(classic_league):
         "rank_sort",
         "total",
         "entry",
-        "entry_name"
+        "entry_name",
     ]
-    assert len(set(participant_info_keys).difference(participant_info)) == 0, "Participant info keys have changed"
+    assert (
+        len(set(participant_info_keys).difference(participant_info)) == 0
+    ), "Participant info keys have changed"
 
     to_json(r, f"{MOCK_DIR}/endpoints/league_endpoint.json")
 
@@ -354,7 +363,9 @@ def test_fpl_player_endpoint(participant, gw_fixture):
     ]
 
     print(entry_history_keys)
-    assert len(set(entry_history_keys).difference(set(curr_entry_history_keys))) == 0, "Keys have changed"
+    assert (
+        len(set(entry_history_keys).difference(set(curr_entry_history_keys))) == 0
+    ), "Keys have changed"
     assert type(r["picks"]) is list
 
     picks_keys = list(r["picks"][0].keys())
@@ -363,7 +374,7 @@ def test_fpl_player_endpoint(participant, gw_fixture):
         "position",
         "multiplier",
         "is_captain",
-        "is_vice_captain"
+        "is_vice_captain",
     }
 
     assert len(set(picks_keys).difference(picks_keys_prev)) == 0, "Picks Keys changed"
@@ -387,7 +398,7 @@ def test_fpl_url_endpoint():
         "total_players",
         "elements",
         "element_stats",
-        "element_types"
+        "element_types",
     }
 
     assert (
@@ -472,14 +483,8 @@ def test_fpl_url_endpoint():
     assert type(r["phases"][0]) is dict
 
     phase_keys = list(r["phases"][0])
-    phase_keys_prev = {
-        "id",
-        "name",
-        "start_event",
-        "stop_event",
-        "highest_score"
-        }
-    
+    phase_keys_prev = {"id", "name", "start_event", "stop_event", "highest_score"}
+
     assert (
         len(set(phase_keys_prev).difference(phase_keys)) == 0
     ), f"Game setting keys have changed new {game_settings_keys}"
@@ -510,16 +515,18 @@ def test_fpl_url_endpoint():
         "strength_defence_away",
         "pulse_id",
     }
-    
+
     assert (
         len(set(team_keys).difference(team_keys_prev)) == 0
-    ), f"Team keys have changed new"
+    ), "Team keys have changed new"
 
     element_stats_keys = r["element_stats"][0].keys()
     assert "label" in element_stats_keys
     assert "name" in element_stats_keys
     assert r["element_stats"][0]["name"] == "minutes", "Measurement metric has changed"
-    assert r["element_stats"][0]["label"] == "Minutes played", "Measurement metric has changed"
+    assert (
+        r["element_stats"][0]["label"] == "Minutes played"
+    ), "Measurement metric has changed"
     assert len(element_stats_keys) == 2
 
     element_types_keys = r["element_types"][0].keys()
@@ -539,7 +546,9 @@ def test_fpl_url_endpoint():
         "sub_positions_locked",
         "element_count",
     ]
-    assert len(set(element_types_keys).difference(element_types_keys_prev)) == 0, "Keys have changed"
+    assert (
+        len(set(element_types_keys).difference(element_types_keys_prev)) == 0
+    ), "Keys have changed"
 
     elements_keys = r["elements"][0].keys()
     assert "chance_of_playing_next_round" in elements_keys
