@@ -32,7 +32,7 @@ class Fixture(Base):
             {self.away}. Date {self.date}"""
 
 
-def update_season_fixture(engine, table_name ="2024_2025_FIXTURES"):
+def update_season_fixture(engine=None, table_name ="2024_2025_FIXTURES"):
     """This function retrieves current information of players
     from the API"""
 
@@ -56,10 +56,13 @@ def update_season_fixture(engine, table_name ="2024_2025_FIXTURES"):
                             "home", "away", "homegoals", "awaygoals",
                             "code", "gameweek", "finished", "date"]]
     
-    fixture_df.to_sql(table_name, con=engine, if_exists="replace", chunksize=100, index=False)
-    print(fixture_df.head())
+    if engine:
+        fixture_df.to_sql(table_name, con=engine, if_exists="replace", chunksize=100, index=False)
+        print(fixture_df.head())
+    else:
+        return fixture_df
 
 
 if __name__ == "__main__":
 
-    update_season_fixture(create_connection_engine())
+    update_season_fixture(engine=create_connection_engine())
