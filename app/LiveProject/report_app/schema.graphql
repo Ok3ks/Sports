@@ -5,7 +5,8 @@ GraphQL schema definitions.
 type Query {
   player(id: Int!, gameweek: Int!): Player!
   players(ids: [Int!]!, gameweek: Int!): [Player!]
-  gameweekScore(gameweek: Int!): [PlayerGameweekScore!]!
+  gameweekScore(gameweek: Int!): PlayerGameweekScore!
+  allGameweekScore: [PlayerGameweekScore!]!
   leagueWeeklyReport(leagueId: Int!, gameweek:Int!): LeagueWeeklyReport!
   participantReport(entryId:Int!, gameweek:Int): ParticipantReport!
 }

@@ -227,6 +227,24 @@ def get_ind_player_stats_from_db(id, gw, session=session):
     return c
 
 
+def get_gameweek_stats(id, gw, session=session):
+    stmt = text(
+        f'SELECT * FROM public."Player_gameweek_score" WHERE gameweek = {gw}'
+    )
+    with session() as session:
+        c = session.execute(stmt).all()
+    return c
+
+
+def get_season_stats(id, gw, session=session):
+    stmt = text(
+        f'SELECT * FROM public."Player_gameweek_score"'
+    )
+    with session() as session:
+        c = session.execute(stmt).all()
+    return c
+
+
 def check_minutes(id, gw, session=session):
     """Checks DB for captain's minutes"""
 
