@@ -193,6 +193,29 @@ def get_teams_id(session=session) -> dict:
         obj = session.execute(statement_1) .all()
         obj = {i[0]: i[1] for i in obj}
         return obj
+
+
+def get_player_team_map(session=session) -> dict:
+    """Return a mapping of Player id to teams"""
+    with session() as session:
+        statement_1 = text(
+            'SELECT player_id, team FROM public."EPL_2024_PLAYER_INFO"')
+        obj = session.execute(statement_1) .all()
+        obj = {i[0]: i[1] for i in obj}
+        return obj
+
+
+def get_player_position_map(session=session) -> dict:
+    """Return a mapping of Player id to teams"""
+    with session() as session:
+        statement_1 = text(
+            'SELECT player_id, position FROM public."EPL_2024_PLAYER_INFO"')
+        obj = session.execute(statement_1) .all()
+        obj = {i[0]: i[1] for i in obj}
+        return obj
+
+
+# r
 # raw sql queries make it hard to switch databases
 # tests are good
 
@@ -237,7 +260,8 @@ def get_ind_player_stats_from_db(id, gw, session=session):
     return c
 
 
-def get_gameweek_stats(id, gw, session=session):
+def get_gameweek_stats(gw, session=session):
+    """Return all stats for a particular gameweek."""
     stmt = text(
         f'SELECT * FROM public."Player_gameweek_score" WHERE gameweek = {gw}'
     )
@@ -245,20 +269,20 @@ def get_gameweek_stats(id, gw, session=session):
         c = session.execute(stmt).all()
     return c
 
-
-def get_fixtures(session=session):
-    
+def get_season_stats(session=session):
+    """Return all season stats"""
     stmt = text(
-        f'SELECT  * FROM public."2024_2025_FIXTURES"'
+        f'SELECT * FROM public."Player_gameweek_score"  ORDER BY GAMEWEEK DESC '
     )
     with session() as session:
         c = session.execute(stmt).all()
     return c
 
 
-def get_season_stats(id, gw, session=session):
+def get_fixtures(session=session):
+    """ Return all fixtures."""
     stmt = text(
-        f'SELECT * FROM public."Player_gameweek_score"'
+        f'SELECT  * FROM public."2024_2025_FIXTURES"'
     )
     with session() as session:
         c = session.execute(stmt).all()

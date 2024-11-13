@@ -4,15 +4,19 @@ import pandas as pd
 import os
 from os.path import join, realpath
 
+from src.db.db import get_player_position_map, get_player_team_map, get_season_stats, get_teams_id, get_fixtures
 from src.urls import HISTORY_URL
 from src.paths import FPL_WRAP_DIR
 import seaborn.objects as so
 
 from src.utils import Participant, to_json
 
-def parse_fixture(fixture_db):
-    fixture_df = pd.DataFrame(fixture_db)
+def parse_fixture():
+    """Parse Fixtures from DB"""
+    fixture = get_fixtures()
+    team_id_to_name = get_teams_id()
 
+    fixture_df = pd.DataFrame(fixture)
     fixture_df = fixture_df.rename(
         {
             "event": "gameweek",
@@ -26,7 +30,7 @@ def parse_fixture(fixture_db):
         },
         axis=1,
     )
-    # pd.set_option()
+
     fixture_df = fixture_df[
         [
             "homedifficulty",
@@ -50,9 +54,8 @@ def parse_fixture(fixture_db):
     fixture_df["code"] = (
         fixture_df["code"].astype(int).map(lambda x: x - 2444470)
     )  # to match full_df
-    fixture_df.rename({"code": "fixtures"}, axis=1, inplace=True)
 
-    fixture_df.head(10)
+    fixture_df.rename({"code": "fixtures"}, axis=1, inplace=True)
 
     fixture_df["homewin"] = fixture_df["homegoals"] > fixture_df["awaygoals"]
     fixture_df["draw"] = fixture_df["homegoals"] == fixture_df["awaygoals"]
@@ -62,39 +65,31 @@ def parse_fixture(fixture_db):
     fixture_df["draw"] = fixture_df["draw"].astype(int)
     fixture_df["awaywin"] = fixture_df["awaywin"].astype(int)
 
-    fixture_df.head(10)
+    return fixture_df
 
 
-def full_df():
-    """"""
-    dfs = []
-    for i in range(1, 10):
-        home = requests.get(gw_url.format(i))
-        home = home.json()
-        temp_df = pd.DataFrame(home["elements"])
+def parse_stats():
+    """Combine Season stats from DB, and map appropriately"""
 
-        # manual way
-        # interest_keys = list(temp_df['stats'][1].keys())
-        # for key in interest_keys:
-        #     temp_df[key] = temp_df['stats'].map(lambda x:x[key])
+    stats = get_season_stats()
+    player_team_mapping = get_player_team_map()
+    player_position_mapping = get_player_position_map()
+    full_df = pd.DataFrame(stats)
 
-        # better way
-        stats_df = pd.json_normalize(temp_df["stats"])
-        temp_df["fixtures"] = temp_df["explain"].map(lambda x: x[0]["fixture"])
-        temp_df.drop(["stats", "explain"], axis=1, inplace=True)
+    full_df["team"] = full_df["player_id"].map(
+        lambda x: player_team_mapping[x])
+    full_df["position"] = full_df["player_id"].map(
+        lambda x: player_position_mapping[x])
 
-        dfs.append(pd.concat([temp_df, stats_df], axis=1))
-        dfs
-
-        full_df = pd.concat(dfs, axis=0)
-        full_df["team"] = full_df["id"].map(lambda x: player_team_mapping[x])
-        full_df["position"] = full_df["id"].map(lambda x: player_position_mapping[x])
-
+    print(full_df.head())
     return full_df
 
-def fixture_plots(fixture_df):
+# def fixture_plots(fixture_df):
+    # """ """
+    # return fixture_df.groupby(["homedifficulty", "awaydifficulty"]).aggregate(
+    # {"homewin": "sum", "draw": "sum", "awaywin": "sum"}
+    # ).plot(kind="bar")
 
-    """ """
-    return fixture_df.groupby(["homedifficulty", "awaydifficulty"]).aggregate(
-    {"homewin": "sum", "draw": "sum", "awaywin": "sum"}
-    ).plot(kind="bar")
+
+if __name__ == "__main__":
+    parse_stats()
