@@ -25,6 +25,7 @@ class Player(Base):
 
     player_id: Mapped[int] = mapped_column(Integer, primary_key=True)
     team: Mapped[str] = mapped_column(String)
+    team_id: Mapped[str] = mapped_column(String)
     position: Mapped[str] = mapped_column(String)
     player_name: Mapped[str] = mapped_column(String)
     half: Mapped[str] = mapped_column(Integer)
