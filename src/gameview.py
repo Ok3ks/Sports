@@ -93,7 +93,10 @@ def groupby(groups: List[str] = ["gameweek", "position"]):
         "total_points": ["sum"],
         "assists": "sum",
     })
-    return obj.to_dict('list')
+    obj = (obj.to_dict('list'))
+    obj = {a[0]: b for a, b in obj.items()} # transforming into a pure dictionary
+    print(obj)
+    return obj
 
 # def fixture_plots(fixture_df):
     # """ """
