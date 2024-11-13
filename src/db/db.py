@@ -24,8 +24,9 @@ class Player(Base):
     __tablename__ = "EPL_2024_PLAYER_INFO"
 
     player_id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    team_code: Mapped[int] = mapped_column(Integer)
     team: Mapped[str] = mapped_column(String)
-    team_id: Mapped[str] = mapped_column(String)
+    team_id: Mapped[int] = mapped_column(Integer)
     position: Mapped[str] = mapped_column(String)
     player_name: Mapped[str] = mapped_column(String)
     half: Mapped[str] = mapped_column(Integer)

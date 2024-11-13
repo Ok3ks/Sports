@@ -31,6 +31,7 @@ def update_db_player_info(engine, table_name="EPL_2024_PLAYER_INFO", half=1):
     data = (
         (
             item["id"],
+            item["team_code"],
             team_code_to_name[item["team_code"]],
             team_code_to_id[item["team_code"]],
             pos_code_to_pos[item["element_type"]],
@@ -40,7 +41,7 @@ def update_db_player_info(engine, table_name="EPL_2024_PLAYER_INFO", half=1):
     )
     data = pd.DataFrame(data)
     data["half"] = half
-    data.columns = ["player_id", "team", "team_id", "position", "player_name", "half"]
+    data.columns = ["player_id", "team_code",  "team", "team_id", "position", "player_name", "half"]
 
     print(f"{len(data)} is ready to be added to database table")
     data.to_sql(
