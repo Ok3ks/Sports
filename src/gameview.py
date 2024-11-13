@@ -1,4 +1,5 @@
 import json
+from typing import List
 import requests
 import pandas as pd
 import os
@@ -12,7 +13,7 @@ import seaborn.objects as so
 from src.utils import Participant, to_json
 
 def parse_fixture():
-    """Parse Fixtures from DB"""
+    """Parse Fixtures from DB."""
     fixture = get_fixtures()
     team_id_to_name = get_teams_id()
 
@@ -69,7 +70,7 @@ def parse_fixture():
 
 
 def parse_stats():
-    """Combine Season stats from DB, and map appropriately"""
+    """Combine Season stats from DB, and map appropriately."""
 
     stats = get_season_stats()
     player_team_mapping = get_player_team_map()
@@ -80,9 +81,19 @@ def parse_stats():
         lambda x: player_team_mapping[x])
     full_df["position"] = full_df["player_id"].map(
         lambda x: player_position_mapping[x])
-
-    print(full_df.head())
     return full_df
+
+
+#ToDo : add kwargs to function to customise groupbys
+def groupby(groups: List[str] = ["gameweek", "position"]):
+    """Calculate aggregates groupby."""
+    stats = parse_stats()
+    obj = stats.groupby(groups).aggregate({
+        "goals_scored": "sum",
+        "total_points": ["sum"],
+        "assists": "sum",
+    })
+    return obj.to_dict('list')
 
 # def fixture_plots(fixture_df):
     # """ """
@@ -92,4 +103,4 @@ def parse_stats():
 
 
 if __name__ == "__main__":
-    parse_stats()
+    groupby()

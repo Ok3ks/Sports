@@ -10,8 +10,9 @@ from ariadne import (
 
 
 # from .models import (Players, Gameweek_Scores)
-from src.db.db import get_gameweek_stats, get_player_gql, get_season_stats
+from src.db.db import get_gameweek_stats, get_player_gql
 from src.fpl_wrap import ParticipantReport
+from src.gameview import groupby
 from src.report import LeagueWeeklyReport
 from src.utils import get_curr_event
 
@@ -29,10 +30,10 @@ def resolve_gameweek_stats(*_, gameweek):
     return get_gameweek_stats(gameweek)
 
 
-@query.field("allGameweekScore")
-def resolve_season_stats(*_,):
-    """Retrieve season statistics for all players"""
-    return get_season_stats()
+@query.field("gameviewReport")
+def resolve_season_stats(*_, ):
+    """Retrieve season statistics for all players by gameweek and position"""
+    return groupby(groups=['gameweek', 'position'])
 
 
 @query.field("player")
