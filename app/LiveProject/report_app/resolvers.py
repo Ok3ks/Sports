@@ -10,8 +10,9 @@ from ariadne import (
 
 
 # from .models import (Players, Gameweek_Scores)
-from src.db.db import get_player_gql
+from src.db.db import get_gameweek_stats, get_player_gql
 from src.fpl_wrap import ParticipantReport
+from src.gameview import groupby
 from src.report import LeagueWeeklyReport
 from src.utils import get_curr_event
 
@@ -22,25 +23,17 @@ import json
 query = QueryType()
 _document = ObjectType("Document")
 
-# For GameView
-# @query.field("gameweekScore")
-# def resolve_player_gameweek_scores(*_,):
-#     """Retrieve a Player's gameweek score based on player_id"""
-#     return Gameweek_Scores().objects.all
 
-# Query resolvers
-# @query.field("players")
-# def resolve_players(*_):
-#     """Retrieve all Player model instances."""
-#     return get_players
+@query.field("gameweekScore")
+def resolve_gameweek_stats(*_, gameweek):
+    """Retrieve gameweek statistics of all players"""
+    return get_gameweek_stats(gameweek)
 
-# @query.field("playerGameweekScore")
-# def resolve_player_gameweek_score(*_, id, gameweek):
-#     """Retrieve a Player's gameweek score based on player_id"""
-#     return get_player_stats_from_db_gql(id, gameweek)
 
-# query get leagueReport - plug into function
-# if indexed, retrieve, others create and save
+@query.field("gameviewReport")
+def resolve_season_stats(*_, ):
+    """Retrieve season statistics for all players by gameweek and position"""
+    return groupby(groups=['gameweek', 'position'])
 
 
 @query.field("player")
@@ -98,7 +91,6 @@ def resolve_league_gameweek_report(*_, league_id, gameweek):
         report.captain_minutes()
         output = report.create_report(display=False)  # replace this with caching?
         print("Recomputed")
-
         return output
 
 
