@@ -177,13 +177,21 @@ def get_player(id, session=session):
             return obj
 
 
-def get_teams(session=sessionmaker(create_connection_engine())):
+def get_teams(session=session):
     with session() as session:
         statement = select(distinct(Player.team))
         obj = session.execute(statement).all()
         return obj
+    
 
-
+def get_teams_id(session=session) -> dict:
+    """Return a mapping of team id to teams"""
+    with session() as session:
+        statement_1 = text(
+            'SELECT team_id,team FROM public."EPL_2024_PLAYER_INFO"')
+        obj = session.execute(statement_1) .all()
+        obj = {i[0]: i[1] for i in obj}
+        return obj
 # raw sql queries make it hard to switch databases
 # tests are good
 
@@ -231,6 +239,16 @@ def get_ind_player_stats_from_db(id, gw, session=session):
 def get_gameweek_stats(id, gw, session=session):
     stmt = text(
         f'SELECT * FROM public."Player_gameweek_score" WHERE gameweek = {gw}'
+    )
+    with session() as session:
+        c = session.execute(stmt).all()
+    return c
+
+
+def get_fixtures(session=session):
+    
+    stmt = text(
+        f'SELECT  * FROM public."2024_2025_FIXTURES"'
     )
     with session() as session:
         c = session.execute(stmt).all()
