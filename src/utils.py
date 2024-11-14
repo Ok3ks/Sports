@@ -400,6 +400,7 @@ class League:
             while has_next:
                 r = wget(LEAGUE_URL.format(self.league_id, PAGE_COUNT))
                 obj = r.json()
+                print(obj)
                 assert r.status_code == 200, "error connecting to the endpoint"
                 del r
 
@@ -417,10 +418,9 @@ class League:
         return self.participants
 
     def get_league_count(self):
-        if len(self.participants > 1):
-            return len(self.participants)
-        else:
-            print("Obtain league participants first before getting league count")
+        while len(self.participants) < 1:
+            self.obtain_league_participants()
+        return len(self.participants)
 
     def get_participant_name(self, refresh=False) -> dict:
         """Creates participant id to name hash table"""
@@ -469,8 +469,9 @@ class League:
     def get_all_participant_entries(self, gw, refresh=False, thread=None):
         self.gw = gw
 
-        if refresh or len(self.participants) == 0:
-            self.obtain_league_participants()
+        self.obtain_league_participants()
+        return self.participants
+            
 
         # optimization 2
         for participant in self.participants:
@@ -521,7 +522,7 @@ if __name__ == "__main__":
         # test_gw.highest_xa()
         # test_gw.gameweek_status()
     else:
-        print(get_participant_entry(entry_id=98120, gw=1))
+        print(get_participant_entry(entry_id=98120, gw=args.gameweek_id))
         # test = League(args.league_id)
         # test.get_participant_name()
         # connection = create_connection_engine("fpl")
