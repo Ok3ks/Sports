@@ -6,7 +6,6 @@ from os.path import join, realpath
 
 from src.urls import HISTORY_URL
 from src.paths import FPL_WRAP_DIR
-import seaborn.objects as so
 
 from src.utils import Participant, to_json
 from functools import lru_cache
