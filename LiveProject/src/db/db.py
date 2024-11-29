@@ -196,9 +196,9 @@ def create_cache_engine():
     """Ensure Redis Instance is running, either docker image or cloud"""
 
     return redis.Redis(
-        host=os.getenv("REDIS_HOST"),
-        port=os.getenv("REDIS_PORT"),
-        password=os.getenv("REDIS_PASSWORD"),
+        host=os.getenv("REDISHOST"),
+        port=os.getenv("REDISPORT"),
+        password=os.getenv("REDISPASSWORD"),
         db=0,
     ).from_pool(redis.connection.ConnectionPool())
 
