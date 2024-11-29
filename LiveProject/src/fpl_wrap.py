@@ -1,7 +1,6 @@
 import json
 import requests
 import pandas as pd
-import os
 from os.path import join, realpath
 
 from src.urls import HISTORY_URL
@@ -13,7 +12,6 @@ from functools import lru_cache
 from src.utils import get_curr_event
 from src.db.db import (
     create_cache_engine,
-    get_player,
     get_ind_player_stats_from_db,
 )
 
@@ -125,7 +123,7 @@ class ParticipantReport(Participant):
             )
             for event in range(1, self.gw + 1)
         ]
-        
+
     def create_report(self, display=False):
         output = self.o_df.to_dict("list")
         r = create_cache_engine()  # save to cache
