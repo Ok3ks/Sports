@@ -14,31 +14,7 @@ from sqlalchemy.orm import DeclarativeBase
 import pandas as pd
 
 
-class Base(DeclarativeBase):
-    pass
-
-
-def create_table(conn, table_name):
-    """Creates a table with columns, player_id, position, team, and player_name"""
-    try:
-        create_table_sql = text(f"""CREATE TABLE IF NOT EXISTS {table_name} (
-                            player_id INTEGER PRIMARY KEY,
-                            team VARCHAR (255),
-                            team_code INTEGER,
-                            position VARCHAR (2000),
-                            player_name VARCHAR (200)
-                        );
-                        """)
-        session = sessionmaker(conn)
-        with session() as session:
-            session.execute(create_table_sql)
-        print("Table Created")
-    except Error as e:
-        print(e)
-    return conn
-
-
-def update_db_player_info(engine, table_name, half=1):
+def update_db_player_info(engine, table_name="EPL_2024_PLAYER_INFO", half=1):
     """This function retrieves current information of players
     from the API"""
 
@@ -50,11 +26,14 @@ def update_db_player_info(engine, table_name, half=1):
         item["id"]: item["singular_name"] for item in home["element_types"]
     }
 
+    team_code_to_id = {item["code"]: item["id"] for item in home["teams"]}
+
     data = (
         (
             item["id"],
-            team_code_to_name[item["team_code"]],
             item["team_code"],
+            team_code_to_name[item["team_code"]],
+            team_code_to_id[item["team_code"]],
             pos_code_to_pos[item["element_type"]],
             item["first_name"] + " " + item["second_name"],
         )
@@ -62,7 +41,7 @@ def update_db_player_info(engine, table_name, half=1):
     )
     data = pd.DataFrame(data)
     data["half"] = half
-    data.columns = ["player_id", "team", "team_code", "position", "player_name", "half"]
+    data.columns = ["player_id", "team_code",  "team", "team_id", "position", "player_name", "half"]
 
     print(f"{len(data)} is ready to be added to database table")
     data.to_sql(
@@ -97,8 +76,6 @@ if __name__ == "__main__":
     engine = create_connection_engine()
 
     if args.table_name:
-        create_table(engine, args.table_name)
-        update_db_player_info(engine, args.table_name, half=args.half)
+        update_db_player_info(engine, table_name=args.table_name, half=args.half)
     else:
-        create_table(engine, PlayerInfo.__tablename__)
-        update_db_player_info(engine, PlayerInfo.__tablename__)
+        update_db_player_info(engine)
