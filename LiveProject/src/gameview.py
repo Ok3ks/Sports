@@ -1,14 +1,8 @@
 import json
 from typing import List
-import requests
 import pandas as pd
-import os
-from os.path import join, realpath
 
 from src.db.db import get_player_position_map, get_player_team_map, get_season_stats, get_teams_id, get_fixtures
-from src.urls import HISTORY_URL
-from paths import FPL_WRAP_DIR
-from src.utils import Participant, to_json
 
 def parse_fixture():
     """Parse Fixtures from DB."""

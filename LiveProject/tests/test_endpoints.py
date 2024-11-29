@@ -11,8 +11,7 @@ from LiveProject.src.urls import (
 
 import requests
 from LiveProject.src.utils import to_json
-from paths import MOCK_DIR
-
+from ...paths import MOCK_DIR
 
 def test_gameweek_endpoint(gw_fixture):
     # digit greater than 1 less than 38

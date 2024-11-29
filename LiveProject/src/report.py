@@ -1,11 +1,9 @@
-from paths import WEEKLY_REPORT_DIR, MOCK_DIR
 from functools import lru_cache
 import operator
 
 import pandas as pd
 import json
-
-from .utils import get_basic_stats, League, get_curr_event, to_json
+from .utils import get_basic_stats, League, to_json
 from .db.db import (
     get_player_stats_from_db,
     check_minutes,
@@ -428,9 +426,6 @@ class LeagueWeeklyReport(League):
 
         if display:
             print(output)
-            to_json(
-                output, f"{WEEKLY_REPORT_DIR}/{str(self.league_id)}_{str(self.gw)}.json"
-            )
 
         return output
 

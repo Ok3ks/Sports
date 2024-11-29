@@ -1,12 +1,7 @@
 import json
 import requests
 import pandas as pd
-from os.path import join, realpath
-
-from src.urls import HISTORY_URL
-from paths import FPL_WRAP_DIR
-
-from src.utils import Participant, to_json
+from src.utils import Participant
 from functools import lru_cache
 
 from src.utils import get_curr_event
@@ -135,7 +130,6 @@ class ParticipantReport(Participant):
 
         if display:
             print(output)
-            to_json(output, f"{FPL_WRAP_DIR}/{str(self.entry_id)}_{str(self.gw)}.json")
         else:
             return output
 

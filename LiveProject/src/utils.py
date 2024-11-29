@@ -10,7 +10,6 @@ import numpy as np
 from .urls import GW_URL, TRANSFER_URL, FPL_URL
 from .urls import LEAGUE_URL, FPL_PLAYER
 
-from paths import APP_DIR, MOCK_DIR
 from .db.db import get_player, get_player_team_code
 from .db.db import team_short_name_mapping, team_name_to_code
 from typing import List, Union
@@ -21,7 +20,7 @@ retries = Retry(
     total=3,
     backoff_factor=0.1,
     status_forcelist=[502, 503, 504],
-    allowed_methods={'GET',},
+    allowed_methods={'GET'},
 )
 r = s.mount("https://fantasy.premierleague.com/api/", HTTPAdapter(max_retries=retries))
 LOGGER = logging.getLogger(__name__)
