@@ -7,12 +7,12 @@ import json
 import numpy as np
 
 
-from src.urls import GW_URL, TRANSFER_URL, FPL_URL
-from src.urls import LEAGUE_URL, FPL_PLAYER
+from .urls import GW_URL, TRANSFER_URL, FPL_URL
+from .urls import LEAGUE_URL, FPL_PLAYER
 
-from src.paths import APP_DIR, MOCK_DIR
-from src.db.db import get_player,  get_player_fixture, get_player_team_code
-from src.db.db import team_short_name_mapping, team_name_to_code
+from paths import APP_DIR, MOCK_DIR
+from .db.db import get_player, get_player_team_code
+from .db.db import team_short_name_mapping, team_name_to_code
 from typing import List, Union
 import logging
 

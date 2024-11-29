@@ -1,5 +1,5 @@
 import pytest
-from src.paths import REPORT_DIR
+from ...paths import REPORT_DIR
 from os.path import realpath
 
 

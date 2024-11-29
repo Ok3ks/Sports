@@ -1,10 +1,9 @@
 #cache
 *cache
 (__pycache__/*)
-*.pyc
+**.pyc
 
-/*/*.pyc
-/*pycache/
+
 *auth.sh
 **-credential-**
 **.DS_Store

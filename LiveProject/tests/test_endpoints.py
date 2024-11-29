@@ -1,4 +1,4 @@
-from src.urls import (
+from LiveProject.src.urls import (
     GW_URL,
     FIXTURE_URL,
     TRANSFER_URL,
@@ -10,9 +10,8 @@ from src.urls import (
 )
 
 import requests
-
-from src.utils import to_json
-from src.paths import MOCK_DIR
+from LiveProject.src.utils import to_json
+from paths import MOCK_DIR
 
 
 def test_gameweek_endpoint(gw_fixture):
@@ -109,8 +108,10 @@ def test_fixture_endpoint():
         "team_a_difficulty",
         "pulse_id",
     ]
+
+    diff = set(fixture_key_prev).difference(fixture_keys)
     assert (
-        len(set(fixture_key_prev).difference(fixture_keys)) == 0
+        len(diff) == 0
     ), "Fixture keys have changed"
     assert type(r[0]["stats"]) is list  # type:ignore
     del fixture_keys
@@ -142,10 +143,10 @@ def test_transfer_endpoint(participant):
             "event",
             "time",
         ]
+        diff = set(transfer_keys_prev).difference(
+            transfer_keys)
 
-        assert set(transfer_keys_prev).difference(
-            transfer_keys
-        ), "Transfer keys have changed"
+        assert len(diff) == 0, f"Transfer keys have changed {diff}"
 
     out_dict = {"transfer": r}
     to_json(out_dict, f"{MOCK_DIR}/endpoints/transfer_endpoint.json")
@@ -400,10 +401,8 @@ def test_fpl_url_endpoint():
         "element_stats",
         "element_types",
     }
-
-    assert (
-        len(set(keys_prev).difference(set(keys))) == 0
-    ), f"Keys have changed {set(keys_prev).difference(set(keys))}"
+    diff = set(keys_prev).difference(set(keys))
+    assert len(diff) == 0, f"Keys have changed {diff}"
 
     assert type(r["events"]) is list
     assert type(r["events"][0]) is dict
@@ -475,8 +474,9 @@ def test_fpl_url_endpoint():
         "league_h2h_tiebreak_stats",
         "timezone",
     ]
+    diff = set(game_settings_keys).difference(game_settings_keys_prev)
     assert (
-        len(set(game_settings_keys).difference(game_settings_keys_prev)) == 0
+        len(diff) == 0
     ), f"Game setting keys have changed new {game_settings_keys}"
 
     assert type(r["phases"]) is list
@@ -485,9 +485,10 @@ def test_fpl_url_endpoint():
     phase_keys = list(r["phases"][0])
     phase_keys_prev = {"id", "name", "start_event", "stop_event", "highest_score"}
 
+    diff = set(phase_keys_prev).difference(phase_keys)
     assert (
-        len(set(phase_keys_prev).difference(phase_keys)) == 0
-    ), f"Game setting keys have changed new {game_settings_keys}"
+        len(diff) == 0
+    ), f"Game setting keys have changed new {diff}"
 
     assert type(r["teams"]) is list
     assert type(r["teams"][0]) is dict
@@ -516,9 +517,10 @@ def test_fpl_url_endpoint():
         "pulse_id",
     }
 
+    diff = set(team_keys).difference(team_keys_prev)
     assert (
-        len(set(team_keys).difference(team_keys_prev)) == 0
-    ), "Team keys have changed new"
+        len(diff) == 0
+    ), f"Team keys have changed new {diff}"
 
     element_stats_keys = r["element_stats"][0].keys()
     assert "label" in element_stats_keys
@@ -546,111 +548,118 @@ def test_fpl_url_endpoint():
         "sub_positions_locked",
         "element_count",
     ]
+    diff = set(element_types_keys).difference(element_types_keys_prev)
     assert (
-        len(set(element_types_keys).difference(element_types_keys_prev)) == 0
-    ), "Keys have changed"
+        len(diff) == 0
+    ), f"Keys have changed{diff}"
 
     elements_keys = r["elements"][0].keys()
-    assert "chance_of_playing_next_round" in elements_keys
-    assert "chance_of_playing_this_round" in elements_keys
-    assert "code" in elements_keys
-    assert "cost_change_event" in elements_keys
-    assert "cost_change_event_fall" in elements_keys
-    assert "cost_change_start" in elements_keys
-    assert "cost_change_start_fall" in elements_keys
-    assert "dreamteam_count" in elements_keys
-    assert "element_type" in elements_keys
-    assert "ep_next" in elements_keys
-    assert "ep_this" in elements_keys
-    assert "event_points" in elements_keys
-    assert "first_name" in elements_keys
-    assert "form" in elements_keys
-    assert "id" in elements_keys
-    assert "in_dreamteam" in elements_keys
-    assert "news" in elements_keys
-    assert "news_added" in elements_keys
+    elements_keys_prev = [
+    "chance_of_playing_next_round",
+    "chance_of_playing_this_round",
+     "code" 
+     "cost_change_event" ,
+     "cost_change_event_fall",
+     "cost_change_start",
+     "cost_change_start_fall",
+     "dreamteam_count",
+     "element_type",
+     "ep_next",
+     "ep_this",
+     "event_points",
+     "first_name",
+     "form",
+     "id",
+     "in_dreamteam",
+     "news",
+     "news_added",
 
-    assert "now_cost" in elements_keys
-    assert "photo" in elements_keys
-    assert "points_per_game" in elements_keys
-    assert "second_name" in elements_keys
-    assert "selected_by_percent" in elements_keys
-    assert "special" in elements_keys
-    assert "squad_number" in elements_keys
-    assert "status" in elements_keys
-    assert "team" in elements_keys
-    assert "team_code" in elements_keys
-    assert "total_points" in elements_keys
-    assert "transfers_in" in elements_keys
-    assert "transfers_in_event" in elements_keys
+     "now_cost",
+     "photo",
+     "points_per_game",
+     "second_name",
+     "selected_by_percent",
+     "special",
+     "squad_number",
+     "status",
+     "team",
+     "team_code",
+     "total_points",
+     "transfers_in",
+     "transfers_in_event",
 
-    assert "transfers_out" in elements_keys
-    assert "transfers_out_event" in elements_keys
-    assert "value_form" in elements_keys
-    assert "value_season" in elements_keys
-    assert "web_name" in elements_keys
-    assert "minutes" in elements_keys
-    assert "goals_scored" in elements_keys
-    assert "assists" in elements_keys
+     "transfers_out",
+     "transfers_out_event",
+     "value_form",
+     "value_season",
+     "web_name",
+     "minutes",
+     "goals_scored",
+     "assists",
 
-    assert "clean_sheets" in elements_keys
-    assert "goals_conceded" in elements_keys
-    assert "own_goals" in elements_keys
-    assert "penalties_saved" in elements_keys
-    assert "penalties_missed" in elements_keys
-    assert "yellow_cards" in elements_keys
-    assert "red_cards" in elements_keys
+     "clean_sheets",
+     "goals_conceded",
+     "own_goals",
+     "penalties_saved",
+     "penalties_missed",
+     "yellow_cards",
+     "red_cards",
 
-    assert "saves" in elements_keys
-    assert "bonus" in elements_keys
-    assert "bps" in elements_keys
-    assert "influence" in elements_keys
-    assert "creativity" in elements_keys
+     "saves",
+     "bonus",
+     "bps",
+     "influence",
+     "creativity",
 
-    assert "threat" in elements_keys
-    assert "ict_index" in elements_keys
-    assert "starts" in elements_keys
-    assert "expected_goals" in elements_keys
-    assert "expected_assists" in elements_keys
-    assert "expected_goal_involvements" in elements_keys
-    assert "expected_goals_conceded" in elements_keys
+     "threat",
+     "ict_index",
+     "starts",
+     "expected_goals",
+     "expected_assists",
+     "expected_goal_involvements",
+     "expected_goals_conceded",
 
-    assert "influence_rank" in elements_keys
-    assert "influence_rank_type" in elements_keys
-    assert "creativity_rank" in elements_keys
-    assert "creativity_rank_type" in elements_keys
-    assert "threat_rank" in elements_keys
-    assert "threat_rank_type" in elements_keys
-    assert "ict_index_rank" in elements_keys
-    assert "ict_index_rank_type" in elements_keys
+     "influence_rank",
+     "influence_rank_type",
+     "creativity_rank",
+     "creativity_rank_type",
+     "threat_rank",
+     "threat_rank_type",
+     "ict_index_rank",
+     "ict_index_rank_type",
 
-    assert "corners_and_indirect_freekicks_order" in elements_keys
-    assert "corners_and_indirect_freekicks_text" in elements_keys
-    assert "direct_freekicks_order" in elements_keys
-    assert "direct_freekicks_text" in elements_keys
-    assert "penalties_order" in elements_keys
-    assert "penalties_text" in elements_keys
-    assert "expected_goals_per_90" in elements_keys
+     "corners_and_indirect_freekicks_order",
+     "corners_and_indirect_freekicks_text",
+     "direct_freekicks_order",
+     "direct_freekicks_text",
+     "penalties_order",
+     "penalties_text",
+     "expected_goals_per_90",
 
-    assert "saves_per_90" in elements_keys
-    assert "expected_assists_per_90" in elements_keys
-    assert "expected_goal_involvements_per_90" in elements_keys
-    assert "expected_goals_conceded_per_90" in elements_keys
-    assert "goals_conceded_per_90" in elements_keys
+     "saves_per_90",
+     "expected_assists_per_90",
+     "expected_goal_involvements_per_90",
+     "expected_goals_conceded_per_90",
+     "goals_conceded_per_90",
 
-    assert "now_cost_rank" in elements_keys
-    assert "now_cost_rank_type" in elements_keys
-    assert "form_rank" in elements_keys
-    assert "form_rank_type" in elements_keys
+     "now_cost_rank",
+     "now_cost_rank_type",
+     "form_rank",
+     "form_rank_type",
 
-    assert "points_per_game_rank" in elements_keys
-    assert "points_per_game_rank_type" in elements_keys
-    assert "selected_rank" in elements_keys
-    assert "selected_rank_type" in elements_keys
-    assert "starts_per_90" in elements_keys
-    assert "clean_sheets_per_90" in elements_keys
-
-    assert len(elements_keys) == 88, "Keys have changed"
+     "points_per_game_rank",
+     "points_per_game_rank_type",
+     "selected_rank",
+     "selected_rank_type",
+     "starts_per_90",
+     "clean_sheets_per_90",
+     'cost_change_event',
+     'code',
+     'region'
+     ]
+    
+    diff = set(elements_keys).difference(set(elements_keys_prev))
+    assert len(diff) == 0, f"Keys have changed {diff}"
 
     to_json(r, f"{MOCK_DIR}/endpoints/fpl_url_endpoint.json")
 

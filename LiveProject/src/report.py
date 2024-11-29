@@ -1,12 +1,12 @@
-from src.paths import WEEKLY_REPORT_DIR, MOCK_DIR
+from paths import WEEKLY_REPORT_DIR, MOCK_DIR
 from functools import lru_cache
 import operator
 
 import pandas as pd
 import json
 
-from src.utils import get_basic_stats, League, to_json
-from src.db.db import (
+from .utils import get_basic_stats, League, to_json
+from .db.db import (
     get_player_stats_from_db,
     check_minutes,
     create_cache_engine,
