@@ -21,7 +21,7 @@ retries = Retry(
     total=3,
     backoff_factor=0.1,
     status_forcelist=[502, 503, 504],
-    allowed_methods={'GET', 'POST'},
+    allowed_methods={'GET',},
 )
 r = s.mount("https://fantasy.premierleague.com/api/", HTTPAdapter(max_retries=retries))
 LOGGER = logging.getLogger(__name__)
@@ -397,20 +397,6 @@ class Participant:
         else:
             raise GameweekError
 
-# class Teams:
-
-
-class Player:
-    def __init__(self, player_id, half):
-        self.player_id = player_id
-        self.half = half
-
-    def get_fixures(self):
-        team_code = get_player_team_code(self.player_id, self.half)[0]
-        obj = get_player_fixture(team_code, gameweek=5)
-        return obj
-
-
 class League:
     def __init__(self, league_id):
         self.league_id = league_id
@@ -438,7 +424,7 @@ class League:
                 self.participants.extend(obj["standings"]["results"])
                 has_next = obj["standings"]["has_next"]
                 PAGE_COUNT += 1
-                print(
+                LOGGER.info(
                     "All participants on page {} have been extracted".format(PAGE_COUNT)
                 )
 
