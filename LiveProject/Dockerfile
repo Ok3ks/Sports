@@ -47,9 +47,6 @@ COPY src/ ./src/
 COPY LiveProject/ ./LiveProject/
 COPY report_app ./report_app/
 
-# RUN ["/bin/bash", "init_env.sh"]
-# RUN ["/bin/bash", "auth.sh"]
-# WORKDIR /sports/app/LiveProject
 
 # ENV GOOGLE_ENTRYPOINT="/venv/bin/gunicorn --bind=8000 LiveProject.wsgi:application"
 

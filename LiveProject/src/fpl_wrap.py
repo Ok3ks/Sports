@@ -6,7 +6,7 @@ from functools import lru_cache
 
 from src.utils import get_curr_event
 from src.db.db import (
-    create_cache_engine,
+    # create_cache_engine,
     get_ind_player_stats_from_db,
 )
 
@@ -121,12 +121,12 @@ class ParticipantReport(Participant):
 
     def create_report(self, display=False):
         output = self.o_df.to_dict("list")
-        r = create_cache_engine()  # save to cache
-        r.set(
-            name=f"participant_{self.entry_id}_{self.gw}", 
-            value=json.dumps(output),
-            ex=300
-            )
+        # r = create_cache_engine()  # save to cache
+        # r.set(
+        #     name=f"participant_{self.entry_id}_{self.gw}", 
+        #     value=json.dumps(output),
+        #     ex=300
+        #     )
 
         if display:
             print(output)

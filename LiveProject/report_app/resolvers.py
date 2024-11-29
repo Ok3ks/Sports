@@ -56,20 +56,20 @@ def resolve_participant(*_, entry_id, gameweek=None):
     if not gameweek:
         gameweek = get_curr_event()[0]
 
-    r = create_cache_engine()
-    output = r.get(f"participant_{entry_id}_{gameweek}")  # Cu
+    # r = create_cache_engine()
+    # output = r.get(f"participant_{entry_id}_{gameweek}")  # Cu
 
-    if output:
-        print("Obtained from cache")
-        return json.loads(output)
-    else:
-        participant = ParticipantReport(gw=gameweek, entry_id=entry_id)
-        participant.weekly_score_transformation()
-        participant.merge_league_weekly_transfer()
-        participant.add_auto_sub()
+    # if output:
+    #     print("Obtained from cache")
+    #     return json.loads(output)
+    # else:
+    participant = ParticipantReport(gw=gameweek, entry_id=entry_id)
+    participant.weekly_score_transformation()
+    participant.merge_league_weekly_transfer()
+    participant.add_auto_sub()
 
-        output = participant.create_report(display=False)
-        return output
+    output = participant.create_report(display=False)
+    return output
 
 
 @query.field("leagueWeeklyReport")
@@ -77,22 +77,22 @@ def resolve_league_gameweek_report(*_, league_id, gameweek):
     """Retrieve a Player's gameweek score based on player_id"""
 
     # check cache
-    r = create_cache_engine()
-    output = r.get(f"{league_id}_{gameweek}")  # Currently loading it all into memory
+    # r = create_cache_engine()
+    # output = r.get(f"{league_id}_{gameweek}")  # Currently loading it all into memory
 
-    if output:
-        print("Obtained from cache")
-        return json.loads(output)
-    else:
-        report = LeagueWeeklyReport(gameweek, league_id)
-        report.get_data()
-        report.weekly_score_transformation()
-        report.merge_league_weekly_transfer()
-        report.add_auto_sub()
-        report.captain_minutes()
-        output = report.create_report(display=False)  # replace this with caching?
-        print("Recomputed")
-        return output
+    # if output:
+    #     print("Obtained from cache")
+    #     return json.loads(output)
+    # else:
+    report = LeagueWeeklyReport(gameweek, league_id)
+    report.get_data()
+    report.weekly_score_transformation()
+    report.merge_league_weekly_transfer()
+    report.add_auto_sub()
+    report.captain_minutes()
+    output = report.create_report(display=False)  # replace this with caching?
+    print("Recomputed")
+    return output
 
 
 # Combine the defined schema and resolvers
