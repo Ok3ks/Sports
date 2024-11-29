@@ -83,15 +83,27 @@ def parse_stats():
 
 
 #ToDo : add kwargs to function to customise groupbys
-def groupby(groups: List[str] = ["gameweek", "position"]):
+def groupby(groups: set[str] = {"gameweek", "position"}):
     """Calculate aggregates groupby."""
+    all_groups = {"gameweek", "position", "team"}
     stats = parse_stats()
-    obj = stats.groupby(groups).aggregate({
+    obj = stats.groupby(list(groups)).aggregate({
         "goals_scored": "sum",
         "total_points": ["sum"],
         "assists": "sum",
     })
-    return obj.to_dict('list')
+    ref = obj.reset_index().to_dict('list')
+    out = {}
+    for key, value in ref.items():
+        if key[1] != '':
+            value.append(key[1])
+        out.update({key[0]: [str(v) for v in value]})  # casting to string for graphql compatibility, not mixing types
+    del ref
+    last_key = list(all_groups.difference(groups))[0]
+    out.update({last_key: [""]})
+    print(out)
+    return [out]
+
 
 # def fixture_plots(fixture_df):
     # """ """
@@ -101,4 +113,4 @@ def groupby(groups: List[str] = ["gameweek", "position"]):
 
 
 if __name__ == "__main__":
-    groupby()
+    print(groupby())

@@ -9,6 +9,7 @@ type Query {
   allGameweekScore: [PlayerGameweekScore!]!
   leagueWeeklyReport(leagueId: Int!, gameweek:Int!): LeagueWeeklyReport!
   participantReport(entryId:Int!, gameweek:Int): ParticipantReport!
+  gameViewReport(useGameweek:Boolean!, usePosition:Boolean!, useTeam:Boolean!): GameViewReport!
 }
 
 type Player {
@@ -73,6 +74,14 @@ type ParticipantReport{
   rank: [Int]
 }
 
+type GameViewReport {
+  gameweek: [String]
+  position: [String]
+  team: [String]
+  goalsScored: [String]
+  totalPoints: [String]
+  assists: [String]
+}
 
 type LeagueWeeklyReport {
   captain: [CaptainStat!]!
