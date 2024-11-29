@@ -5,7 +5,7 @@ import operator
 import pandas as pd
 import json
 
-from .utils import get_basic_stats, League, to_json
+from .utils import get_basic_stats, League, get_curr_event, to_json
 from .db.db import (
     get_player_stats_from_db,
     check_minutes,
@@ -183,26 +183,6 @@ class LeagueWeeklyReport(League):
                 temp["participant_name"] = participant_name
                 fall.append(temp)
             return {"rise": rise, "fall": fall}
-
-        # @profile
-        # def promoted_vice():
-        #     self.o_df["promoted_vice"] = self.o_df["cap_minutes"].map(lambda x: True if x == 0 else False)
-        #     promoted_vice = (
-        #         self.o_df[self.o_df["promoted_vice"] == True]
-        #         .sort_values(by="vice_captain_points", ascending=False)
-        #         .reset_index(drop=True)
-        #         .iloc[:3, :]
-        #     )
-
-        #     return [
-        #         {
-        #             'promoted_vice_points': i.vice_captain_points * 2,
-        #             'participants_name': self.participants_name[str(i.entry_id)],
-        #             'captain_name': i.captain,
-        #             'vice_captain_name': i.vice_captain,
-        #         }
-        #         for i in promoted_vice.itertuples()
-        #     ]
 
         @profile
         def outliers():
@@ -440,7 +420,11 @@ class LeagueWeeklyReport(League):
 
         # Save to redis
         r = create_cache_engine()  # save to cache
-        r.set(f"league_{self.league_id}_{self.gw}", json.dumps(output))
+
+        r.set(name=f"league_{self.league_id}_{self.gw}", 
+              value=json.dumps(output),
+              ex=300
+              )
 
         if display:
             print(output)

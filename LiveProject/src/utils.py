@@ -413,12 +413,12 @@ class League:
             PAGE_COUNT = 1
             while has_next:
                 r = s.get(LEAGUE_URL.format(self.league_id, PAGE_COUNT))
+                assert r.status_code == 200, "error connecting to the endpoint"
                 obj = r.json()
                 LOGGER.info(r.status_code)
                 LOGGER.info(r.headers)
-                assert r.status_code == 200, "error connecting to the endpoint"
                 del r
-
+                
                 self.league_name = obj["league"]["name"]
 
                 self.participants.extend(obj["standings"]["results"])

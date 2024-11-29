@@ -197,7 +197,11 @@ class ParticipantReport(Participant):
     def create_report(self, display=False):
         output = self.o_df.to_dict("list")
         r = create_cache_engine()  # save to cache
-        r.set(f"participant_{self.entry_id}_{self.gw}", json.dumps(output))
+        r.set(
+            name=f"participant_{self.entry_id}_{self.gw}", 
+            value=json.dumps(output),
+            ex=300
+            )
 
         if display:
             print(output)
