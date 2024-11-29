@@ -125,75 +125,7 @@ class ParticipantReport(Participant):
             )
             for event in range(1, self.gw + 1)
         ]
-
-    def plots_1(self):
-        self.f["captain"] = self.f["captain"].map(lambda x: get_player(x))
-        captain_bar_chart = (
-            so.Plot(self.f, x="captain")
-            .add(so.Bars(), so.Count())
-            .scale(y=so.Continuous().tick(every=1))
-            .label(y="Count")
-        )
-
-        os.makedirs(realpath(join(FPL_WRAP_DIR, str(args.player_id))), exist_ok=True)
-        captain_bar_chart.save(
-            realpath(join(FPL_WRAP_DIR, str(args.player_id), "captain_bar_chart.png"))
-        )
-
-        points_on_bench = (
-            so.Plot(self.f, y="points_on_bench", x="gw")
-            .add(so.Lines())
-            .add(so.Dots(color="C2"))
-            .scale(y=so.Continuous().tick(every=2), x=so.Continuous().tick(every=1))
-        )
-
-        points_on_bench.save(
-            realpath(join(FPL_WRAP_DIR, str(args.player_id), "points_on_bench.png"))
-        )
-
-    def plots_2(self):
-        r = requests.get(HISTORY_URL.format(self.entry_id))
-        r = r.json()
-
-        history = r["current"]
-        history = pd.DataFrame(history)
-        history["value"] = history["value"] / 10
-        history["bank"] = history["bank"] / 10
-
-        history.rename(columns={"event": "gameweek"}, inplace=True)
-        history.set_index("gameweek", inplace=True)
-
-        line_plot = (
-            so.Plot(history, x="gameweek", y="points")
-            .add(so.Lines(color="C1"))
-            .add(so.Dots(color="C2"), so.Agg("min"))
-            .add(so.Dots(color="C2"), so.Agg("max"))
-            .scale(
-                x=so.Continuous().tick(every=1),
-                color=so.Continuous().tick(at=history.index),
-            )
-        )
-        line_plot.save(
-            realpath(join(FPL_WRAP_DIR, str(self.entry_id), "line_plot.png"))
-        )
-
-        rank_plot = (
-            so.Plot(history, x="gameweek", y="overall_rank")
-            .add(so.Lines(color="C1"))
-            .scale(
-                x=so.Continuous().tick(every=1),
-                y=so.Continuous().label(like="{x:,}"),
-                color=so.Continuous().tick(at=history.index),
-            )
-            .limit(y=(2_000_000, 0))
-            .label(
-                title="Overall rank versus gameweek",
-            )
-        )
-        rank_plot.save(
-            realpath(join(FPL_WRAP_DIR, str(self.entry_id), "rank_plot.png"))
-        )
-
+        
     def create_report(self, display=False):
         output = self.o_df.to_dict("list")
         r = create_cache_engine()  # save to cache
