@@ -3,11 +3,11 @@ import operator
 
 import pandas as pd
 import json
-from .utils import get_basic_stats, League, to_json
+from .utils import get_basic_stats, League
 from .db.db import (
     get_player_stats_from_db,
     check_minutes,
-    create_cache_engine,
+    # create_cache_engine,
 )
 import math
 
@@ -417,12 +417,12 @@ class LeagueWeeklyReport(League):
         output.update(get_league_name())
 
         # Save to redis
-        r = create_cache_engine()  # save to cache
+        # r = create_cache_engine()  # save to cache
 
-        r.set(name=f"league_{self.league_id}_{self.gw}", 
-              value=json.dumps(output),
-              ex=300
-              )
+        # r.set(name=f"league_{self.league_id}_{self.gw}", 
+        #       value=json.dumps(output),
+        #       ex=300
+        #       )
 
         if display:
             print(output)
@@ -456,14 +456,6 @@ if __name__ == "__main__":
 
     if args.dry_run:
         test = LeagueWeeklyReport(args.gameweek_id, args.league_id)
-        with open(f"{MOCK_DIR}/leagues/weekly_score_transformation.json", "r") as ins:
-            test.o_df = json.load(ins)
-
-        with open(f"{MOCK_DIR}/leagues/add_auto_sub.json", "r") as ins:
-            test.f = json.load(ins)
-
-        with open(f"{MOCK_DIR}/leagues/participants.json", "r") as ins:
-            test.participants = json.load(ins)
 
         test.o_df = pd.DataFrame(test.o_df)
         test.f = pd.DataFrame(test.f)
@@ -473,10 +465,6 @@ if __name__ == "__main__":
     else:
         test = LeagueWeeklyReport(args.gameweek_id, args.league_id)
         test.get_data()
-        # test.get_all_participant_entries(args.gameweek_id, thread = args.thread)
-        # print(test.get_all_participant_entries(args.gameweek_id))
-        # print(test.res)
-
         test.weekly_score_transformation()
         test.merge_league_weekly_transfer()
         test.add_auto_sub()

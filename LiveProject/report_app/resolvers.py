@@ -69,8 +69,8 @@ def resolve_participant(*_, entry_id, gameweek=None):
         participant.add_auto_sub()
         participant.prep_for_gql()
 
-        output = participant.create_report(display=False)
-        return output
+    output = participant.create_report(display=False)
+    return output
 
 
 @query.field("leagueWeeklyReport")
@@ -78,22 +78,22 @@ def resolve_league_gameweek_report(*_, league_id, gameweek):
     """Retrieve a Player's gameweek score based on player_id"""
 
     # check cache
-    r = create_cache_engine()
-    output = r.get(f"{league_id}_{gameweek}")  # Currently loading it all into memory
+    # r = create_cache_engine()
+    # output = r.get(f"{league_id}_{gameweek}")  # Currently loading it all into memory
 
-    if output:
-        print("Obtained from cache")
-        return json.loads(output)
-    else:
-        report = LeagueWeeklyReport(gameweek, league_id)
-        report.get_data()
-        report.weekly_score_transformation()
-        report.merge_league_weekly_transfer()
-        report.add_auto_sub()
-        report.captain_minutes()
-        output = report.create_report(display=False)  # replace this with caching?
-        print("Recomputed")
-        return output
+    # if output:
+    #     print("Obtained from cache")
+    #     return json.loads(output)
+    # else:
+    report = LeagueWeeklyReport(gameweek, league_id)
+    report.get_data()
+    report.weekly_score_transformation()
+    report.merge_league_weekly_transfer()
+    report.add_auto_sub()
+    report.captain_minutes()
+    output = report.create_report(display=False)  # replace this with caching?
+    print("Recomputed")
+    return output
 
 
 # Combine the defined schema and resolvers
