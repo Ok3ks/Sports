@@ -56,7 +56,7 @@ type PlayerInfo {
 }
 
 type ParticipantReport{
- autoSubIn: [String]
+  autoSubIn: [String]
   autoSubOut: [String]
   gw: [Int]
   entryId: [Int]
@@ -66,8 +66,8 @@ type ParticipantReport{
   eventTransfersCost: [Int]
   players: [String]
   bench: [String]  
-  viceCaptain: [Int]
-  captain: [Int]
+  viceCaptain: [Player]
+  captain: [Player]
   pointsBreakdown: [[Int]]
   captainPoints: [Int]
   viceCaptainPoints: [Int]

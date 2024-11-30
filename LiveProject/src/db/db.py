@@ -207,19 +207,16 @@ session = sessionmaker(create_connection_engine())
 
 
 def get_player_gql(id, gameweek, session=session):
-    out = []
     half = 1 if gameweek < 19 else 2
     with session() as session:
-        if isinstance(id, list):
-            for item in id:
-                stmt = select(PlayerInfo).where(PlayerInfo.player_id == int(item))
-                player_info = session.scalars(stmt).all()
-                out.append(player_info[0])
-            return out
-        else:
+        try:
+            id = int(id)
+        except Exception:
+            pass
+        finally:
             stmt = (
                 select(PlayerInfo)
-                .where(PlayerInfo.player_id == int(id))
+                .where(PlayerInfo.player_id == id)
                 .where(PlayerInfo.half == int(half))
             )
             player_info = session.scalars(stmt).all()[0].__dict__
@@ -425,6 +422,13 @@ def get_teams(session=sessionmaker(create_connection_engine())):
         obj = session.execute(statement).all()
         return obj
 
+def get_player_info(player_id, half,
+                         session=sessionmaker(create_connection_engine())):
+    with session() as session:
+        statement = select(PlayerInfo).where(
+            PlayerInfo.player_id == player_id).where(PlayerInfo.half == half)
+        obj = session.execute(statement).one()
+        return obj
 
 def get_player_team_code(player_id, half,
                          session=sessionmaker(create_connection_engine())):

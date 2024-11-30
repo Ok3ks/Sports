@@ -57,7 +57,7 @@ def resolve_participant(*_, entry_id, gameweek=None):
         gameweek = get_curr_event()[0]
 
     r = create_cache_engine()
-    output = r.get(f"participant_{entry_id}_{gameweek}")  # Cu
+    output = r.get(f"participant_{entry_id}")  # Cu
 
     if output:
         print("Obtained from cache")
@@ -67,6 +67,7 @@ def resolve_participant(*_, entry_id, gameweek=None):
         participant.weekly_score_transformation()
         participant.merge_league_weekly_transfer()
         participant.add_auto_sub()
+        participant.prep_for_gql()
 
         output = participant.create_report(display=False)
         return output
