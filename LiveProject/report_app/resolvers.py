@@ -17,7 +17,6 @@ from src.report import LeagueWeeklyReport
 from src.utils import get_curr_event
 
 # from .shortcuts import get_object_or_none
-from src.db.db import create_cache_engine
 import json
 
 query = QueryType()
@@ -56,7 +55,7 @@ def resolve_participant(*_, entry_id, gameweek=None):
     if not gameweek:
         gameweek = get_curr_event()[0]
 
-    r = create_cache_engine()
+    # r = create_cache_engine()
     # output = r.get(f"participant_{entry_id}")  # Currently loading it all into memory
     output = None
     if output:

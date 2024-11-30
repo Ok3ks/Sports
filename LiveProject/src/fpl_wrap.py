@@ -8,7 +8,6 @@ from src.utils import get_curr_event
 from src.db.db import (
     get_player_gql,
     session,
-    create_cache_engine,
     get_ind_player_stats_from_db,
 )
 
@@ -140,12 +139,12 @@ class ParticipantReport(Participant):
 
     def create_report(self, display=False):
         # output = self.output.to_dict("list")
-        r = create_cache_engine()  # save to cache
-        r.set(
-            name=f"participant_{self.entry_id}",
-            value=json.dumps(self.output),
-            nx=600
-            )
+        # r = create_cache_engine()  # save to cache
+        # r.set(
+        #     name=f"participant_{self.entry_id}",
+        #     value=json.dumps(self.output),
+        #     nx=600
+        #     )
 
         if display:
             print(self.output)
