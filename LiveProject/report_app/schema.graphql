@@ -66,12 +66,16 @@ type ParticipantReport{
   eventTransfersCost: [Int]
   players: [String]
   bench: [String]  
+
   viceCaptain: [Player]
   captain: [Player]
+  highestScoringPlayer: [Player]
+
   pointsBreakdown: [[Int]]
   captainPoints: [Int]
   viceCaptainPoints: [Int]
-  rank: [Int]
+  highestScoringPlayerPoints: [Int]
+
 }
 
 type GameViewReport {

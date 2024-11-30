@@ -57,8 +57,8 @@ def resolve_participant(*_, entry_id, gameweek=None):
         gameweek = get_curr_event()[0]
 
     r = create_cache_engine()
-    output = r.get(f"participant_{entry_id}")  # Cu
-
+    # output = r.get(f"participant_{entry_id}")  # Currently loading it all into memory
+    output = None
     if output:
         print("Obtained from cache")
         return json.loads(output)
