@@ -1,12 +1,13 @@
 import json
-import requests
 import pandas as pd
 from src.utils import Participant
 from functools import lru_cache
+import numpy as np
 
 from src.utils import get_curr_event
 from src.db.db import (
-    # create_cache_engine,
+    get_player_gql,
+    session,
     get_ind_player_stats_from_db,
 )
 
@@ -33,8 +34,18 @@ class ParticipantReport(Participant):
             ]
             for event in range(1, self.gw + 1)
         ]
+
+        self.o_df['highest_scoring_player'] = self.o_df['points_breakdown'].apply(np.argmax)
+        self.o_df['highest_scoring_player'] = [
+            i.players.split(',')[i.highest_scoring_player]
+            for i in self.o_df.itertuples()
+            ]
+        self.o_df['highest_scoring_player_points'] = self.o_df[
+            'points_breakdown'].apply(max)
+
         self.o_df["captain_points"] = [
-            get_ind_player_stats_from_db(self.o_df["captain"][event - 1], event)[0] * 2
+            get_ind_player_stats_from_db(
+                self.o_df["captain"][event - 1], event)[0] * 2
             for event in range(1, self.gw + 1)
         ]
         self.o_df["vice_captain_points"] = [
@@ -42,10 +53,8 @@ class ParticipantReport(Participant):
             for event in range(1, self.gw + 1)
         ]
 
-        self.o_df["rank"] = self.o_df["total_points"].rank(ascending=False)
-        self.o_df.rename(columns={"entry": "entry_id"}, inplace=True)
-        self.o_df["rank"] = self.o_df["rank"].map(int)
         print(self.o_df)
+        self.o_df.rename(columns={"entry": "entry_id"}, inplace=True)
         return self.o_df
 
     @lru_cache
@@ -91,8 +100,6 @@ class ParticipantReport(Participant):
         self.f.reset_index(inplace=True, names="gw")
         self.f.drop(inplace=True, axis=1, labels="entry_id")
         self.f = self.o_df.merge(self.f, on="gw", how="right")
-        print(self.f)
-        print(self.f.columns)
         return self.f
 
     def add_auto_sub(self):
@@ -119,19 +126,30 @@ class ParticipantReport(Participant):
             for event in range(1, self.gw + 1)
         ]
 
+    def prep_for_gql(self):
+        self.output = self.o_df.to_dict("list")
+        for key, value in self.output.items():
+            if key in ['captain', 'vice_captain', 'highest_scoring_player']:
+                self.output[key] = [
+                    get_player_gql(
+                        id=player_id,
+                        gameweek=gameweek+1,
+                        session=session)
+                    for gameweek, player_id in enumerate(value)]
+
     def create_report(self, display=False):
-        output = self.o_df.to_dict("list")
+        # output = self.output.to_dict("list")
         # r = create_cache_engine()  # save to cache
         # r.set(
-        #     name=f"participant_{self.entry_id}_{self.gw}", 
-        #     value=json.dumps(output),
-        #     ex=300
+        #     name=f"participant_{self.entry_id}",
+        #     value=json.dumps(self.output),
+        #     nx=600
         #     )
 
         if display:
-            print(output)
+            print(self.output)
         else:
-            return output
+            return self.output
 
 
 if __name__ == "__main__":

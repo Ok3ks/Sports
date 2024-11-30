@@ -17,7 +17,6 @@ from src.report import LeagueWeeklyReport
 from src.utils import get_curr_event
 
 # from .shortcuts import get_object_or_none
-from src.db.db import create_cache_engine
 import json
 
 query = QueryType()
@@ -57,16 +56,17 @@ def resolve_participant(*_, entry_id, gameweek=None):
         gameweek = get_curr_event()[0]
 
     # r = create_cache_engine()
-    # output = r.get(f"participant_{entry_id}_{gameweek}")  # Cu
-
-    # if output:
-    #     print("Obtained from cache")
-    #     return json.loads(output)
-    # else:
-    participant = ParticipantReport(gw=gameweek, entry_id=entry_id)
-    participant.weekly_score_transformation()
-    participant.merge_league_weekly_transfer()
-    participant.add_auto_sub()
+    # output = r.get(f"participant_{entry_id}")  # Currently loading it all into memory
+    output = None
+    if output:
+        print("Obtained from cache")
+        return json.loads(output)
+    else:
+        participant = ParticipantReport(gw=gameweek, entry_id=entry_id)
+        participant.weekly_score_transformation()
+        participant.merge_league_weekly_transfer()
+        participant.add_auto_sub()
+        participant.prep_for_gql()
 
     output = participant.create_report(display=False)
     return output
