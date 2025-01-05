@@ -1,16 +1,6 @@
-from src.db.db import create_connection_engine, PlayerInfo
+from src.db.db import create_connection_engine
 import requests
 from src.urls import FPL_URL
-
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import text
-from pymysql import Error
-
-from sqlalchemy import Integer, String
-
-from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy.orm import DeclarativeBase
-
 import pandas as pd
 
 
@@ -20,14 +10,13 @@ def update_db_player_info(engine, table_name="EPL_2024_PLAYER_INFO", half=1):
 
     home = requests.get(FPL_URL)
     home = home.json()
-
+    
     team_code_to_name = {item["code"]: item["name"] for item in home["teams"]}
     pos_code_to_pos = {
         item["id"]: item["singular_name"] for item in home["element_types"]
     }
 
     team_code_to_id = {item["code"]: item["id"] for item in home["teams"]}
-
     data = (
         (
             item["id"],
@@ -58,7 +47,7 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "-t", "--table_name", type=str, help="Table name", required=False
+        "-t", "--table_name", type=str, help="Table name", required=True
     )
     parser.add_argument(
         "-db", "--db_name", type=str, help="Database name", required=True
@@ -75,7 +64,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     engine = create_connection_engine()
 
-    if args.table_name:
-        update_db_player_info(engine, table_name=args.table_name, half=args.half)
-    else:
-        update_db_player_info(engine)
+    update_db_player_info(engine, table_name=args.table_name, half=args.half)

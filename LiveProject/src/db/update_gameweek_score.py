@@ -7,6 +7,8 @@ from sqlalchemy.orm import DeclarativeBase
 
 import requests
 from src.urls import GW_URL
+import logging
+LOGGER = logging.getLogger(__name__)
 
 
 class Base(DeclarativeBase):
@@ -90,13 +92,12 @@ def update_db_gameweek_score(conn, gw):
         print(delete_gameweek_scores(gw, 
                                      table_name=PlayerGameweekScores.__tablename__))
         df.to_sql("Player_gameweek_score", conn, if_exists="append", method="multi")
-        print("Data insert successful")
+        LOGGER.info("Data insert successful")
 
     else:
-        # Combining all gameweeks into one database, 
-        # which is why I am appending files
+        # Combining all gameweeks into one database table, 
         df.to_sql("Player_gameweek_score", conn, if_exists="append", method="multi")
-        print("Data insert successful")
+        LOGGER.info("Data insert successful")
 
 
 if __name__ == "__main__":
@@ -118,4 +119,4 @@ if __name__ == "__main__":
     try:
         update_db_gameweek_score(connection, args.gameweek_id)
     except ValueError:
-        print("Gameweek is unavailable")
+        LOGGER.info("Gameweek is unavailable")

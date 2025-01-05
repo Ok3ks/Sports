@@ -6,6 +6,8 @@ import pandas as pd
 import json
 import numpy as np
 
+from paths import MOCK_DIR
+
 
 from .urls import GW_URL, TRANSFER_URL, FPL_URL
 from .urls import LEAGUE_URL, FPL_PLAYER
@@ -14,6 +16,7 @@ from .db.db import get_player, get_player_team_code
 from .db.db import team_short_name_mapping, team_name_to_code
 from typing import List, Union
 import logging
+LOGGER = logging.getLogger(__name__)
 
 s = requests.Session()
 retries = Retry(
@@ -23,7 +26,7 @@ retries = Retry(
     allowed_methods={'GET'},
 )
 r = s.mount("https://fantasy.premierleague.com/api/", HTTPAdapter(max_retries=retries))
-LOGGER = logging.getLogger(__name__)
+
 
 
 def to_json(x: dict, fp):
@@ -402,16 +405,17 @@ class League:
         self.participants = []
         self.res = None
         self.league_name = ""
+        self.has_next = True
+        self.PAGE_COUNT = 1
 
     def obtain_league_participants(self, refresh=False):
         """This function uses the league url as an endpoint to query for participants of a league at a certain date.
         Should be used to update participants table in DB"""
 
         if refresh or len(self.participants) == 0:
-            has_next = True
-            PAGE_COUNT = 1
-            while has_next:
-                r = s.get(LEAGUE_URL.format(self.league_id, PAGE_COUNT))
+            self.has_next = True
+            while self.has_next:
+                r = wget(LEAGUE_URL.format(self.league_id, self.PAGE_COUNT))
                 assert r.status_code == 200, "error connecting to the endpoint"
                 obj = r.json()
                 LOGGER.info(r.status_code)
@@ -421,10 +425,10 @@ class League:
                 self.league_name = obj["league"]["name"]
 
                 self.participants.extend(obj["standings"]["results"])
-                has_next = obj["standings"]["has_next"]
-                PAGE_COUNT += 1
+                self.has_next = obj["standings"]["has_next"]
+                self.PAGE_COUNT += 1
                 LOGGER.info(
-                    "All participants on page {} have been extracted".format(PAGE_COUNT)
+                    "All participants on page {} have been extracted".format(self.PAGE_COUNT)
                 )
 
                 self.league_name = obj["league"]["name"]
@@ -435,7 +439,7 @@ class League:
         if len(self.participants > 1):
             return len(self.participants)
         else:
-            print("Obtain league participants first before getting league count")
+            LOGGER.info("Obtain league participants first before getting league count")
 
     def get_participant_name(self, refresh=False) -> dict:
         """Creates participant id to name hash table"""
@@ -456,26 +460,23 @@ class League:
         return self.participant_name
 
     def get_league_participant_mp(self, PAGE_COUNT):
-        has_next = True
+        """MultiProcessing version of get league participants"""
         out = []
 
         r = wget(LEAGUE_URL.format(self.league_id, PAGE_COUNT))
         obj = r.json()
-        assert r.status_code == 200, "error connecting to the endpoint"
-        del r
-        out.extend(obj["standings"]["results"])
-        has_next = obj["standings"]["has_next"]
-        PAGE_COUNT += 1
-        print("page {} done".format(PAGE_COUNT))
+        if r.status_code == 200:
+            out.extend(obj["standings"]["results"])
 
-        return (
-            [
-                participant["entry"],
-                participant["entry_name"],
-                participant["player_name"],
-            ]
-            for participant in out
-        )
+            LOGGER.info("page {} done".format(PAGE_COUNT))
+            return (
+                [
+                    participant["entry"],
+                    participant["entry_name"],
+                    participant["player_name"],
+                ]
+                for participant in out
+            )
 
     def batch_participant_entry(self, batch):
         for participant in batch:
@@ -529,20 +530,5 @@ if __name__ == "__main__":
             test_gw.gw_json = json.load(ins_2)
 
         test_gw.parse_payload()
-        # test_gw.highest_scoring_player()
-        # test_gw.dream_team()
-        # test_gw.highest_xg()
-        # test_gw.highest_xgc()
-        # test_gw.highest_xa()
-        # test_gw.gameweek_status()
     else:
         print(get_participant_entry(entry_id=98120, gw=1))
-        # test = League(args.league_id)
-        # test.get_participant_name()
-        # connection = create_connection_engine("fpl")
-        # create_id_table(table_name= test.league_name)
-        # df = pd.DataFrame(test.id_participant)
-        # df.columns = ['id', 'participant_entry_name', 'participant_player_name']
-
-        # df.to_sql(test.league_name,connection, if_exists='append', chunksize=1000, method="multi")
-        # test.get_all_participant_entries(args.gameweek_id, thread=args.thread)

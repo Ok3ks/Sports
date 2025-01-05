@@ -1,11 +1,11 @@
+"""Multiprocessing script to write weekly entries to database"""
 from src.utils import get_participant_entry
-
 from pymysql import Error
 from sqlalchemy import text
 from sqlalchemy.orm import sessionmaker
-
 from src.db.db import create_connection_engine, get_entry_ids
-
+import logging
+LOGGER = logging.getLogger(__name__)
 
 def create_gameweek_entries_table(conn="", table_name=""):
     """Creates a table with columns, player_id, position, team, and player_name"""
@@ -38,27 +38,23 @@ if __name__ == "__main__":
     import argparse
     import gevent
     import time
-
+    from src.db.participant_info_table import league_participant_info
     from itertools import islice
     import pandas as pd
 
-
     parser = argparse.ArgumentParser("Writing participant entries into DB")
-
     parser.add_argument("-g", "--gameweek_id", type=int, help="Gameweek entry")
     parser.add_argument("-t", "--processes", type=int, help="Number of processes")
-    parser.add_argument("-ta", "--table_name", default="Overall", type=int)
-    parser.add_argument(
-        "-db", "--db_name", type=str, help="Database name", required=True
-    )
+    parser.add_argument("-l", "--league_id", type=int)
+
     args = parser.parse_args()
+    TABLE_NAME = f"Entries_League_{args.league_id}_Gameweek_{args.gameweek_id}"
+    engine = create_connection_engine()
 
-    TABLE_NAME = f"Entries_Gameweek_{args.gameweek_id}"
-    engine = create_connection_engine("fpl")
-    list_of_entry_ids, LENGTH = get_entry_ids(table_name=f"`{args.table_name}`")
-
-    create_gameweek_entries_table(conn=engine, table_name=TABLE_NAME)
-    start_time = time.time()
+    league_participant_info(args.league_id, engine)
+    list_of_entry_ids, LENGTH = get_entry_ids(table_name=f"League_{str(args.league_id)}")
+    if LENGTH > 1:
+        create_gameweek_entries_table(conn=engine, table_name=TABLE_NAME)
 
     for n in range(0, LENGTH, 100):
         # optimum number of spawned threads to 100
@@ -67,16 +63,10 @@ if __name__ == "__main__":
             for i in islice(list_of_entry_ids, n, n + 100, 1)
         ]
         res = [response.value for response in gevent.iwait(req)]
-
         # chaining tuples obtained from spawned processes
         df = pd.DataFrame(res)
-        print(df)
-
         df.to_sql(TABLE_NAME, engine, if_exists="append", method="multi", index=False)
-        print("cycle {} complete".format(n))
+        LOGGER.info("cycle {} complete".format(n))
 
         if n % 10_000 == 0:
             time.sleep(5)
-
-    end_time = time.time()
-    print(end_time - start_time)
