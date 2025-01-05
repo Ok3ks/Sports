@@ -35,17 +35,19 @@ class ParticipantReport(Participant):
             for event in range(1, self.gw + 1)
         ]
 
-        self.o_df['highest_scoring_player'] = self.o_df['points_breakdown'].apply(np.argmax)
-        self.o_df['highest_scoring_player'] = [
-            i.players.split(',')[i.highest_scoring_player]
+        self.o_df["highest_scoring_player"] = self.o_df["points_breakdown"].apply(
+            np.argmax
+        )
+        self.o_df["highest_scoring_player"] = [
+            i.players.split(",")[i.highest_scoring_player]
             for i in self.o_df.itertuples()
-            ]
-        self.o_df['highest_scoring_player_points'] = self.o_df[
-            'points_breakdown'].apply(max)
+        ]
+        self.o_df["highest_scoring_player_points"] = self.o_df[
+            "points_breakdown"
+        ].apply(max)
 
         self.o_df["captain_points"] = [
-            get_ind_player_stats_from_db(
-                self.o_df["captain"][event - 1], event)[0] * 2
+            get_ind_player_stats_from_db(self.o_df["captain"][event - 1], event)[0] * 2
             for event in range(1, self.gw + 1)
         ]
         self.o_df["vice_captain_points"] = [
@@ -129,13 +131,11 @@ class ParticipantReport(Participant):
     def prep_for_gql(self):
         self.output = self.o_df.to_dict("list")
         for key, value in self.output.items():
-            if key in ['captain', 'vice_captain', 'highest_scoring_player']:
+            if key in ["captain", "vice_captain", "highest_scoring_player"]:
                 self.output[key] = [
-                    get_player_gql(
-                        id=player_id,
-                        gameweek=gameweek+1,
-                        session=session)
-                    for gameweek, player_id in enumerate(value)]
+                    get_player_gql(id=player_id, gameweek=gameweek + 1, session=session)
+                    for gameweek, player_id in enumerate(value)
+                ]
 
     def create_report(self, display=False):
         # output = self.output.to_dict("list")

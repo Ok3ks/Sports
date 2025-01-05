@@ -1,11 +1,14 @@
 """Multiprocessing script to write weekly entries to database"""
+
 from src.utils import get_participant_entry
 from pymysql import Error
 from sqlalchemy import text
 from sqlalchemy.orm import sessionmaker
 from src.db.db import create_connection_engine, get_entry_ids
 import logging
+
 LOGGER = logging.getLogger(__name__)
+
 
 def create_gameweek_entries_table(conn="", table_name=""):
     """Creates a table with columns, player_id, position, team, and player_name"""
@@ -52,7 +55,9 @@ if __name__ == "__main__":
     engine = create_connection_engine()
 
     league_participant_info(args.league_id, engine)
-    list_of_entry_ids, LENGTH = get_entry_ids(table_name=f"League_{str(args.league_id)}")
+    list_of_entry_ids, LENGTH = get_entry_ids(
+        table_name=f"League_{str(args.league_id)}"
+    )
     if LENGTH > 1:
         create_gameweek_entries_table(conn=engine, table_name=TABLE_NAME)
 

@@ -2,7 +2,14 @@ import json
 from typing import List
 import pandas as pd
 
-from src.db.db import get_player_position_map, get_player_team_map, get_season_stats, get_teams_id, get_fixtures
+from src.db.db import (
+    get_player_position_map,
+    get_player_team_map,
+    get_season_stats,
+    get_teams_id,
+    get_fixtures,
+)
+
 
 def parse_fixture():
     """Parse Fixtures from DB."""
@@ -69,29 +76,31 @@ def parse_stats():
     player_position_mapping = get_player_position_map()
     full_df = pd.DataFrame(stats)
 
-    full_df["team"] = full_df["player_id"].map(
-        lambda x: player_team_mapping[x])
-    full_df["position"] = full_df["player_id"].map(
-        lambda x: player_position_mapping[x])
+    full_df["team"] = full_df["player_id"].map(lambda x: player_team_mapping[x])
+    full_df["position"] = full_df["player_id"].map(lambda x: player_position_mapping[x])
     return full_df
 
 
-#ToDo : add kwargs to function to customise groupbys
+# ToDo : add kwargs to function to customise groupbys
 def groupby(groups: set[str] = {"gameweek", "position"}):
     """Calculate aggregates groupby."""
     all_groups = {"gameweek", "position", "team"}
     stats = parse_stats()
-    obj = stats.groupby(list(groups)).aggregate({
-        "goals_scored": "sum",
-        "total_points": ["sum"],
-        "assists": "sum",
-    })
-    ref = obj.reset_index().to_dict('list')
+    obj = stats.groupby(list(groups)).aggregate(
+        {
+            "goals_scored": "sum",
+            "total_points": ["sum"],
+            "assists": "sum",
+        }
+    )
+    ref = obj.reset_index().to_dict("list")
     out = {}
     for key, value in ref.items():
-        if key[1] != '':
+        if key[1] != "":
             value.append(key[1])
-        out.update({key[0]: [str(v) for v in value]})  # casting to string for graphql compatibility, not mixing types
+        out.update(
+            {key[0]: [str(v) for v in value]}
+        )  # casting to string for graphql compatibility, not mixing types
     del ref
     last_key = list(all_groups.difference(groups))[0]
     out.update({last_key: [""]})
@@ -100,10 +109,10 @@ def groupby(groups: set[str] = {"gameweek", "position"}):
 
 
 # def fixture_plots(fixture_df):
-    # """ """
-    # return fixture_df.groupby(["homedifficulty", "awaydifficulty"]).aggregate(
-    # {"homewin": "sum", "draw": "sum", "awaywin": "sum"}
-    # ).plot(kind="bar")
+# """ """
+# return fixture_df.groupby(["homedifficulty", "awaydifficulty"]).aggregate(
+# {"homewin": "sum", "draw": "sum", "awaywin": "sum"}
+# ).plot(kind="bar")
 
 
 if __name__ == "__main__":

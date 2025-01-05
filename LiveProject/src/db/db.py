@@ -5,7 +5,18 @@ import redis
 
 from sqlite3 import Error  # type: ignore
 import redis.connection
-from sqlalchemy import Integer, String, Boolean, DateTime, create_engine, select, text, distinct, delete, func
+from sqlalchemy import (
+    Integer,
+    String,
+    Boolean,
+    DateTime,
+    create_engine,
+    select,
+    text,
+    distinct,
+    delete,
+    func,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 from sqlalchemy import URL
@@ -72,16 +83,15 @@ class GameweekScore(Base):
 
 
 class Fixtures(Base):
-
     __tablename__ = "2024_2025_FIXTURES"
 
-    homedifficulty: Mapped[int] = mapped_column(Integer) 
+    homedifficulty: Mapped[int] = mapped_column(Integer)
     awaydifficulty: Mapped[int] = mapped_column(Integer)
     home: Mapped[int] = mapped_column(Integer)
     away: Mapped[int] = mapped_column(Integer)
     homegoals: Mapped[int] = mapped_column(Integer)
     awaygoals: Mapped[int] = mapped_column(Integer)
-    code: Mapped[int] = mapped_column(Integer, primary_key= True)
+    code: Mapped[int] = mapped_column(Integer, primary_key=True)
     gameweek: Mapped[int] = mapped_column(Integer)
     finished: Mapped[bool] = mapped_column(Boolean)
     date: Mapped[String] = mapped_column(DateTime)
@@ -92,48 +102,52 @@ class Fixtures(Base):
                         Code: {self.code},"""
 
 
-team_short_name_mapping=   {1: 'ARS',
-                            2: 'AVL',
-                            3: 'BOU',
-                            4: 'BRE',
-                            5: 'BHA',
-                            6: 'CHE',
-                            7: 'CRY',
-                            8: 'EVE',
-                            9: 'FUL',
-                            10: 'IPS',
-                            11: 'LEI',
-                            12: 'LIV',
-                            13: 'MCI',
-                            14: 'MUN',
-                            15: 'NEW',
-                            16: 'NFO',
-                            17: 'SOU',
-                            18: 'TOT',
-                            19: 'WHU',
-                            20: 'WOL'}
+team_short_name_mapping = {
+    1: "ARS",
+    2: "AVL",
+    3: "BOU",
+    4: "BRE",
+    5: "BHA",
+    6: "CHE",
+    7: "CRY",
+    8: "EVE",
+    9: "FUL",
+    10: "IPS",
+    11: "LEI",
+    12: "LIV",
+    13: "MCI",
+    14: "MUN",
+    15: "NEW",
+    16: "NFO",
+    17: "SOU",
+    18: "TOT",
+    19: "WHU",
+    20: "WOL",
+}
 
 
-team_name_to_code= {'Arsenal': 1,
-                    'Aston Villa': 2,
-                    'Bournemouth': 3,
-                    'Brentford': 4,
-                    'Brighton': 5,
-                    'Chelsea': 6,
-                    'Crystal Palace': 7,
-                    'Everton': 8,
-                    'Fulham': 9,
-                    'Ipswich': 10,
-                    'Leicester': 11,
-                    'Liverpool': 12,
-                    'Man City': 13,
-                    'Man Utd': 14,
-                    'Newcastle': 15,
-                    "Nott'm Forest": 16,
-                    'Southampton': 17,
-                    'Spurs': 18,
-                    'West Ham': 19,
-                    'Wolves': 20}
+team_name_to_code = {
+    "Arsenal": 1,
+    "Aston Villa": 2,
+    "Bournemouth": 3,
+    "Brentford": 4,
+    "Brighton": 5,
+    "Chelsea": 6,
+    "Crystal Palace": 7,
+    "Everton": 8,
+    "Fulham": 9,
+    "Ipswich": 10,
+    "Leicester": 11,
+    "Liverpool": 12,
+    "Man City": 13,
+    "Man Utd": 14,
+    "Newcastle": 15,
+    "Nott'm Forest": 16,
+    "Southampton": 17,
+    "Spurs": 18,
+    "West Ham": 19,
+    "Wolves": 20,
+}
 
 
 def create_connection(db, db_type="postgres"):
@@ -231,7 +245,9 @@ def get_player(id, session=session):
     with session() as session:
         if isinstance(id, list):
             for item in id:
-                stmt = select(PlayerInfo.player_name).where(PlayerInfo.player_id == int(item))
+                stmt = select(PlayerInfo.player_name).where(
+                    PlayerInfo.player_id == int(item)
+                )
                 obj = session.scalars(stmt).all()
                 out.append(obj[0])
             return out
@@ -246,14 +262,13 @@ def get_teams(session=session):
         statement = select(distinct(Player.team))
         obj = session.execute(statement).all()
         return obj
-    
+
 
 def get_teams_id(session=session) -> dict:
     """Return a mapping of team id to teams"""
     with session() as session:
-        statement_1 = text(
-            'SELECT team_id,team FROM public."EPL_2024_PLAYER_INFO"')
-        obj = session.execute(statement_1) .all()
+        statement_1 = text('SELECT team_id,team FROM public."EPL_2024_PLAYER_INFO"')
+        obj = session.execute(statement_1).all()
         obj = {i[0]: i[1] for i in obj}
         return obj
 
@@ -261,9 +276,8 @@ def get_teams_id(session=session) -> dict:
 def get_player_team_map(session=session) -> dict:
     """Return a mapping of Player id to teams"""
     with session() as session:
-        statement_1 = text(
-            'SELECT player_id, team FROM public."EPL_2024_PLAYER_INFO"')
-        obj = session.execute(statement_1) .all()
+        statement_1 = text('SELECT player_id, team FROM public."EPL_2024_PLAYER_INFO"')
+        obj = session.execute(statement_1).all()
         obj = {i[0]: i[1] for i in obj}
         return obj
 
@@ -272,8 +286,9 @@ def get_player_position_map(session=session) -> dict:
     """Return a mapping of Player id to teams"""
     with session() as session:
         statement_1 = text(
-            'SELECT player_id, position FROM public."EPL_2024_PLAYER_INFO"')
-        obj = session.execute(statement_1) .all()
+            'SELECT player_id, position FROM public."EPL_2024_PLAYER_INFO"'
+        )
+        obj = session.execute(statement_1).all()
         obj = {i[0]: i[1] for i in obj}
         return obj
 
@@ -325,12 +340,11 @@ def get_ind_player_stats_from_db(id, gw, session=session):
 
 def get_gameweek_stats(gw, session=session):
     """Return all stats for a particular gameweek."""
-    stmt = text(
-        f'SELECT * FROM public."Player_gameweek_score" WHERE gameweek = {gw}'
-    )
+    stmt = text(f'SELECT * FROM public."Player_gameweek_score" WHERE gameweek = {gw}')
     with session() as session:
         c = session.execute(stmt).all()
     return c
+
 
 def get_season_stats(session=session):
     """Return all season stats"""
@@ -343,10 +357,8 @@ def get_season_stats(session=session):
 
 
 def get_fixtures(session=session):
-    """ Return all fixtures."""
-    stmt = text(
-        f'SELECT  * FROM public."2024_2025_FIXTURES"'
-    )
+    """Return all fixtures."""
+    stmt = text(f'SELECT  * FROM public."2024_2025_FIXTURES"')
     with session() as session:
         c = session.execute(stmt).all()
     return c
@@ -368,6 +380,7 @@ def check_minutes(id, gw, session=session):
 
 ## Gameweek
 
+
 def get_available_gameweek_scores(
     session=sessionmaker(create_connection_engine()),
 ):
@@ -380,23 +393,26 @@ def get_available_gameweek_scores(
 
 def get_gameweek_scores(gameweek: int, session=session):
     with session() as session:
-        stmt = select(func.count("*")).select_from(GameweekScore).where(
-            GameweekScore.gameweek == gameweek)
+        stmt = (
+            select(func.count("*"))
+            .select_from(GameweekScore)
+            .where(GameweekScore.gameweek == gameweek)
+        )
         obj = session.scalars(stmt).one()
         return obj
 
 
 def delete_gameweek_scores(gameweek: int, session=session, table_name=""):
-
     with session() as session:
         stmt = text(f'DELETE FROM public."{table_name}" where gameweek = {gameweek}')
         session.execute(stmt)
         session.commit()
 
+
 # raw sql queries make it hard to switch databases
 # tests are good
 
-#Leagues
+# Leagues
 
 
 def get_entry_ids(session=sessionmaker(create_connection_engine()), table_name=""):
@@ -415,21 +431,30 @@ def get_teams(session=sessionmaker(create_connection_engine())):
         obj = session.execute(statement).all()
         return obj
 
-def get_player_info(player_id, half,
-                         session=sessionmaker(create_connection_engine())):
+
+def get_player_info(player_id, half, session=sessionmaker(create_connection_engine())):
     with session() as session:
-        statement = select(PlayerInfo).where(
-            PlayerInfo.player_id == player_id).where(PlayerInfo.half == half)
+        statement = (
+            select(PlayerInfo)
+            .where(PlayerInfo.player_id == player_id)
+            .where(PlayerInfo.half == half)
+        )
         obj = session.execute(statement).one()
         return obj
 
-def get_player_team_code(player_id, half,
-                         session=sessionmaker(create_connection_engine())):
+
+def get_player_team_code(
+    player_id, half, session=sessionmaker(create_connection_engine())
+):
     with session() as session:
-        statement = select(PlayerInfo.team_code).where(
-            PlayerInfo.player_id == player_id).where(PlayerInfo.half == half)
+        statement = (
+            select(PlayerInfo.team_code)
+            .where(PlayerInfo.player_id == player_id)
+            .where(PlayerInfo.half == half)
+        )
         obj = session.execute(statement).one()
         return obj
+
 
 def create_id_table(conn, table_name="league_name"):
     """Creates a table with columns, player_id, position, team, and player_name"""

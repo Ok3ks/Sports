@@ -1,8 +1,6 @@
 import os
 
-BASE_DIR = os.path.realpath(
-    os.path.dirname(__file__)
-)  # make this absolute
+BASE_DIR = os.path.realpath(os.path.dirname(__file__))  # make this absolute
 SRC_DIR = os.path.join(BASE_DIR, "src")
 APP_DIR = os.path.join(BASE_DIR, "app")
 REPORT_DIR = os.path.join(BASE_DIR, "reports")

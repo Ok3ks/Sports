@@ -10,7 +10,7 @@ def update_db_player_info(engine, table_name="EPL_2024_PLAYER_INFO", half=1):
 
     home = requests.get(FPL_URL)
     home = home.json()
-    
+
     team_code_to_name = {item["code"]: item["name"] for item in home["teams"]}
     pos_code_to_pos = {
         item["id"]: item["singular_name"] for item in home["element_types"]
@@ -30,7 +30,15 @@ def update_db_player_info(engine, table_name="EPL_2024_PLAYER_INFO", half=1):
     )
     data = pd.DataFrame(data)
     data["half"] = half
-    data.columns = ["player_id", "team_code",  "team", "team_id", "position", "player_name", "half"]
+    data.columns = [
+        "player_id",
+        "team_code",
+        "team",
+        "team_id",
+        "position",
+        "player_name",
+        "half",
+    ]
 
     print(f"{len(data)} is ready to be added to database table")
     data.to_sql(

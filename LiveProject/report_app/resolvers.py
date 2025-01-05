@@ -30,10 +30,10 @@ def resolve_gameweek_stats(*_, gameweek):
 
 
 @query.field("gameViewReport")
-def resolve_season_stats(*_, use_gameweek:bool, use_position:bool, use_team:bool):
+def resolve_season_stats(*_, use_gameweek: bool, use_position: bool, use_team: bool):
     """Retrieve season statistics for all players by either gameweek, position, or team"""
-    if (use_gameweek & use_position):
-        return groupby(groups={'gameweek', 'position'})
+    if use_gameweek & use_position:
+        return groupby(groups={"gameweek", "position"})
 
 
 @query.field("player")

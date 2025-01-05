@@ -1,5 +1,9 @@
 import pandas as pd
-from src.db.db import create_connection_engine, get_gameweek_scores,delete_gameweek_scores
+from src.db.db import (
+    create_connection_engine,
+    get_gameweek_scores,
+    delete_gameweek_scores,
+)
 
 from sqlalchemy import Integer, Boolean, Float
 from sqlalchemy.orm import Mapped, mapped_column
@@ -8,6 +12,7 @@ from sqlalchemy.orm import DeclarativeBase
 import requests
 from src.urls import GW_URL
 import logging
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -89,13 +94,12 @@ def update_db_gameweek_score(conn, gw):
     # check if this has been created before for live updates
 
     if get_gameweek_scores(gw) > 0:
-        print(delete_gameweek_scores(gw, 
-                                     table_name=PlayerGameweekScores.__tablename__))
+        print(delete_gameweek_scores(gw, table_name=PlayerGameweekScores.__tablename__))
         df.to_sql("Player_gameweek_score", conn, if_exists="append", method="multi")
         LOGGER.info("Data insert successful")
 
     else:
-        # Combining all gameweeks into one database table, 
+        # Combining all gameweeks into one database table,
         df.to_sql("Player_gameweek_score", conn, if_exists="append", method="multi")
         LOGGER.info("Data insert successful")
 

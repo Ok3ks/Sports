@@ -16,6 +16,7 @@ from .db.db import get_player, get_player_team_code
 from .db.db import team_short_name_mapping, team_name_to_code
 from typing import List, Union
 import logging
+
 LOGGER = logging.getLogger(__name__)
 
 s = requests.Session()
@@ -23,10 +24,9 @@ retries = Retry(
     total=3,
     backoff_factor=0.1,
     status_forcelist=[502, 503, 504],
-    allowed_methods={'GET'},
+    allowed_methods={"GET"},
 )
 r = s.mount("https://fantasy.premierleague.com/api/", HTTPAdapter(max_retries=retries))
-
 
 
 def to_json(x: dict, fp):
@@ -399,6 +399,7 @@ class Participant:
         else:
             raise GameweekError
 
+
 class League:
     def __init__(self, league_id):
         self.league_id = league_id
@@ -421,14 +422,16 @@ class League:
                 LOGGER.info(r.status_code)
                 LOGGER.info(r.headers)
                 del r
-                
+
                 self.league_name = obj["league"]["name"]
 
                 self.participants.extend(obj["standings"]["results"])
                 self.has_next = obj["standings"]["has_next"]
                 self.PAGE_COUNT += 1
                 LOGGER.info(
-                    "All participants on page {} have been extracted".format(self.PAGE_COUNT)
+                    "All participants on page {} have been extracted".format(
+                        self.PAGE_COUNT
+                    )
                 )
 
                 self.league_name = obj["league"]["name"]

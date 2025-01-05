@@ -11,7 +11,13 @@ from os.path import join
 import os
 import json
 
-from LiveProject.src.utils import check_gw, Participant, get_curr_event, League, GameweekError
+from LiveProject.src.utils import (
+    check_gw,
+    Participant,
+    get_curr_event,
+    League,
+    GameweekError,
+)
 from LiveProject.src.urls import FPL_URL
 import requests
 
@@ -88,7 +94,10 @@ def test_get_participant_entry(participant, gw_fixture):
 
 
 class TestParticipant:
-    def test_init(self, participant,):
+    def test_init(
+        self,
+        participant,
+    ):
         pass
 
     def test_get_gw_transfers(self):

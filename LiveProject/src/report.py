@@ -419,7 +419,7 @@ class LeagueWeeklyReport(League):
         # Save to redis
         # r = create_cache_engine()  # save to cache
 
-        # r.set(name=f"league_{self.league_id}_{self.gw}", 
+        # r.set(name=f"league_{self.league_id}_{self.gw}",
         #       value=json.dumps(output),
         #       ex=300
         #       )

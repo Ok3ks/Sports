@@ -54,11 +54,11 @@ MIDDLEWARE = [
 CORS_ALLOW_ALL_ORIGINS = True  # Restrict later
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
-    'authorization',
-    'authorizationsource',
-    'content-type',
-    'Access-Control-Allow-Origin', 
-    'Access-Control-Allow-Methods',
+    "authorization",
+    "authorizationsource",
+    "content-type",
+    "Access-Control-Allow-Origin",
+    "Access-Control-Allow-Methods",
     # ...any other headers you want to allow...
 ]
 CORS_ALLOW_METHODS = (
