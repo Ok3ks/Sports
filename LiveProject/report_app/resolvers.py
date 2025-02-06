@@ -10,7 +10,7 @@ from ariadne import (
 
 
 # from .models import (Players, Gameweek_Scores)
-from src.db.db import get_gameweek_stats, get_player_gql
+from src.db.db import create_cache_engine, get_gameweek_stats, get_player_gql
 from src.fpl_wrap import ParticipantReport
 from src.gameview import groupby
 from src.report import LeagueWeeklyReport
@@ -77,20 +77,26 @@ def resolve_league_gameweek_report(*_, league_id, gameweek):
     """Retrieve a Player's gameweek score based on player_id"""
 
     # check cache
-    # r = create_cache_engine()
-    # output = r.get(f"{league_id}_{gameweek}")  # Currently loading it all into memory
+    r = create_cache_engine()
+    output = r.get(f"{league_id}_{gameweek}")  # Currently loading it all into memory
 
-    # if output:
-    #     print("Obtained from cache")
-    #     return json.loads(output)
-    # else:
-    report = LeagueWeeklyReport(gameweek, league_id)
-    report.get_data()
-    report.weekly_score_transformation()
-    report.merge_league_weekly_transfer()
-    report.add_auto_sub()
-    report.captain_minutes()
-    output = report.create_report(display=False)  # replace this with caching?
+    if output:
+        print("Obtained from cache")
+        return json.loads(output)
+    else:
+        report = LeagueWeeklyReport(gameweek, league_id)
+        report.get_data()
+        report.weekly_score_transformation()
+        report.merge_league_weekly_transfer()
+        report.add_auto_sub()
+        report.captain_minutes()
+        output = report.create_report(display=False)  # replace this with caching?     
+        r.set(name=f"league_{report.league_id}_{report.gw}",
+              value=json.dumps(output),
+              ex=300
+              )
+
+    print(output)
     print("Recomputed")
     return output
 
