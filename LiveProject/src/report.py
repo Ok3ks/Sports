@@ -7,7 +7,7 @@ from .utils import get_basic_stats, League
 from .db.db import (
     get_player_stats_from_db,
     check_minutes,
-    # create_cache_engine,
+    create_cache_engine,
 )
 import math
 
@@ -32,7 +32,6 @@ class LeagueWeeklyReport(League):
         self.one_df = pd.DataFrame(self.get_all_participant_entries(self.gw))
         self.f = pd.DataFrame(self.get_gw_transfers(self.gw))
         self.f = self.f.T
-        print(self.f.columns)
 
     @lru_cache(10)
     @profile
@@ -51,7 +50,6 @@ class LeagueWeeklyReport(League):
             ]
         )
 
-        # print(self.o_df['captain'].isna())
         self.o_df["captain_points"] = self.o_df["captain"].map(
             lambda x: self.player_points[int(x)] * 2 if math.isnan(x) != True else 0
         )
@@ -72,7 +70,6 @@ class LeagueWeeklyReport(League):
         """Merges Weekly score dataframe with transfers dataframe"""
 
         if "element_in" in self.f.columns.to_list():
-            print("In merge league weekly")
             self.f["transfer_points_in"] = self.f["element_in"].map(
                 lambda x: sum([self.player_points[int(y)] for y in x])
             )
@@ -103,7 +100,6 @@ class LeagueWeeklyReport(League):
     @profile
     def add_auto_sub(self):
         if "auto_sub_in" in self.f.columns:
-            print(self.f["auto_sub_in"].tolist())
 
             # optimization 1 - switching dictionaries to tuples
             self.f["auto_sub_in_player"] = self.f["auto_sub_in"].map(
@@ -295,7 +291,6 @@ class LeagueWeeklyReport(League):
             best_transfer_in = []
             if len(self.no_chips) > 2:
                 self.no_chips = self.no_chips.sort_values(by="delta", ascending=False)
-                print(self.no_chips["delta"])
                 n = min(len(self.f), 3)
 
                 if "element_in" in self.f.keys() and "element_out" in self.f.keys():
@@ -345,13 +340,11 @@ class LeagueWeeklyReport(League):
             player_on_bench = self.f["bench"].to_list()
             player_on_bench = ",".join(player_on_bench)
             player_on_bench = player_on_bench.split(",")
-            print(player_on_bench)
 
             resultDict = {}
             for i in player_on_bench:
                 if len(i.strip()) >= 1:
                     resultDict[i] = resultDict.get(i, 0) + 1
-            print(resultDict)
 
             # resultDict = dict(sorted(resultDict.items(), key=operator.itemgetter(1), reverse=True))
             pointsDict = {
@@ -415,14 +408,6 @@ class LeagueWeeklyReport(League):
         output.update(most_benched())
 
         output.update(get_league_name())
-
-        # Save to redis
-        # r = create_cache_engine()  # save to cache
-
-        # r.set(name=f"league_{self.league_id}_{self.gw}",
-        #       value=json.dumps(output),
-        #       ex=300
-        #       )
 
         if display:
             print(output)
