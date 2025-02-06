@@ -29,7 +29,7 @@ class ParticipantReport(Participant):
 
         self.o_df["points_breakdown"] = [
             [
-                get_ind_player_stats_from_db(y, event)[0]
+                get_ind_player_stats_from_db(y, event)
                 for y in self.o_df["players"][event - 1].split(",")
             ]
             for event in range(1, self.gw + 1)
@@ -47,11 +47,11 @@ class ParticipantReport(Participant):
         ].apply(max)
 
         self.o_df["captain_points"] = [
-            get_ind_player_stats_from_db(self.o_df["captain"][event - 1], event)[0] * 2
+            get_ind_player_stats_from_db(self.o_df["captain"][event - 1], event) * 2
             for event in range(1, self.gw + 1)
         ]
         self.o_df["vice_captain_points"] = [
-            get_ind_player_stats_from_db(self.o_df["vice_captain"][event - 1], event)[0]
+            get_ind_player_stats_from_db(self.o_df["vice_captain"][event - 1], event)
             for event in range(1, self.gw + 1)
         ]
 
@@ -80,7 +80,7 @@ class ParticipantReport(Participant):
         self.f["transfer_points_in"] = [
             sum(
                 [
-                    get_ind_player_stats_from_db(y, event)[0]
+                    get_ind_player_stats_from_db(y, event)
                     for y in self.f["element_in"][event]
                 ]
             )
@@ -90,7 +90,7 @@ class ParticipantReport(Participant):
         self.f["transfer_points_out"] = [
             sum(
                 [
-                    get_ind_player_stats_from_db(y, event)[0]
+                    get_ind_player_stats_from_db(y, event)
                     for y in self.f["element_out"][event]
                 ]
             )
@@ -105,25 +105,29 @@ class ParticipantReport(Participant):
         return self.f
 
     def add_auto_sub(self):
-        self.f["auto_sub_in_player"] = self.f["auto_sub_in"]  # .map(lambda x: x["in"])
-        self.f["auto_sub_out_player"] = self.f[
-            "auto_sub_in"
-        ]  # .map(lambda x: x["out"])
+        # self.f["auto_sub_in_player"] = self.f["auto_sub_in"]  # .map(lambda x: x["in"])
+        # self.f["auto_sub_out_player"] = self.f[
+        #     "auto_sub_out"
+        # ]  # .map(lambda x: x["out"])
         self.f["auto_sub_in_points"] = [
             sum(
+                i for i in
                 [
-                    get_ind_player_stats_from_db(y, event)[0]
-                    for y in self.f["auto_sub_in_player"][event - 1]
+                    get_ind_player_stats_from_db(y, event)
+                    for y in self.f["auto_sub_in"][event - 1].strip().split(",")
                 ]
+                if isinstance(i, int)
             )
             for event in range(1, self.gw + 1)
         ]
         self.f["auto_sub_out_points"] = [
             sum(
+                i for i in
                 [
-                    get_ind_player_stats_from_db(y, event)[0]
-                    for y in self.f["auto_sub_out_player"][event - 1]
+                    get_ind_player_stats_from_db(y, event)
+                    for y in self.f["auto_sub_out"][event - 1].split(",")
                 ]
+                if isinstance(i, int)
             )
             for event in range(1, self.gw + 1)
         ]
