@@ -4,7 +4,7 @@ from src.urls import FPL_URL
 import pandas as pd
 
 
-def update_db_player_info(engine, table_name="EPL_2024_PLAYER_INFO", half=1):
+def update_db_player_info(engine, table_name, half=1):
     """This function retrieves current information of players
     from the API"""
 
@@ -42,7 +42,7 @@ def update_db_player_info(engine, table_name="EPL_2024_PLAYER_INFO", half=1):
 
     print(f"{len(data)} is ready to be added to database table")
     data.to_sql(
-        f"{table_name}", engine, if_exists="replace", method="multi", index=True
+        f"{table_name}", engine, if_exists="append", method="multi", index=True
     )
     print(f"success adding {len(data)}")
 
@@ -55,10 +55,12 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "-t", "--table_name", type=str, help="Table name", required=True
+        "-t", "--table_name", type=str, help="Table name",
+        default="EPL_2024_PLAYER_INFO"
     )
     parser.add_argument(
-        "-db", "--db_name", type=str, help="Database name", required=True
+        "-db", "--db_name", type=str, help="Database name",
+        default="fpl"
     )
     parser.add_argument(
         "-ha",
@@ -72,4 +74,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     engine = create_connection_engine()
 
-    update_db_player_info(engine, table_name=args.table_name, half=args.half)
+    update_db_player_info(engine, args.table_name, half=args.half)
