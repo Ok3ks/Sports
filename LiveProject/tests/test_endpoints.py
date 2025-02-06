@@ -1,4 +1,4 @@
-from LiveProject.src.urls import (
+from ..src.urls import (
     GW_URL,
     FIXTURE_URL,
     TRANSFER_URL,
@@ -10,7 +10,7 @@ from LiveProject.src.urls import (
 )
 
 import requests
-from LiveProject.src.utils import to_json
+from ..src.utils import to_json
 from ...paths import MOCK_DIR
 
 
@@ -35,6 +35,13 @@ def test_gameweek_endpoint(gw_fixture):
 
     stats_keys = set(r["elements"][0]["stats"].keys())
     stats_keys_prev = [
+        "mng_win",
+        "mng_underdog_draw",
+        "mng_loss",
+        "mng_draw",
+        "mng_goals_scored",
+        "mng_underdog_win",
+        "mng_clean_sheets",
         "minutes",
         "goals_scored",
         "assists",
@@ -61,17 +68,17 @@ def test_gameweek_endpoint(gw_fixture):
         "in_dreamteam",
     ]
 
-    assert (
-        len(stats_keys.difference(set(stats_keys_prev))) == 0
-    ), f"Keys have changed {stats_keys.difference(set(stats_keys_prev))}"
+    assert len(stats_keys.difference(set(stats_keys_prev))) == 0, (
+        f"Keys have changed {stats_keys.difference(set(stats_keys_prev))}"
+    )
 
     del stats_keys
     explain_key = r["elements"][0]["explain"][0].keys()
     explain_key_prev = {"fixture", "stats"}
 
-    assert (
-        len(set(explain_key).difference(explain_key_prev)) == 0
-    ), "Explain keys have changed"
+    assert len(set(explain_key).difference(explain_key_prev)) == 0, (
+        "Explain keys have changed"
+    )
 
     assert r["elements"][0]["explain"][0]["stats"][0]["identifier"] == "minutes"
     assert "points" in r["elements"][0]["explain"][0]["stats"][0]
@@ -160,9 +167,9 @@ def test_history_endpoint(participant):
     history_keys = list(r.keys())
     history_keys_prev = ["current", "past", "chips"]
 
-    assert (
-        len(set(history_keys_prev).difference(set(history_keys))) == 0
-    ), "History keys have changed"
+    assert len(set(history_keys_prev).difference(set(history_keys))) == 0, (
+        "History keys have changed"
+    )
 
     assert type(r["current"]) is list, "Endpoint structure has changed"  # type: ignore
     assert type(r["current"][0]) is dict, "Endpoint structure has changed"  # type: ignore
@@ -189,9 +196,9 @@ def test_history_endpoint(participant):
         "points_on_bench",
     ]
 
-    assert (
-        len(set(current_keys).difference(set(current_keys_prev))) == 0
-    ), "Current keys has changed"
+    assert len(set(current_keys).difference(set(current_keys_prev))) == 0, (
+        "Current keys has changed"
+    )
 
     assert len(current_keys) == 12, "Number of keys has changed"
 
@@ -218,9 +225,9 @@ def test_h2h_league_endpoint(h2h_league):
     h2h_keys = list(r.keys())
     h2h_keys_prev = ["has_next", "page", "results"]
 
-    assert (
-        len(set(h2h_keys_prev).difference(set(h2h_keys))) == 0
-    ), "H2h keys have changed"
+    assert len(set(h2h_keys_prev).difference(set(h2h_keys))) == 0, (
+        "H2h keys have changed"
+    )
 
     results_keys = list(r["results"][0].keys())
     results_keys_prev = [
@@ -251,9 +258,9 @@ def test_h2h_league_endpoint(h2h_league):
         "knockout_name",
     ]
 
-    assert (
-        len(set(results_keys_prev).difference(results_keys)) == 0
-    ), "Results keys has changed"
+    assert len(set(results_keys_prev).difference(results_keys)) == 0, (
+        "Results keys has changed"
+    )
     to_json(r, f"{MOCK_DIR}/endpoints/h2h_league_endpoint.json")
 
 
@@ -291,22 +298,22 @@ def test_league_endpoint(classic_league):
         "cup_league",
         "rank",
     ]
-    assert (
-        len(set(league_keys).difference(league_keys_prev)) == 0
-    ), "League keys have changed"
+    assert len(set(league_keys).difference(league_keys_prev)) == 0, (
+        "League keys have changed"
+    )
 
     new_entries_keys = r["new_entries"]  # type: ignore
     new_entries_keys_prev = ["has_next", "page", "results"]
-    assert (
-        len(set(new_entries_keys).difference(new_entries_keys_prev)) == 0
-    ), "New Entries keys have changed"
+    assert len(set(new_entries_keys).difference(new_entries_keys_prev)) == 0, (
+        "New Entries keys have changed"
+    )
 
     standings_keys = r["standings"]  # type: ignore
     standings_keys_prev = ["has_next", "page", "results"]
 
-    assert (
-        len(set(standings_keys).difference(standings_keys_prev)) == 0
-    ), " Standings have changed"
+    assert len(set(standings_keys).difference(standings_keys_prev)) == 0, (
+        " Standings have changed"
+    )
 
     participant_info = r["standings"]["results"][0]  # type: ignore
     participant_info_keys = [
@@ -320,9 +327,9 @@ def test_league_endpoint(classic_league):
         "entry",
         "entry_name",
     ]
-    assert (
-        len(set(participant_info_keys).difference(participant_info)) == 0
-    ), "Participant info keys have changed"
+    assert len(set(participant_info_keys).difference(participant_info)) == 0, (
+        "Participant info keys have changed"
+    )
 
     to_json(r, f"{MOCK_DIR}/endpoints/league_endpoint.json")
 
@@ -361,13 +368,14 @@ def test_fpl_player_endpoint(participant, gw_fixture):
     ]
 
     print(entry_history_keys)
-    assert (
-        len(set(entry_history_keys).difference(set(curr_entry_history_keys))) == 0
-    ), "Keys have changed"
+    assert len(set(entry_history_keys).difference(set(curr_entry_history_keys))) == 0, (
+        "Keys have changed"
+    )
     assert type(r["picks"]) is list
 
     picks_keys = list(r["picks"][0].keys())
     picks_keys_prev = {
+        "element_type",
         "element",
         "position",
         "multiplier",
@@ -431,14 +439,18 @@ def test_fpl_url_endpoint():
         "most_vice_captained",
     ]
 
-    assert (
-        len(set(event_keys_prev).difference(set(event_keys))) == 0
-    ), f"Keys have changed {set(event_keys_prev).difference(set(event_keys))}"
+    assert len(set(event_keys_prev).difference(set(event_keys))) == 0, (
+        f"Keys have changed {set(event_keys_prev).difference(set(event_keys))}"
+    )
 
     assert type(r["game_settings"]) is dict
     game_settings_keys = r["game_settings"].keys()
 
     game_settings_keys_prev = [
+        "element_sell_at_purchase_price",
+        "squad_special_max",
+        "squad_special_min",
+        "underdog_differential",
         "league_join_private_max",
         "league_join_public_max",
         "league_max_size_public_classic",
@@ -517,9 +529,9 @@ def test_fpl_url_endpoint():
     assert "label" in element_stats_keys
     assert "name" in element_stats_keys
     assert r["element_stats"][0]["name"] == "minutes", "Measurement metric has changed"
-    assert (
-        r["element_stats"][0]["label"] == "Minutes played"
-    ), "Measurement metric has changed"
+    assert r["element_stats"][0]["label"] == "Minutes played", (
+        "Measurement metric has changed"
+    )
     assert len(element_stats_keys) == 2
 
     element_types_keys = r["element_types"][0].keys()
@@ -545,8 +557,22 @@ def test_fpl_url_endpoint():
     elements_keys = r["elements"][0].keys()
     elements_keys_prev = [
         "chance_of_playing_next_round",
+        "team_join_date",
+        "mng_win",
+        "mng_underdog_win",
+        "can_transact",
+        "mng_underdog_draw",
+        "mng_clean_sheets",
+        "mng_draw",
+        "opta_code",
+        "removed",
+        "has_temporary_code",
+        "mng_goals_scored",
+        "can_select",
+        "mng_loss",
+        "team_join_datechance_of_playing_next_round",
         "chance_of_playing_this_round",
-        "code" "cost_change_event",
+        "codecost_change_event",
         "cost_change_event_fall",
         "cost_change_start",
         "cost_change_start_fall",
