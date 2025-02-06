@@ -74,7 +74,14 @@ class GameweekScore(Base):
     expected_assists: Mapped[String] = mapped_column(String)
     expected_goal_involvements: Mapped[String] = mapped_column(String)
     expected_goals_conceded: Mapped[String] = mapped_column(String)
-    total_points: Mapped[String] = mapped_column(String)
+    mng_win: Mapped[int] = mapped_column(Integer)
+    mng_draw: Mapped[int] = mapped_column(Integer)
+    mng_loss: Mapped[int] = mapped_column(Integer)
+    mng_underdog_win: Mapped[int] = mapped_column(Integer)
+    mng_underdog_draw: Mapped[int] = mapped_column(Integer)
+    mng_clean_sheets: Mapped[int] = mapped_column(Integer)
+    mng_goals_scored: Mapped[int] = mapped_column(Integer)
+    total_points: Mapped[int] = mapped_column(Integer)
     in_dreamteam: Mapped[int] = mapped_column(Integer)
     gameweek: Mapped[int] = mapped_column(Integer)
 
@@ -197,17 +204,17 @@ def create_connection_engine():
     return create_engine(url_object, pool_pre_ping=True)
 
 
-# def create_cache_engine():
-#     """Ensure Redis Instance is running, either docker image or cloud"""
+def create_cache_engine():
+    """Ensure Redis Instance is running, either docker image or cloud"""
 
-#     return redis.Redis(
-#                 host=os.getenv("REDISHOST"),
-#                 port=os.getenv("REDISPORT"),
-#                 password=os.getenv("REDISPASSWORD"),
-#                 db=0).from_pool(
-#                     redis.connection.ConnectionPool.from_url(
-#                         f"redis://{os.getenv("REDISHOST")}:{os.getenv("REDISPORT")}/0"
-#                         ))
+    return redis.Redis(
+                host=os.getenv("REDISHOST"),
+                port=os.getenv("REDISPORT"),
+                password=os.getenv("REDISPASSWORD"),
+                db=0).from_pool(
+                    redis.connection.ConnectionPool.from_url(
+                        f"redis://{os.getenv("REDISHOST")}:{os.getenv("REDISPORT")}/0"
+                        ))
 
 
 session = sessionmaker(create_connection_engine())
@@ -392,6 +399,7 @@ def get_available_gameweek_scores(
 
 
 def get_gameweek_scores(gameweek: int, session=session):
+    #Causes an issue, if database table has not been created from start
     with session() as session:
         stmt = (
             select(func.count("*"))
@@ -400,7 +408,7 @@ def get_gameweek_scores(gameweek: int, session=session):
         )
         obj = session.scalars(stmt).one()
         return obj
-
+        
 
 def delete_gameweek_scores(gameweek: int, session=session, table_name=""):
     with session() as session:
