@@ -1,6 +1,8 @@
 from functools import lru_cache
+from itertools import chain
 import operator
 
+import gevent
 import pandas as pd
 import json
 from .utils import get_basic_stats, League
@@ -31,6 +33,9 @@ class LeagueWeeklyReport(League):
     def get_data(self):
         self.one_df = pd.DataFrame(self.get_all_participant_entries(self.gw))
         self.f = pd.DataFrame(self.get_gw_transfers(self.gw))
+        
+        print(self.one_df.T.columns)
+        print(self.one_df.T.drop(axis=1))
         self.f = self.f.T
         
 

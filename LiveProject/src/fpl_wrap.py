@@ -142,13 +142,6 @@ class ParticipantReport(Participant):
                 ]
 
     def create_report(self, display=False):
-        # output = self.output.to_dict("list")
-        # r = create_cache_engine()  # save to cache
-        # r.set(
-        #     name=f"participant_{self.entry_id}",
-        #     value=json.dumps(self.output),
-        #     nx=600
-        #     )
 
         if display:
             print(self.output)

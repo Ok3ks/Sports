@@ -1,3 +1,5 @@
+from itertools import chain
+import gevent
 import requests
 from urllib3.util import Retry
 from requests.adapters import HTTPAdapter
@@ -161,8 +163,6 @@ def get_participant_entry(entry_id: int, gw: int) -> dict:
             ]
 
             if obj["automatic_subs"]:
-                # optimization 1
-                # team_list["auto_subs"] = [(item['element_in'],item['element_out'],) for item in obj['automatic_subs']]
 
                 for item in obj["automatic_subs"]:
                     if len(team_list["auto_sub_in"]) < 1:
@@ -492,8 +492,18 @@ class League:
             self.obtain_league_participants()
 
         # optimization 2
-        for participant in self.participants:
-            yield get_participant_entry(participant["entry"], gw)
+        req = [
+            gevent.spawn(get_participant_entry, 
+                         self.participants[i]['entry'], self.gw)
+            for i in range(0, len(self.participants)-1, 1)
+        ]
+
+        res = [response.value for response in gevent.iwait(req)]
+        count = sum(1 for _ in res)
+        return chain.from_iterable(res)
+
+        # for participant in self.participants:
+        #     yield get_participant_entry(participant["entry"], gw)
 
     def get_gw_transfers(self, gw, refresh=False, thread=None):
         self.transfers = []
