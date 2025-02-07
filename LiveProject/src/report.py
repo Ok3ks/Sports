@@ -32,6 +32,7 @@ class LeagueWeeklyReport(League):
         self.one_df = pd.DataFrame(self.get_all_participant_entries(self.gw))
         self.f = pd.DataFrame(self.get_gw_transfers(self.gw))
         self.f = self.f.T
+        
 
     @lru_cache(10)
     @profile
