@@ -278,6 +278,7 @@ class LeagueWeeklyReport(League):
 
                         worst_transfer_in.append(
                             {
+                                "entry_id": participant_id,
                                 "team_name": self.participants_name[participant_id],
                                 "player_in": int(player_in),
                                 "player_out": int(player_out),
@@ -303,6 +304,7 @@ class LeagueWeeklyReport(League):
 
                         best_transfer_in.append(
                             {
+                                "entry_id": participant_id,
                                 "team_name": self.participants_name[participant_id],
                                 "player_in": int(player_in),
                                 "player_out": int(player_out),
