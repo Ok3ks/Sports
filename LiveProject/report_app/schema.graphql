@@ -145,6 +145,7 @@ type PerformanceChange {
 }
 
 type transferImpact {
+  entryId: Int!
   teamName: String
   playerIn: String
   playerOut: String

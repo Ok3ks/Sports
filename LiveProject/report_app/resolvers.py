@@ -15,6 +15,7 @@ from src.fpl_wrap import ParticipantReport
 from src.gameview import groupby
 from src.report import LeagueWeeklyReport
 from src.utils import get_curr_event
+import functools
 
 # from .shortcuts import get_object_or_none
 import json
@@ -48,6 +49,7 @@ def resolve_players(*_, ids, gameweek):
     return [get_player_gql(id, gameweek) for id in ids]
 
 
+@functools.cache
 @query.field("participantReport")
 def resolve_participant(*_, entry_id, gameweek=None):
     """Retrieve a participant's league analysis"""
