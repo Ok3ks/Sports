@@ -1,4 +1,7 @@
+from sqlite3 import OperationalError
+import sqlite3
 import pandas as pd
+import sqlalchemy
 from src.db.db import (
     create_connection_engine,
     get_gameweek_scores,
@@ -13,7 +16,6 @@ import logging
 
 LOGGER = logging.getLogger(__name__)
 
-
 def update_db_gameweek_score(conn, gw):
     """This function retrieves current information of players
     from the API"""
@@ -26,6 +28,9 @@ def update_db_gameweek_score(conn, gw):
     df = df.T
     df["gameweek"] = gw
     df.reset_index(level=0, names="player_id", inplace=True)
+
+    # Write first, so we're assured table is always created
+    df.to_sql("Player_gameweek_score", conn, if_exists="append", method="multi")
 
     if get_gameweek_scores(gw) > 0:
         print(delete_gameweek_scores(gw, table_name=GameweekScore.__tablename__))
@@ -55,5 +60,4 @@ if __name__ == "__main__":
     try:
         update_db_gameweek_score(connection, args.gameweek_id)
     except ValueError:
-
         LOGGER.info("Gameweek is unavailable")
