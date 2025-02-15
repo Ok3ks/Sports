@@ -8,3 +8,6 @@ export DJANGO_SECRET_KEY='django-insecure-f&xs472(b!o6_b$5l*--ea1*m^*_=y))edubhv
 export REDISHOST=localhost
 export REDISPORT="6379"
 # export REDIS_PASSWORD=None
+
+export DB_PATH="LiveProject/src/db/db.sqlite3"
+export IS_SQLITE=True

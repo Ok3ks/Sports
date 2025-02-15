@@ -1,4 +1,5 @@
 # from utils import Gameweek, Player, League
+import sqlite3
 from types import NoneType
 import pymysql  # type: ignore
 import psycopg2  # type: ignore
@@ -158,9 +159,24 @@ team_name_to_code = {
 }
 
 
-def create_connection(db, db_type="postgres"):
-    """Use either postgresql or mysql"""
+def create_connection(db, db_type="sqlite"):
+    """
+        Create Direct Database connection using
+        either postgresql, mysql or sqlite
+    """
     conn = None
+
+    if db_type == "sqlite":
+        try:
+            conn = sqlite3.connect(
+                os.getenv("DB_PATH"),
+                check_same_thread=True,
+                timeout=10,
+                uri=True)
+            return conn
+        except Error as e:
+            print(e)
+        return conn
 
     if db_type == "postgres":
         try:
@@ -190,19 +206,23 @@ def create_connection(db, db_type="postgres"):
         return conn
 
 
-def create_connection_engine():
+def create_connection_engine(db="sqlite3"):
     """Creates a SQLAlchemy engine with a database"""
 
-    url_object = URL.create(
-        drivername=os.getenv("DB_DRIVER_NAME"),
-        username=os.getenv("DB_USERNAME"),
-        password=os.getenv("DB_PASSWORD"),
-        host=os.getenv("DB_HOST"),
-        port=os.getenv("DB_PORT"),
-        database=os.getenv("DB_DATABASE"),
-    )
+    if db == "sqlite3":
+        return create_engine('sqlite:///db.sqlite3', pool_recycle=3600, echo=True)
 
-    return create_engine(url_object, pool_pre_ping=True)
+    else:
+        url_object = URL.create(
+            drivername=os.getenv("DB_DRIVER_NAME"),
+            username=os.getenv("DB_USERNAME"),
+            password=os.getenv("DB_PASSWORD"),
+            host=os.getenv("DB_HOST"),
+            port=os.getenv("DB_PORT"),
+            database=os.getenv("DB_DATABASE"),
+        )
+
+        return create_engine(url_object, pool_pre_ping=True)
 
 
 def create_cache_engine():
@@ -267,7 +287,7 @@ def get_player(id, session=session):
 
 def get_teams(session=session):
     with session() as session:
-        statement = select(distinct(Player.team))
+        statement = select(distinct(PlayerInfo.team))
         obj = session.execute(statement).all()
         return obj
 
@@ -275,7 +295,7 @@ def get_teams(session=session):
 def get_teams_id(session=session) -> dict:
     """Return a mapping of team id to teams"""
     with session() as session:
-        statement_1 = text('SELECT team_id,team FROM public."EPL_2024_PLAYER_INFO"')
+        statement_1 = text('SELECT team_id,team FROM EPL_2024_PLAYER_INFO')
         obj = session.execute(statement_1).all()
         obj = {i[0]: i[1] for i in obj}
         return obj
@@ -284,7 +304,7 @@ def get_teams_id(session=session) -> dict:
 def get_player_team_map(session=session) -> dict:
     """Return a mapping of Player id to teams"""
     with session() as session:
-        statement_1 = text('SELECT player_id, team FROM public."EPL_2024_PLAYER_INFO"')
+        statement_1 = text('SELECT player_id, team FROM EPL_2024_PLAYER_INFO')
         obj = session.execute(statement_1).all()
         obj = {i[0]: i[1] for i in obj}
         return obj
@@ -294,7 +314,7 @@ def get_player_position_map(session=session) -> dict:
     """Return a mapping of Player id to teams"""
     with session() as session:
         statement_1 = text(
-            'SELECT player_id, position FROM public."EPL_2024_PLAYER_INFO"'
+            'SELECT player_id, position FROM "EPL_2024_PLAYER_INFO"'
         )
         obj = session.execute(statement_1).all()
         obj = {i[0]: i[1] for i in obj}
@@ -308,8 +328,8 @@ def get_player_position_map(session=session) -> dict:
 
 def get_entry_ids(session=sessionmaker(create_connection_engine()), table_name=""):
     with session() as session:
-        statement_1 = text(f"""SELECT id FROM public.'{table_name}'""")
-        statement_2 = text(f"""SELECT count(id) FROM public.'{table_name}'""")
+        statement_1 = text(f"""SELECT id FROM {table_name}""")
+        statement_2 = text(f"""SELECT count(id) FROM {table_name}""")
         obj = session.execute(statement_1).all()
         obj_2 = session.execute(statement_2).one()
         return (i.id for i in obj), obj_2[0]
@@ -328,7 +348,7 @@ def get_player_stats_from_db_gql(id, gw, session=session):
 
 def get_player_stats_from_db(gw, session=session):
     stmt = text(
-        f'SELECT player_id, total_points FROM public."Player_gameweek_score" WHERE gameweek = {gw}'
+        f'SELECT player_id, total_points FROM Player_gameweek_score WHERE gameweek = {gw}'
     )
     # stmt = select(PlayerGameweekScores.total_points).where((PlayerGameweekScores.player_id == id)&(PlayerGameweekScores.gameweek == gw))
     with session() as session:
@@ -339,14 +359,12 @@ def get_player_stats_from_db(gw, session=session):
 
 def get_ind_player_stats_from_db(id, gw, session=session):
     if (id and gw):
-        print(id)
         stmt = text(
-            f'SELECT total_points FROM public."Player_gameweek_score" WHERE gameweek = {gw} and player_id = {id}'
+            f'SELECT total_points FROM Player_gameweek_score WHERE gameweek = {gw} and player_id = {id}'
         )
         with session() as session:
             c = session.execute(stmt).one()
         if isinstance(c[0], int):
-            # print(f"Id is {id}, gw is {gw}")
             return c[0]
         else:
             pass
@@ -354,7 +372,7 @@ def get_ind_player_stats_from_db(id, gw, session=session):
 
 def get_gameweek_stats(gw, session=session):
     """Return all stats for a particular gameweek."""
-    stmt = text(f'SELECT * FROM public."Player_gameweek_score" WHERE gameweek = {gw}')
+    stmt = text(f'SELECT * FROM Player_gameweek_score WHERE gameweek = {gw}')
     with session() as session:
         c = session.execute(stmt).all()
     return c
@@ -363,7 +381,7 @@ def get_gameweek_stats(gw, session=session):
 def get_season_stats(session=session):
     """Return all season stats"""
     stmt = text(
-        f'SELECT * FROM public."Player_gameweek_score"  ORDER BY GAMEWEEK DESC '
+        f'SELECT * FROM Player_gameweek_score ORDER BY GAMEWEEK DESC '
     )
     with session() as session:
         c = session.execute(stmt).all()
@@ -372,7 +390,7 @@ def get_season_stats(session=session):
 
 def get_fixtures(session=session):
     """Return all fixtures."""
-    stmt = text(f'SELECT  * FROM public."2024_2025_FIXTURES"')
+    stmt = text(f'SELECT  * FROM 2024_2025_FIXTURES')
     with session() as session:
         c = session.execute(stmt).all()
     return c
@@ -383,7 +401,7 @@ def check_minutes(id, gw, session=session):
 
     if not math.isnan(id):
         stmt = text(
-            f'SELECT minutes FROM public."Player_gameweek_score" WHERE player_id={id} and gameweek = {gw}'
+            f'SELECT minutes FROM Player_gameweek_score WHERE player_id={id} and gameweek = {gw}'
         )
         with session() as session:
             c = session.execute(stmt)
@@ -399,7 +417,7 @@ def get_available_gameweek_scores(
     session=sessionmaker(create_connection_engine()),
 ):
     # can be refactored to get_distinct of any column
-    stmt = text('SELECT distinct(gameweek) FROM public."Player_gameweek_score"')
+    stmt = text('SELECT distinct(gameweek) FROM Player_gameweek_score')
     with session() as session:
         c = session.execute(stmt)
     return c.fetchall()
@@ -415,11 +433,10 @@ def get_gameweek_scores(gameweek: int, session=session):
         )
         obj = session.scalars(stmt).one()
         return obj
-        
 
 def delete_gameweek_scores(gameweek: int, session=session, table_name=""):
     with session() as session:
-        stmt = text(f'DELETE FROM public."{table_name}" where gameweek = {gameweek}')
+        stmt = text(f'DELETE FROM {table_name} where gameweek = {gameweek}')
         session.execute(stmt)
         session.commit()
 
@@ -432,8 +449,8 @@ def delete_gameweek_scores(gameweek: int, session=session, table_name=""):
 
 def get_entry_ids(session=sessionmaker(create_connection_engine()), table_name=""):
     with session() as session:
-        statement_1 = text(f'SELECT id FROM public."{table_name}"')
-        statement_2 = text(f'SELECT count(id) FROM public."{table_name}"')
+        statement_1 = text(f'SELECT id FROM {table_name}')
+        statement_2 = text(f'SELECT count(id) FROM {table_name}')
         obj = session.execute(statement_1).all()
         obj_2 = session.execute(statement_2).one()
         return (i.id for i in obj), obj_2[0]

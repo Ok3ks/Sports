@@ -93,8 +93,14 @@ WSGI_APPLICATION = "LiveProject.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 PASSWORD = os.getenv("DB_PASSWORD")
+
 DATABASES = {
     "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+} if os.getenv("IS_SQLITE") else {
+      "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": os.getenv("DB_DATABASE"),
         "USER": os.getenv("DB_USERNAME"),
@@ -104,7 +110,6 @@ DATABASES = {
         # 'OPTIONS': {'sslmode': 'require'},
     },
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
