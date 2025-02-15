@@ -9,8 +9,8 @@ import logging
 
 LOGGER = logging.getLogger(__name__)
 
-
 def league_participant_info(league_id: int, connection, PAGE_COUNT=1):
+    """Extracts Participants of a league """
     test = League(league_id)
     while test.has_next:
         # spawning 100 threads at once
