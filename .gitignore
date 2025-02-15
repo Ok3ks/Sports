@@ -10,3 +10,4 @@
 
 fpl-frontend/
 reports/weekly_report
+**/db.sqlite3
