@@ -12,15 +12,10 @@ RUN apt-get update \
 # Set environment variables for GDAL
 ENV GDAL_CONFIG=/usr/bin/gdal-config
 
-ARG DB_PORT
-ARG DB_USERNAME
-ARG DB_PASSWORD
-ARG DB_HOST
-ARG DB_DATABASE
-ARG DB_DRIVER_NAME
+ARG DB_PATH
 ARG DJANGO_SECRET_KEY
-ARG REDISHOST
-ARG REDISPORT
+ARG IS_SQLITE
+
 
 #setup environments
 COPY requirements.txt .
@@ -45,6 +40,8 @@ WORKDIR /sports/LiveProject
 
 COPY src/ ./src/ 
 COPY LiveProject/ ./LiveProject/
+COPY db.sqlite3 ./
+
 COPY report_app ./report_app/
 
 

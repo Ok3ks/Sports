@@ -1,9 +1,6 @@
 # from utils import Gameweek, Player, League
 import sqlite3
 from types import NoneType
-import pymysql  # type: ignore
-import psycopg2  # type: ignore
-import redis
 
 from sqlite3 import Error  # type: ignore
 import redis.connection
@@ -180,26 +177,14 @@ def create_connection(db, db_type="sqlite"):
 
     if db_type == "postgres":
         try:
-            conn = psycopg2.connect(
-                dbname=os.getenv("DB_DATABASE"),
-                user=os.getenv("DB_DATABASE"),
-                password=os.getenv("DB_PASSWORD"),
-                host=os.getenv("DB_HOST"),
-                port=os.getenv("DB_PORT"),
-            )
+            conn = None
             return conn
         except Error as e:
             print(e)
         return conn
     else:
         try:
-            conn = pymysql.connect(
-                dbname=os.getenv("DB_NAME"),
-                user=os.getenv("DB_USERNAME"),  # confirm? May lead to bug
-                password=os.getenv("DB_PASSWORD"),
-                host=os.getenv("DB_HOST"),
-                port=os.getenv("DB_PORT"),
-            )
+            conn = None
             return conn
         except Error as e:
             print(e)
