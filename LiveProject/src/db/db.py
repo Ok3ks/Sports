@@ -209,17 +209,17 @@ def create_connection_engine(db="sqlite3"):
         return create_engine(url_object, pool_pre_ping=True)
 
 
-def create_cache_engine():
-    """Ensure Redis Instance is running, either docker image or cloud"""
+# def create_cache_engine():
+#     """Ensure Redis Instance is running, either docker image or cloud"""
 
-    return redis.Redis(
-                host=os.getenv("REDISHOST"),
-                port=os.getenv("REDISPORT"),
-                password=os.getenv("REDISPASSWORD"),
-                db=0).from_pool(
-                    redis.connection.ConnectionPool.from_url(
-                        f"redis://{os.getenv("REDISHOST")}:{os.getenv("REDISPORT")}/0"
-                        ))
+#     return redis.Redis(
+#                 host=os.getenv("REDISHOST"),
+#                 port=os.getenv("REDISPORT"),
+#                 password=os.getenv("REDISPASSWORD"),
+#                 db=0).from_pool(
+#                     redis.connection.ConnectionPool.from_url(
+#                         f"redis://{os.getenv("REDISHOST")}:{os.getenv("REDISPORT")}/0"
+#                         ))
 
 
 session = sessionmaker(create_connection_engine())
