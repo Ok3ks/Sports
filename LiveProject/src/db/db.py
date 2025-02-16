@@ -3,7 +3,6 @@ import sqlite3
 from types import NoneType
 
 from sqlite3 import Error  # type: ignore
-import redis.connection
 from sqlalchemy import (
     Integer,
     String,
