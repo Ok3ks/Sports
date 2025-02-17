@@ -10,7 +10,7 @@ from ariadne import (
 
 
 # from .models import (Players, Gameweek_Scores)
-from src.db.db import create_cache_engine, get_gameweek_stats, get_player_gql
+from src.db.db import get_gameweek_stats, get_player_gql
 from src.fpl_wrap import ParticipantReport
 from src.gameview import groupby
 from src.report import LeagueWeeklyReport

@@ -7,7 +7,6 @@ from .utils import get_basic_stats, League
 from .db.db import (
     get_player_stats_from_db,
     check_minutes,
-    create_cache_engine,
 )
 import math
 
