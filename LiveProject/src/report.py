@@ -294,7 +294,6 @@ class LeagueWeeklyReport(League):
                 n = min(len(self.f), 3)
 
                 if "element_in" in self.f.keys() and "element_out" in self.f.keys():
-                    self.no_chips.head(3).to_json(path_or_buf="../temp.json")
                     for i in range(0, n):
                         player_in = self.no_chips.iloc[i, :]["element_in"][0]
                         player_out = self.no_chips.iloc[i, :]["element_out"][0]
