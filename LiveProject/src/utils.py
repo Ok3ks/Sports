@@ -6,8 +6,6 @@ import pandas as pd
 import json
 import numpy as np
 
-from paths import MOCK_DIR
-
 
 from .urls import GW_URL, TRANSFER_URL, FPL_URL
 from .urls import LEAGUE_URL, FPL_PLAYER
@@ -517,21 +515,10 @@ if __name__ == "__main__":
         type=int,
         help="Gameweek you are trying to get a report of",
     )
-    parser.add_argument("-dry", "--dry_run", type=bool, help="Dry run")
     parser.add_argument(
         "-l", "--league_id", type=int, help="Gameweek you are trying to get a report of"
     )
     parser.add_argument("-t", "--thread", type=int)
 
     args = parser.parse_args()
-    if args.dry_run:
-        test_gw = Gameweek(args.gameweek_id)
-        with open(f"{MOCK_DIR}/endpoints/gameweek_endpoint.json", "r") as ins:
-            test_gw.json = json.load(ins)
-
-        with open(f"{MOCK_DIR}/endpoints/fpl_url_endpoint.json", "r") as ins_2:
-            test_gw.gw_json = json.load(ins_2)
-
-        test_gw.parse_payload()
-    else:
-        print(get_participant_entry(entry_id=98120, gw=1))
+    print(get_participant_entry(entry_id=98120, gw=1))
