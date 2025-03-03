@@ -41,14 +41,10 @@ def get_basic_stats(total_points: List[Union[int, float]]):
     return Q1, average, Q3
 
 
-def parse_transfers(item: dict) -> dict:
-    row = {}
-    """
-        row[item['entry']] = {'element_in': [], 'element_out': []}
-        row[item['entry']] = row.get(item['entry'], {})
+def parse_transfers(item: dict, row: dict) -> dict:
 
-        row[item['entry']]['element_in'] = [item['element_in']]
-        row[item['entry']]['element_out'] = [item['element_out']]
+    """
+        Update Parsed transfer, Row contains a parsed transfer, and is being updated in get_gw_transfers()
     """
 
     row[item["entry"]] = row.get(item["entry"], {})
@@ -73,7 +69,7 @@ def check_gw(gw: Union[int, List[int]]) -> tuple:
         return (True, out)
     else:
         print("Gameweek has to be in the range 1 to 38")
-        pass
+        return (False, None)
 
 
 class GameweekError(Exception):
@@ -104,7 +100,7 @@ def get_gw_transfers(alist: List[int], gw: Union[int, List[int]], all=False) -> 
                     else:
                         if type(gw) == int and int(item["event"]) == gw:
                             # updates each id
-                            row.update(parse_transfers(item))
+                            row.update(parse_transfers(item, row))
                         elif type(gw) == list:
                             if int(item["event"]) in gw:
                                 row[item["event"]] = parse_transfers(item)
@@ -114,7 +110,6 @@ def get_gw_transfers(alist: List[int], gw: Union[int, List[int]], all=False) -> 
                         entry_id
                     )
                 )
-
     return row
 
 

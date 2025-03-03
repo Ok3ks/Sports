@@ -3,8 +3,8 @@ import operator
 
 import pandas as pd
 import json
-from .utils import get_basic_stats, League
-from .db.db import (
+from src.utils import get_basic_stats, League
+from src.db.db import (
     get_player_stats_from_db,
     check_minutes,
 )
@@ -51,7 +51,8 @@ class LeagueWeeklyReport(League):
 
         self.o_df["captain_points"] = self.o_df["captain"].map(
             lambda x: self.player_points[int(x)] * 2 if math.isnan(x) != True else 0
-        )
+            )
+        
         self.o_df["vice_captain_points"] = self.o_df["vice_captain"].map(
             lambda x: self.player_points[x] if math.isnan(x) != True else 0
         )
