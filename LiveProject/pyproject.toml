@@ -15,12 +15,12 @@ ariadne-django = "^0.3.0"
 gunicorn = "^23.0.0"
 pandas = "^2.2.3"
 numpy = "^2.1.2"
-sqlalchemy = "2.0.20"
 pymysql = "^1.1.1"
 requests = "^2.32.3"
 argparse = "^1.4.0"
 gevent = "^24.11.1"
 pytest = "^8.3.4"
+sqlalchemy = "^2.0.38"
 
 
 [tool.poetry.group.dev.dependencies]

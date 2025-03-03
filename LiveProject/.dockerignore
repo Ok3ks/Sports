@@ -4,5 +4,9 @@
 *.pyc
 **auth.sh
 
+
+.env
+.env.template
+
 fpl-frontend/
 reports/weekly_report
