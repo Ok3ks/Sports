@@ -7,7 +7,7 @@ import json
 import numpy as np
 
 
-from .urls import GW_URL, TRANSFER_URL, FPL_URL
+from .urls import GW_URL, TRANSFER_URL, FPL_URL, FPL_PLAYER
 from .urls import LEAGUE_URL, FPL_PLAYER
 
 from .db.db import get_player, get_player_team_code

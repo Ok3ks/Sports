@@ -271,8 +271,8 @@ class LeagueWeeklyReport(League):
                         by="delta", ascending=False
                     )
                     for i in range(1, n):
-                        player_in = self.no_chips.iloc[-i, :]["element_in"][0]
-                        player_out = self.no_chips.iloc[-i, :]["element_out"][0]
+                        player_in = self.no_chips.iloc[-i, :]["element_in"]
+                        player_out = self.no_chips.iloc[-i, :]["element_out"]
                         points_lost = int(self.no_chips.iloc[-i, :]["delta"])
                         participant_id = str(self.no_chips.iloc[-i, :]["entry_id"])
 
@@ -280,9 +280,9 @@ class LeagueWeeklyReport(League):
                             {
                                 "entry_id": participant_id,
                                 "team_name": self.participants_name[participant_id],
-                                "player_in": int(player_in),
-                                "player_out": int(player_out),
-                                "points_delta": points_lost,
+                                "player_in": player_in,
+                                "player_out": player_out,
+                                "points_delta": points_lost + (-int(self.o_df.iloc[-i, :]['event_transfers_cost'])),
                             }
                         )
             return {"worst_transfer_in": worst_transfer_in}
@@ -296,8 +296,8 @@ class LeagueWeeklyReport(League):
 
                 if "element_in" in self.f.keys() and "element_out" in self.f.keys():
                     for i in range(0, n):
-                        player_in = self.no_chips.iloc[i, :]["element_in"][0]
-                        player_out = self.no_chips.iloc[i, :]["element_out"][0]
+                        player_in = self.no_chips.iloc[i, :]["element_in"]
+                        player_out = self.no_chips.iloc[i, :]["element_out"]
                         points_gained = int(self.no_chips.iloc[i, :]["delta"])
                         participant_id = str(self.no_chips.iloc[i, :]["entry_id"])
 
@@ -305,12 +305,11 @@ class LeagueWeeklyReport(League):
                             {
                                 "entry_id": participant_id,
                                 "team_name": self.participants_name[participant_id],
-                                "player_in": int(player_in),
-                                "player_out": int(player_out),
-                                "points_delta": points_gained,
+                                "player_in": player_in,
+                                "player_out": player_out,
+                                "points_delta": points_gained + (int(self.o_df.iloc[-i, :]['event_transfers_cost'])),
                             }
-                        )
-
+                        )                  
             return {"best_transfer_in": best_transfer_in}
 
         @profile
@@ -376,7 +375,6 @@ class LeagueWeeklyReport(League):
             n = min(len(self.f), 3)
             for i in range(n):
                 player_on_bench = self.f.iloc[i, :]["bench"].split(",")
-                # point_player = {i: self.player_points[int(i)] for i in player_on_bench}
                 points_on_bench = int(self.f.iloc[i, :]["points_on_bench"])
                 participant_id = str(self.f.iloc[i, :]["entry_id"])
                 most_points.append(
