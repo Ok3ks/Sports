@@ -283,6 +283,7 @@ class LeagueWeeklyReport(League):
                                 "player_in": player_in,
                                 "player_out": player_out,
                                 "points_delta": points_lost + (-int(self.o_df.iloc[-i, :]['event_transfers_cost'])),
+                                "point_hit": int(self.o_df.iloc[-i, :]['event_transfers_cost']),
                             }
                         )
             return {"worst_transfer_in": worst_transfer_in}
@@ -307,7 +308,8 @@ class LeagueWeeklyReport(League):
                                 "team_name": self.participants_name[participant_id],
                                 "player_in": player_in,
                                 "player_out": player_out,
-                                "points_delta": points_gained + (int(self.o_df.iloc[-i, :]['event_transfers_cost'])),
+                                "points_delta": points_gained + (- int(self.o_df.iloc[-i, :]['event_transfers_cost'])) ,
+                                "point_hit": int(self.o_df.iloc[-i, :]['event_transfers_cost'])
                             }
                         )                  
             return {"best_transfer_in": best_transfer_in}

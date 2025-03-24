@@ -149,6 +149,7 @@ type transferImpact {
   teamName: String
   playerIn: [Int]
   playerOut: [Int]
+  pointHit: Int
   pointsDelta: Int
 }
 
