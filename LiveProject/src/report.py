@@ -130,6 +130,18 @@ class LeagueWeeklyReport(League):
         self.participants = self.obtain_league_participants()
         self.participants_name = self.get_participant_name()
 
+        def find_differential():
+            """Find the league differential. Calculating league EO"""
+
+            all_players = self.o_df["players"].map(
+                lambda x: [
+                    int(y) for y in x.split(",") if len(y.strip()) >= 1
+                ])
+            
+            all_players = all_players.explode().value_counts()
+
+            return {"differential": all_players.iloc[-3:].index.to_list()}
+        
         def get_league_name():
             return {"league_name": self.league_name}
 
@@ -407,6 +419,7 @@ class LeagueWeeklyReport(League):
         output.update(most_points_on_bench())
         output.update(jammy_points())
         output.update(most_benched())
+        output.update(find_differential())
 
         output.update(get_league_name())
 

@@ -10,6 +10,7 @@ type Query {
   leagueWeeklyReport(leagueId: Int!, gameweek:Int!): LeagueWeeklyReport!
   participantReport(entryId:Int!, gameweek:Int): ParticipantReport!
   gameViewReport(useGameweek:Boolean!, usePosition:Boolean!, useTeam:Boolean!): GameViewReport!
+  Differential(gameweek:Int!): [Player!]
 }
 
 type Player {
