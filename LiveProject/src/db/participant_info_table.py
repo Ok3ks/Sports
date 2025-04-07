@@ -9,7 +9,7 @@ import logging
 
 LOGGER = logging.getLogger(__name__)
 
-def league_participant_info(league_id: int, connection, PAGE_COUNT=1):
+def league_participant_info(league_id: int, connection=None, PAGE_COUNT=1):
     """Extracts Participants of a league """
     test = League(league_id)
     while test.has_next:
@@ -24,7 +24,7 @@ def league_participant_info(league_id: int, connection, PAGE_COUNT=1):
 
         df = pd.DataFrame(chain.from_iterable(res))
 
-        if df.shape[1] == 3:
+        if df.shape[1] == 3 and connection is not None:
             df.columns = ["id", "participant_entry_name", "participant_player_name"]
             df.to_sql(
                 f"League_{str(test.league_id)}",
