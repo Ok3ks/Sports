@@ -140,7 +140,7 @@ class LeagueWeeklyReport(League):
             
             all_players = all_players.explode().value_counts()
 
-            return {"differential": all_players.iloc[-3:].index.to_list()}
+            return {"differential": {"players": all_players.iloc[-3:].index.to_list()}}
         
         def get_league_name():
             return {"league_name": self.league_name}

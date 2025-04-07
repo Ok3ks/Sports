@@ -10,7 +10,7 @@ type Query {
   leagueWeeklyReport(leagueId: Int!, gameweek:Int!): LeagueWeeklyReport!
   participantReport(entryId:Int!, gameweek:Int): ParticipantReport!
   gameViewReport(useGameweek:Boolean!, usePosition:Boolean!, useTeam:Boolean!): GameViewReport!
-  Differential(gameweek:Int!): [Player!]
+  Differential(gameweek:Int!): DifferentialPlayer
 }
 
 type Player {
@@ -18,6 +18,11 @@ type Player {
   info: PlayerInfo!
   gameweekScore: PlayerGameweekScore!
 }
+
+type DifferentialPlayer {
+  players: [Int!]
+}
+
 
 type PlayerGameweekScore {
     playerId: Int!
@@ -105,6 +110,7 @@ type LeagueWeeklyReport {
   jammyPoints: [JammyPoints]
   mostBenched: mostBenched!
   leagueName: String!
+  differential: DifferentialPlayer
 }
 
 type promotedViceInfo {
