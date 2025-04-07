@@ -70,7 +70,10 @@ if __name__ == "__main__":
         res = [response.value for response in gevent.iwait(req)]
         # chaining tuples obtained from spawned processes
         df = pd.DataFrame(res)
-        df.to_sql(TABLE_NAME, engine, if_exists="append", method="multi", index=False)
+        df.to_json("test.json")
+        break
+
+        # df.to_sql(TABLE_NAME, engine, if_exists="append", method="multi", index=False)
         LOGGER.info("cycle {} complete".format(n))
 
         if n % 10_000 == 0:
