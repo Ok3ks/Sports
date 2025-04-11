@@ -311,7 +311,7 @@ class LeagueWeeklyReport(League):
                     for i in range(0, n):
                         player_in = self.no_chips.iloc[i, :]["element_in"]
                         player_out = self.no_chips.iloc[i, :]["element_out"]
-                        points_gained = int(self.no_chips.iloc[i, :]["delta"])
+                        points_delta = int(self.no_chips.iloc[i, :]["delta"])
                         participant_id = str(self.no_chips.iloc[i, :]["entry_id"])
 
                         best_transfer_in.append(
@@ -320,7 +320,7 @@ class LeagueWeeklyReport(League):
                                 "team_name": self.participants_name[participant_id],
                                 "player_in": player_in,
                                 "player_out": player_out,
-                                "points_delta": points_gained + (- int(self.o_df.iloc[-i, :]['event_transfers_cost'])) ,
+                                "points_delta": points_delta,
                                 "point_hit": int(self.o_df.iloc[-i, :]['event_transfers_cost'])
                             }
                         )                  
