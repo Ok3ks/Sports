@@ -208,7 +208,42 @@ def get_curr_event():
             curr_event.append((event["finished"], event["data_checked"]))
     return curr_event
 
+def get_gw_transfers_scrap(alist: List[int], gw: Union[int, List[int]], all=False) -> dict:
+    """Input is a list of entry_id. Gw is the gameweek number.
+    'all' toggles between extracting all gameweeks or not"""
 
+    try:
+        valid, gw = check_gw(gw)
+    except TypeError:
+        valid, gw = False, None
+    row = {}
+    if valid:
+        for entry_id in alist:
+            obj_row = {}
+            r = wget(TRANSFER_URL.format(entry_id))
+            if r.status_code == 200:
+                obj = r.json()
+                # updates by gameweek
+                for item in obj:
+                    if all:
+                        obj_row[item["event"]] = parse_transfers(item, {})
+                    else:
+                        if type(gw) == int and int(item["event"]) == gw:
+                            # updates each id
+                            obj_row.update(parse_transfers(item, {}))
+                        elif type(gw) == list:
+                            if int(item["event"]) in gw:
+                                obj_row[item["event"]] = parse_transfers(item, {})
+            else:
+                print(
+                    "{} does not exist or Transfer URL endpoint unavailable".format(
+                        entry_id
+                    )
+                )
+            row[entry_id] = obj
+        # yield row
+
+    return row
 class Gameweek:
     def __init__(self, gw=1):
         self.gw = gw
