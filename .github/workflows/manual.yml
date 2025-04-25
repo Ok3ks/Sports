@@ -6,7 +6,7 @@ name: Participants entry
 # or API.
 on:
   schedule: 
-    - cron:  '00/60 * * * *'
+    - cron:  '15/60 * * * *'
     
   workflow_dispatch:
     inputs:
@@ -45,7 +45,7 @@ jobs:
           echo END=$END >> $GITHUB_ENV
           
       - name: "update start & end"
-        if: ${{ github.event.schedule == '00/60 3 * * * *' }}
+        if: ${{ github.event.schedule == '15/60 3 * * * *' }}
         run: |
           START=20000
           END=30000
