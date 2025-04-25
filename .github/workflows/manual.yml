@@ -111,6 +111,6 @@ jobs:
         - id: 'upload-folder'
           uses: 'google-github-actions/upload-cloud-storage@v2'
           with:
-            path: LiveProject/$GW # modularize
+            path: LiveProject/${{ env.GW }} # modularize
             destination: 'wrapped_participants_entry'
     
