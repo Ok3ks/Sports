@@ -81,7 +81,37 @@ if __name__ == "__main__":
     parser.add_argument("-p", "--participant_id")
 
     args = parser.parse_args()
+<<<<<<< Updated upstream
     # TABLE_NAME = f"Entries_League_{args.participant_id}_Gameweek_{args.gameweek_id}"
     # engine = create_connection_engine()
     participant_weekly_entry(args.participant_id, args.gameweek_id)
     
+=======
+    TABLE_NAME = f"Entries_League_{args.league_id}_Gameweek_{args.gameweek_id}"
+    engine = create_connection_engine()
+
+    league_participant_info(args.league_id, engine)
+    list_of_entry_ids, LENGTH = get_entry_ids(
+        table_name=f"League_{str(args.league_id)}"
+    )
+    if LENGTH > 1:
+        create_gameweek_entries_table(conn=engine, table_name=TABLE_NAME)
+
+    for n in range(0, LENGTH, 100):
+        # optimum number of spawned threads to 100
+        req = [
+            gevent.spawn(get_participant_entry, gw=args.gameweek_id, entry_id=i)
+            for i in islice(list_of_entry_ids, n, n + 100, 1)
+        ]
+        res = [response.value for response in gevent.iwait(req)]
+        # chaining tuples obtained from spawned processes
+        df = pd.DataFrame(res)
+        print(df.to_json())
+        # break
+
+        # df.to_sql(TABLE_NAME, engine, if_exists="append", method="multi", index=False)
+        LOGGER.info("cycle {} complete".format(n))
+
+        if n % 10_000 == 0:
+            time.sleep(5)
+>>>>>>> Stashed changes

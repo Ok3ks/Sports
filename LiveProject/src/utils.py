@@ -141,9 +141,7 @@ def get_participant_entry(entry_id: int, gw: int) -> dict:
         }
 
         if r.status_code == 200:
-            print(
-                "Retrieving results, participant {} for event = {}".format(entry_id, gw)
-            )
+            
             obj = r.json()
 
             team_list["active_chip"] = obj["active_chip"]
