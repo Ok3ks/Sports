@@ -1,0 +1,92 @@
+# This is a basic workflow that is manually triggered
+
+name: Participants entry
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Endpoint to Scrap'
+        default: 'Scrap Participants Entry'
+        required: true
+        type: string
+
+jobs:
+  scrap:
+    # Allow the job to fetch a GitHub ID token
+    permissions:
+      id-token: write
+      contents: read
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - id: 'checkout'
+        uses: 'actions/checkout@v4'
+        with: 
+          ref: docker-production-sqlite
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: "LiveProject/.python-version"
+
+      - name: Create virtualenv
+        run: |
+          which python
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r LiveProject/requirements.txt
+          which python
+    
+      - name: 'Scrap Weekly Entry'
+        run: |
+            source venv/bin/activate
+            source init_env.sh
+            cd LiveProject
+            touch test.json
+            python src/db/write_participant_weekly_entry.py -g 3 -t 1 -p 12 > test.json 
+      # make dynamic
+
+      - name: 'Upload scrapped weekly entry'
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly_entry
+          path: LiveProject/test.json
+
+  upload:
+    # Allow the job to fetch a GitHub ID token
+      needs: scrap
+      permissions:
+        id-token: write
+        contents: read
+  
+      runs-on: ubuntu-latest
+      steps: 
+        - id: 'checkout'
+          uses: 'actions/checkout@v4'
+          
+        - id: 'auth'
+          name: 'Authenticate to Google Cloud'
+          uses: 'google-github-actions/auth@v2'
+          with:
+            create_credentials_file: true
+            workload_identity_provider: projects/987818742353/locations/global/workloadIdentityPools/gh-fpl/providers/github
+            service_account: league-analysis@fpl-analysis-tool.iam.gserviceaccount.com
+            process_gcloudignore: false
+
+        - name: Download outputted json
+          uses: actions/download-artifact@v4
+          with:
+            name: weekly_entry
+            path: LiveProject/test.json
+            
+        - id: 'upload-folder'
+          uses: 'google-github-actions/upload-cloud-storage@v2'
+          with:
+            path: LiveProject/test.json # modularize
+            destination: 'particpiants_entry'
+    
+            # files: '${{ steps.upload-folder.outputs.uploaded }}'
