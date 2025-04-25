@@ -6,7 +6,7 @@ name: Participants entry
 # or API.
 on:
   schedule: 
-    - cron:  '20/60 * * * *'
+    - cron:  '22/60 * * * *'
     
   workflow_dispatch:
     inputs:
