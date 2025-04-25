@@ -79,7 +79,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: weekly_entry
-          path: LiveProject/$START_$END.json
+          path: LiveProject/ ${{ env.START }}.json
 
   upload:
     # Allow the job to fetch a GitHub ID token
