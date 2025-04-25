@@ -79,7 +79,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: weekly_entry
-          path: LiveProject/${START}_${END}.json
+          path: LiveProject/$START_$END.json
 
   upload:
     # Allow the job to fetch a GitHub ID token
@@ -106,7 +106,7 @@ jobs:
           uses: actions/download-artifact@v4
           with:
             name: weekly_entry
-            path: LiveProject/${START}_${END}.json
+            path: LiveProject/$START_$END.json
             
         - id: 'upload-folder'
           uses: 'google-github-actions/upload-cloud-storage@v2'
