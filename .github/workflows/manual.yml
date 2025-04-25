@@ -51,6 +51,46 @@ jobs:
           END=30000
           echo START=$START >> $GITHUB_ENV
           echo END=$END >> $GITHUB_ENV
+          
+      - name: "update start & end"
+        if: ${{ github.event.schedule == '15/60 4 * * * *' }}
+        run: |
+          START=30000
+          END=40000
+          echo START=$START >> $GITHUB_ENV
+          echo END=$END >> $GITHUB_ENV
+
+      - name: "update start & end"
+        if: ${{ github.event.schedule == '15/60 5 * * * *' }}
+        run: |
+          START=40000
+          END=50000
+          echo START=$START >> $GITHUB_ENV
+          echo END=$END >> $GITHUB_ENV
+
+      - name: "update start & end"
+        if: ${{ github.event.schedule == '15/60 7 * * * *' }}
+        run: |
+          START=50000
+          END=60000
+          echo START=$START >> $GITHUB_ENV
+          echo END=$END >> $GITHUB_ENV
+
+      - name: "update start & end"
+        if: ${{ github.event.schedule == '15/60 8 * * * *' }}
+        run: |
+          START=60000
+          END=70000
+          echo START=$START >> $GITHUB_ENV
+          echo END=$END >> $GITHUB_ENV
+          
+      - name: "update start & end"
+        if: ${{ github.event.schedule == '15/60 9 * * * *' }}
+        run: |
+          START=70000
+          END=80000
+          echo START=$START >> $GITHUB_ENV
+          echo END=$END >> $GITHUB_ENV
 
       - name: Set up Python
         uses: actions/setup-python@v5
