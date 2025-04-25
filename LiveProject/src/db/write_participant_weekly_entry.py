@@ -1,10 +1,6 @@
 """Multiprocessing script to write weekly entries to database"""
 
 from src.utils import get_participant_entry
-from pymysql import Error
-from sqlalchemy import text
-from sqlalchemy.orm import sessionmaker
-from src.db.db import create_connection_engine
 import logging
 import gevent
 from src.db.participant_info_table import league_participant_info
@@ -45,22 +41,28 @@ def participant_weekly_entry(entry_id: list[int] | int, to_json=False):
     """Downloads weekly entry for a list of entry Id"""
     new_directory = "data/participant/"
     if type(entry_id) is list:
+        START = 0
         for n in range(0, len(entry_id), 100):
             # optimum number of spawned threads to 100
             req = [
                 gevent.spawn(
                     get_participant_entry,
                     gw=args.gameweek_id,
-                    entry_id=entry_id[n])
+                    entry_id=i) 
+                    for i in entry_id[START:START+100]
                 ]
             res = [response.value for response in gevent.iwait(req)]
             filename = f"{entry_id[n]}.json"
+            df = pd.DataFrame(res)
+            df.set_index("entry_id", inplace=True)
             if not os.path.exists(new_directory):
                 os.makedirs(new_directory)
-            df = pd.DataFrame(res)
-            df.to_json(os.path.join(new_directory, filename))
-            print(f"done {filename}")
+            if to_json:
+                df.to_json(os.path.join(new_directory, filename))
+            if n % 10_000 == 0:
+                time.sleep(5)
 
+            START += 100
             # chaining tuples obtained from spawned processes
     else:
         import json
@@ -78,33 +80,19 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser("Writing participant entries into DB")
     parser.add_argument("-g", "--gameweek_id", type=int, help="Gameweek entry")
     parser.add_argument("-t", "--processes", type=int, help="Number of processes")
-    parser.add_argument("-p", "--participant_id")
+    parser.add_argument("-s", "--start", type=int)
+    parser.add_argument("-e", "--end", type=int)
 
     args = parser.parse_args()
-    TABLE_NAME = f"Entries_League_{args.league_id}_Gameweek_{args.gameweek_id}"
-    engine = create_connection_engine()
+    import time
 
-    league_participant_info(args.league_id, engine)
-    list_of_entry_ids, LENGTH = get_entry_ids(
-        table_name=f"League_{str(args.league_id)}"
-    )
-    if LENGTH > 1:
-        create_gameweek_entries_table(conn=engine, table_name=TABLE_NAME)
+    # league_participant_info(args.league_id, engine)
+    # list_of_entry_ids, LENGTH = get_entry_ids(
+    #     table_name=f"League_{str(args.league_id)}"
+    # )
+    # if LENGTH > 1:
+    #     create_gameweek_entries_table(conn=engine, table_name=TABLE_NAME)
 
-    for n in range(0, LENGTH, 100):
-        # optimum number of spawned threads to 100
-        req = [
-            gevent.spawn(get_participant_entry, gw=args.gameweek_id, entry_id=i)
-            for i in islice(list_of_entry_ids, n, n + 100, 1)
-        ]
-        res = [response.value for response in gevent.iwait(req)]
-        # chaining tuples obtained from spawned processes
-        df = pd.DataFrame(res)
-        print(df.to_json())
-        # break
+    participant_weekly_entry([n for n in range(args.start, args.end)])
 
-        # df.to_sql(TABLE_NAME, engine, if_exists="append", method="multi", index=False)
-        LOGGER.info("cycle {} complete".format(n))
 
-        if n % 10_000 == 0:
-            time.sleep(5)
