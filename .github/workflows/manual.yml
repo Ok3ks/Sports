@@ -71,7 +71,7 @@ jobs:
             source init_env.sh
             cd LiveProject
             echo ${{ env.START }}.json
-            touch  $START.json
+            touch  ${{ env.START }}.json
             python src/db/write_participant_weekly_entry.py -g $GW -t 1 -s $START -e $END > ${{ env.START }}.json
       # make dynamic
 
@@ -79,7 +79,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: weekly_entry
-          path: LiveProject/ ${{ env.START }}.json
+          path: LiveProject/${{ env.START }}.json
 
   upload:
     # Allow the job to fetch a GitHub ID token
