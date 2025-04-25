@@ -5,6 +5,9 @@ name: Participants entry
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
 on:
+  schedule: 
+    - cron:  '20/60 * * * *'
+    
   workflow_dispatch:
     inputs:
       name:
@@ -12,6 +15,8 @@ on:
         default: 'Scrap Participants Entry'
         required: true
         type: string
+env:
+      GW: 1
 
 jobs:
   scrap:
@@ -21,6 +26,10 @@ jobs:
       contents: read
 
     runs-on: ubuntu-latest
+    env:
+      if: github.event.schedule == '30 1 * * * '
+      START: 1
+      END: 10000
 
     steps:
       - id: 'checkout'
@@ -47,14 +56,14 @@ jobs:
             source init_env.sh
             cd LiveProject
             touch test.json
-            python src/db/write_participant_weekly_entry.py -g 3 -t 1 -p 12 > test.json 
+            python src/db/write_participant_weekly_entry.py -g ${GW} -t 1 -s ${START} -e ${END} > ${START}_${END}.json
       # make dynamic
 
       - name: 'Upload scrapped weekly entry'
         uses: actions/upload-artifact@v4
         with:
           name: weekly_entry
-          path: LiveProject/test.json
+          path: LiveProject/${START}_${END}.json
 
   upload:
     # Allow the job to fetch a GitHub ID token
@@ -81,12 +90,12 @@ jobs:
           uses: actions/download-artifact@v4
           with:
             name: weekly_entry
-            path: LiveProject/test.json
+            path: LiveProject/${START}_${END}.json
             
         - id: 'upload-folder'
           uses: 'google-github-actions/upload-cloud-storage@v2'
           with:
-            path: LiveProject/test.json # modularize
-            destination: 'particpiants_entry'
+            path: LiveProject/$GW.json # modularize
+            destination: 'participiants_entry'
     
             # files: '${{ steps.upload-folder.outputs.uploaded }}'
