@@ -37,58 +37,82 @@ jobs:
 
       
       - name: "update start & end"
-        if: ${{ github.event.schedule == '00/60 2 * * * *' }}
+        if: ${{ github.event.schedule == '* 2 * * * *' }}
         run: |
           START=10000
-          END=20000
-          echo START=$START >> $GITHUB_ENV
-          echo END=$END >> $GITHUB_ENV
-          
-      - name: "update start & end"
-        if: ${{ github.event.schedule == '15/60 3 * * * *' }}
-        run: |
-          START=20000
           END=30000
           echo START=$START >> $GITHUB_ENV
           echo END=$END >> $GITHUB_ENV
           
       - name: "update start & end"
-        if: ${{ github.event.schedule == '15/60 4 * * * *' }}
+        if: ${{ github.event.schedule == '* 3 * * * *' }}
         run: |
           START=30000
-          END=40000
-          echo START=$START >> $GITHUB_ENV
-          echo END=$END >> $GITHUB_ENV
-
-      - name: "update start & end"
-        if: ${{ github.event.schedule == '15/60 5 * * * *' }}
-        run: |
-          START=40000
           END=50000
-          echo START=$START >> $GITHUB_ENV
-          echo END=$END >> $GITHUB_ENV
-
-      - name: "update start & end"
-        if: ${{ github.event.schedule == '15/60 7 * * * *' }}
-        run: |
-          START=50000
-          END=60000
-          echo START=$START >> $GITHUB_ENV
-          echo END=$END >> $GITHUB_ENV
-
-      - name: "update start & end"
-        if: ${{ github.event.schedule == '15/60 8 * * * *' }}
-        run: |
-          START=60000
-          END=70000
           echo START=$START >> $GITHUB_ENV
           echo END=$END >> $GITHUB_ENV
           
       - name: "update start & end"
-        if: ${{ github.event.schedule == '15/60 9 * * * *' }}
+        if: ${{ github.event.schedule == '* 4 * * * *' }}
+        run: |
+          START=50000
+          END=70000
+          echo START=$START >> $GITHUB_ENV
+          echo END=$END >> $GITHUB_ENV
+
+      - name: "update start & end"
+        if: ${{ github.event.schedule == '* 5 * * * *' }}
         run: |
           START=70000
-          END=80000
+          END=90000
+          echo START=$START >> $GITHUB_ENV
+          echo END=$END >> $GITHUB_ENV
+
+      - name: "update start & end"
+        if: ${{ github.event.schedule == '* 7 * * * *' }}
+        run: |
+          START=90000
+          END=1100000
+          echo START=$START >> $GITHUB_ENV
+          echo END=$END >> $GITHUB_ENV
+
+      - name: "update start & end"
+        if: ${{ github.event.schedule == '* 8 * * * *' }}
+        run: |
+          START=1100000
+          END=1300000
+          echo START=$START >> $GITHUB_ENV
+          echo END=$END >> $GITHUB_ENV
+          
+      - name: "update start & end"
+        if: ${{ github.event.schedule == '* 9 * * * *' }}
+        run: |
+          START=1300000
+          END=1500000
+          echo START=$START >> $GITHUB_ENV
+          echo END=$END >> $GITHUB_ENV
+          
+      - name: "update start & end"
+        if: ${{ github.event.schedule == '* 11 * * * *' }}
+        run: |
+          START=1500000
+          END=1700000
+          echo START=$START >> $GITHUB_ENV
+          echo END=$END >> $GITHUB_ENV
+
+      - name: "update start & end"
+        if: ${{ github.event.schedule == '* 12 * * * *' }}
+        run: |
+          START=1700000
+          END=1900000
+          echo START=$START >> $GITHUB_ENV
+          echo END=$END >> $GITHUB_ENV
+
+      - name: "update start & end"
+        if: ${{ github.event.schedule == '* 12 * * * *' }}
+        run: |
+          START=1900000
+          END=2100000
           echo START=$START >> $GITHUB_ENV
           echo END=$END >> $GITHUB_ENV
 
