@@ -18,7 +18,7 @@ on:
 env:
       GW: 1
       START: 1
-      END: 10000
+      END: 100000
 
 jobs:
   scrap:
@@ -37,47 +37,47 @@ jobs:
 
       
       - name: "update start & end"
-        if: ${{ github.event.schedule == '* 2 * * *' }}
+        if: ${{ github.event.schedule == '* 18 * * *' }}
         run: |
-          START=10000
-          END=30000
+          START=100000
+          END=300000
           echo START=$START >> $GITHUB_ENV
           echo END=$END >> $GITHUB_ENV
           
       - name: "update start & end"
-        if: ${{ github.event.schedule == '* 3 * * *' }}
+        if: ${{ github.event.schedule == '* 19 * * *' }}
         run: |
-          START=30000
-          END=50000
+          START=300000
+          END=500000
           echo START=$START >> $GITHUB_ENV
           echo END=$END >> $GITHUB_ENV
           
       - name: "update start & end"
-        if: ${{ github.event.schedule == '* 4 * * *' }}
+        if: ${{ github.event.schedule == '* 20 * * *' }}
         run: |
-          START=50000
-          END=70000
+          START=500000
+          END=700000
           echo START=$START >> $GITHUB_ENV
           echo END=$END >> $GITHUB_ENV
 
       - name: "update start & end"
-        if: ${{ github.event.schedule == '* 5 * * *' }}
+        if: ${{ github.event.schedule == '* 21 * * *' }}
         run: |
-          START=70000
-          END=90000
+          START=700000
+          END=900000
           echo START=$START >> $GITHUB_ENV
           echo END=$END >> $GITHUB_ENV
 
       - name: "update start & end"
-        if: ${{ github.event.schedule == '* 6 * * *' }}
+        if: ${{ github.event.schedule == '* 22 * * *' }}
         run: |
-          START=90000
+          START=900000
           END=1100000
           echo START=$START >> $GITHUB_ENV
           echo END=$END >> $GITHUB_ENV
 
       - name: "update start & end"
-        if: ${{ github.event.schedule == '* 7 * * *' }}
+        if: ${{ github.event.schedule == '* 23 * * *' }}
         run: |
           START=1100000
           END=1300000
@@ -85,7 +85,7 @@ jobs:
           echo END=$END >> $GITHUB_ENV
           
       - name: "update start & end"
-        if: ${{ github.event.schedule == '* 8 * * *' }}
+        if: ${{ github.event.schedule == '* 0 * * *' }}
         run: |
           START=1300000
           END=1500000
@@ -93,7 +93,7 @@ jobs:
           echo END=$END >> $GITHUB_ENV
           
       - name: "update start & end"
-        if: ${{ github.event.schedule == '* 9 * * *' }}
+        if: ${{ github.event.schedule == '* 1 * * *' }}
         run: |
           START=1500000
           END=1700000
@@ -101,7 +101,7 @@ jobs:
           echo END=$END >> $GITHUB_ENV
 
       - name: "update start & end"
-        if: ${{ github.event.schedule == '* 10 * * *' }}
+        if: ${{ github.event.schedule == '* 2 * * *' }}
         run: |
           START=1700000
           END=1900000
@@ -109,7 +109,7 @@ jobs:
           echo END=$END >> $GITHUB_ENV
 
       - name: "update start & end"
-        if: ${{ github.event.schedule == '* 11 * * *' }}
+        if: ${{ github.event.schedule == '* 3 * * *' }}
         run: |
           START=1900000
           END=2100000
@@ -121,13 +121,13 @@ jobs:
         with:
           python-version-file: "LiveProject/.python-version"
 
-      # - name: Create virtualenv
-      #   run: |
-      #     which python
-      #     python -m venv venv
-      #     source venv/bin/activate
-      #     pip install -r LiveProject/requirements.txt
-      #     which python
+      - name: Create virtualenv
+        run: |
+          which python
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r LiveProject/requirements.txt
+          which python
     
       - name: 'Scrap Weekly Entry'
         run: |
