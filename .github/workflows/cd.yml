@@ -53,19 +53,6 @@ jobs:
             source init_env.sh
             source startup.sh
 
-  build:
-    needs: init_env
-    permissions:
-      id-token: write
-      contents: read
-
-    runs-on: ubuntu-latest
-    steps:
-      - id: 'checkout'
-        uses: 'actions/checkout@v4'
-        with: 
-          ref: docker-production-sqlite
-
       - id: 'auth'
         name: 'Authenticate to Google Cloud'
         uses: 'google-github-actions/auth@v2'
