@@ -16,7 +16,7 @@ on:
         required: true
         type: string
 env:
-      GW: 1
+      GW: 2
       START: 1
       END: 100000
 
