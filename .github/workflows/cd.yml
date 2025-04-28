@@ -58,6 +58,10 @@ jobs:
           service_account: '${{ secrets.AUTH_SERVICE_ACCOUNT }}'
           process_gcloudignore: false
 
+      - name: 'Docker auth'
+        run: |
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+
       - name: 'Build and push container'
         run: |
           cd LiveProject
@@ -67,4 +71,3 @@ jobs:
           docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_NAME }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ env.REVISION }}
           echo "Image pushed"
 
-      #name: 'Deploy to Cloud Run'
