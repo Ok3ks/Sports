@@ -7,10 +7,6 @@ on:
         default: 'Deploy Backend Image'
         required: true
         type: string
-  push:
-    paths:
-      - 'deploy'
-    branches: [main]
 
 env:
   PROJECT_NAME: fpl-analysis-tool
