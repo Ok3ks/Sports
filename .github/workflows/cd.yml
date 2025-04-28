@@ -54,6 +54,7 @@ jobs:
             source startup.sh
 
   build:
+    needs: init_env
     permissions:
       id-token: write
       contents: read
