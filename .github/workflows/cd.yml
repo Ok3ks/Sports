@@ -20,7 +20,7 @@ env:
   REGION: europe-west2
 
 jobs: 
-  init_env:
+  build:
     # Allow the job to fetch a GitHub ID token
     permissions:
       id-token: write
@@ -82,3 +82,5 @@ jobs:
           echo "pushing ${{ env.REGION-docker.pkg.dev }}/${{ env.PROJECT_NAME }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ env.REVISION }} to Artifacts Registry"
           docker push ${{ env.REGION-docker.pkg.dev }}/${{ env.PROJECT_NAME }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ env.REVISION }}
           echo "Image pushed"
+
+      #name: 'Deploy to Cloud Run'
