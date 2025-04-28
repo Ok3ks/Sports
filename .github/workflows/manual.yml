@@ -163,8 +163,8 @@ jobs:
           uses: 'google-github-actions/auth@v2'
           with:
             create_credentials_file: true
-            workload_identity_provider: projects/987818742353/locations/global/workloadIdentityPools/gh-fpl/providers/github
-            service_account: league-analysis@fpl-analysis-tool.iam.gserviceaccount.com
+            workload_identity_provider: '${{secrets.WORKLOAD_IDENTITY_PROVIDERS }}'
+            service_account: '${{ secrets.AUTH_SERVICE_ACCOUNT }}'
             process_gcloudignore: false
 
         - name: Download outputted json

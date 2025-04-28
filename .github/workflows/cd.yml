@@ -1,41 +1,83 @@
 name: continuous deployment
-
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Deploy Backend Image'
+        default: 'Scrap Participants Entry'
+        required: true
+        type: string
   push:
     paths:
       - 'deploy'
     branches: [main]
 
 env:
-  PROJECT_ID: fpl-analysis-tools
-  ART_LOCATION: repo
-  REGION: europe-west
-  APP: test-image
+  PROJECT_NAME: fpl-analysis-tool
+  ARTIFACT_REPO_NAME: fpl
+  IMAGE_NAME: fpl-backend
+  REVISION: GW34_5
+  REGION: europe-west2
 
 jobs: 
+  init_env:
+    # Allow the job to fetch a GitHub ID token
+    permissions:
+      id-token: write
+      contents: read
+
+    runs-on: ubuntu-latest
+      
+    steps:
+      - id: 'checkout'
+        uses: 'actions/checkout@v4'
+        with: 
+          ref: docker-production-sqlite
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: "LiveProject/.python-version"
+
+      - name: Create virtualenv
+        run: |
+          which python
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r LiveProject/requirements.txt
+          which python
+    
+      - name: 'Update DB and info' # depends on endpoint
+        run: |
+            source venv/bin/activate
+            source init_env.sh
+            source startup.sh
+
   build:
+    permissions:
+      id-token: write
+      contents: read
+
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - id: 'checkout'
+        uses: 'actions/checkout@v4'
+        with: 
+          ref: docker-production-sqlite
 
-      - name: Google Auth
-        id: auth
-        uses: 'google-github-actions/auth@v1'
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v2'
         with:
-          workload_identity_provider: '${{secrets.WIF_PROVIDER}}'
-          service_account: '${{secrets.WIF_SERVICE_ACCOUNT }}'
-
-      - name: 'Set up Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v1'
-        with:
-          project_id: '${{ env.PROJECT_ID }}'
-
-      - name: 'Docker auth'
-        run: |
-          gcloud auth configure-docker ${{ env.ART_LOCATION }}-docker.pkg.dev
+          create_credentials_file: true
+          workload_identity_provider: '${{secrets.WORKLOAD_IDENTITY_PROVIDERS }}'
+          service_account: '${{ secrets.AUTH_SERVICE_ACCOUNT }}'
+          process_gcloudignore: false
 
       - name: 'Build and push container'
         run: |
-          docker build -t "${{ env.ART_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.APP }}/${{ env.APP }}:${{ github.sha }}" ./app
-          docker push "${{ env.ART_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.APP }}/${{ env.APP }}:${{ github.sha }}"
-        
+          docker build . -t ${{ env.IMAGE_NAME }} :${{ env.REVISION }}
+          docker tag ${{ env.IMAGE_NAME }} :${{ env.REVISION }} ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_NAME }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ env.REVISION }}
+          echo "pushing ${{ env.REGION-docker.pkg.dev }}/${{ env.PROJECT_NAME }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ env.REVISION }} to Artifacts Registry"
+          docker push ${{ env.REGION-docker.pkg.dev }}/${{ env.PROJECT_NAME }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ env.REVISION }}
+          echo "Image pushed"
