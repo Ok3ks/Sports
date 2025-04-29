@@ -1,12 +1,12 @@
 # This is a basic workflow that is manually triggered
 
-name: Participants entry
+name: GW1
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
 on:
   schedule: 
-    - cron:  '15 18,19,20,21,22,23,0,1,2,3,4,5,6,7,8,9 * * *'
+    - cron:  '15 18 * * *'
     
   workflow_dispatch:
     inputs:
@@ -16,9 +16,9 @@ on:
         required: true
         type: string
 env:
-      GW: 3
-      START: 1
-      END: 100000
+      GW: 1
+      START: 100000
+      END: 200000
 
 jobs:
   scrap:
@@ -34,87 +34,6 @@ jobs:
         uses: 'actions/checkout@v4'
         with: 
           ref: docker-production-sqlite
-
-      
-      - name: "update start & end"
-        if: ${{ github.event.schedule == '15 18 * * *' }}
-        run: |
-          START=100000
-          END=300000
-          echo START=$START >> $GITHUB_ENV
-          echo END=$END >> $GITHUB_ENV
-          
-      - name: "update start & end"
-        if: ${{ github.event.schedule == '* 19 * * *' }}
-        run: |
-          START=300000
-          END=500000
-          echo START=$START >> $GITHUB_ENV
-          echo END=$END >> $GITHUB_ENV
-          
-      - name: "update start & end"
-        if: ${{ github.event.schedule == '* 20 * * *' }}
-        run: |
-          START=500000
-          END=700000
-          echo START=$START >> $GITHUB_ENV
-          echo END=$END >> $GITHUB_ENV
-
-      - name: "update start & end"
-        if: ${{ github.event.schedule == '* 21 * * *' }}
-        run: |
-          START=700000
-          END=900000
-          echo START=$START >> $GITHUB_ENV
-          echo END=$END >> $GITHUB_ENV
-
-      - name: "update start & end"
-        if: ${{ github.event.schedule == '* 22 * * *' }}
-        run: |
-          START=900000
-          END=1100000
-          echo START=$START >> $GITHUB_ENV
-          echo END=$END >> $GITHUB_ENV
-
-      - name: "update start & end"
-        if: ${{ github.event.schedule == '* 23 * * *' }}
-        run: |
-          START=1100000
-          END=1300000
-          echo START=$START >> $GITHUB_ENV
-          echo END=$END >> $GITHUB_ENV
-          
-      - name: "update start & end"
-        if: ${{ github.event.schedule == '* 0 * * *' }}
-        run: |
-          START=1300000
-          END=1500000
-          echo START=$START >> $GITHUB_ENV
-          echo END=$END >> $GITHUB_ENV
-          
-      - name: "update start & end"
-        if: ${{ github.event.schedule == '* 1 * * *' }}
-        run: |
-          START=1500000
-          END=1700000
-          echo START=$START >> $GITHUB_ENV
-          echo END=$END >> $GITHUB_ENV
-
-      - name: "update start & end"
-        if: ${{ github.event.schedule == '* 2 * * *' }}
-        run: |
-          START=1700000
-          END=1900000
-          echo START=$START >> $GITHUB_ENV
-          echo END=$END >> $GITHUB_ENV
-
-      - name: "update start & end"
-        if: ${{ github.event.schedule == '* 3 * * *' }}
-        run: |
-          START=1900000
-          END=2100000
-          echo START=$START >> $GITHUB_ENV
-          echo END=$END >> $GITHUB_ENV
 
       - name: Set up Python
         uses: actions/setup-python@v5
