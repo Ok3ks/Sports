@@ -18,7 +18,7 @@ on:
 env:
       GW: 12
       START: 1
-      END: 100000
+      END: 40000
 
 jobs:
   scrap:
