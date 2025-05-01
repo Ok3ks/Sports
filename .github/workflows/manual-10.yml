@@ -16,11 +16,7 @@ on:
         required: true
         type: string
 env:
-<<<<<<< Updated upstream:.github/workflows/manual.yml
-      GW: 3
-=======
       GW: 10
->>>>>>> Stashed changes:.github/workflows/manual-10.yml
       START: 1
       END: 100000
 
