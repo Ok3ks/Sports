@@ -56,9 +56,10 @@ jobs:
             source init_env.sh
             cd LiveProject
             echo ${{ env.START }}.json
+            touch error.log
             touch  ${{ env.START }}.json
             echo ${{ github.event.schedule }}
-            python src/db/write_participant_weekly_entry.py -g $GW -t 1 -s $START -e $END > ${{ env.GW }}-${{ env.START }}.json
+            python src/db/write_participant_weekly_entry.py -g $GW -t 1 -s $START -e $END > ${{ env.GW }}-${{ env.START }}.json 2>error.log
       # make dynamic
 
       - name: 'Upload scrapped weekly entry'
@@ -66,6 +67,12 @@ jobs:
         with:
           name: weekly_entry
           path: LiveProject/${{ env.GW }}-${{ env.START }}.json
+
+      - name: 'Upload Logs'
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly_entry
+          path: LiveProject/error.log
 
   upload:
     # Allow the job to fetch a GitHub ID token
