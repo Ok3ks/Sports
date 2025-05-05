@@ -5,7 +5,7 @@ import logging
 import gevent
 from src.db.participant_info_table import league_participant_info
 import pandas as pd
-
+from src.utils import bucket_client
 
 LOGGER = logging.getLogger(__name__)
 
@@ -37,7 +37,11 @@ def create_gameweek_entries_table(conn="", table_name=""):
     return conn
 
 
-def participant_weekly_entry(entry_id: list[int] | int, to_json=False):
+
+
+bucket=bucket_client()
+
+def participant_weekly_entry(entry_id: list[int] | int, to_json=False, upload=True):
     """Downloads weekly entry for a list of entry Id"""
     new_directory = f"data/participant/{args.gameweek_id}"
     if type(entry_id) is list:
@@ -54,7 +58,6 @@ def participant_weekly_entry(entry_id: list[int] | int, to_json=False):
             res = [response.value for response in gevent.iwait(req)]
             filename = f"{entry_id[0] + n}.json"
             df = pd.DataFrame(res)
-            print(df.head())
             df.set_index("entry_id", inplace=True)
             if not os.path.exists(new_directory):
                 os.makedirs(new_directory)
@@ -63,6 +66,8 @@ def participant_weekly_entry(entry_id: list[int] | int, to_json=False):
                 print(f"{filename} saved to json")
             if n % 10_000 == 0:
                 time.sleep(5)
+            if upload:
+                print(bucket.exists())
 
             START += 100
             # chaining tuples obtained from spawned processes
@@ -95,6 +100,6 @@ if __name__ == "__main__":
     # if LENGTH > 1:
     #     create_gameweek_entries_table(conn=engine, table_name=TABLE_NAME)
 
-    participant_weekly_entry([n for n in range(args.start, args.end)], to_json=True)
+    participant_weekly_entry([n for n in range(args.start, args.end)], to_json=True, upload=True)
 
 
