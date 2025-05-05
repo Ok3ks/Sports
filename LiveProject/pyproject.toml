@@ -21,6 +21,7 @@ argparse = "^1.4.0"
 gevent = "^24.11.1"
 pytest = "^8.3.4"
 sqlalchemy = "^2.0.38"
+google-cloud-storage = "^3.1.0"
 
 
 [tool.poetry.group.dev.dependencies]
