@@ -39,7 +39,7 @@ def create_gameweek_entries_table(conn="", table_name=""):
 
 def participant_weekly_entry(entry_id: list[int] | int, to_json=False):
     """Downloads weekly entry for a list of entry Id"""
-    new_directory = "data/participant/"
+    new_directory = f"data/participant/{args.gameweek_id}"
     if type(entry_id) is list:
         START = 0
         for n in range(0, len(entry_id), 100):
@@ -52,13 +52,15 @@ def participant_weekly_entry(entry_id: list[int] | int, to_json=False):
                     for i in entry_id[START:START+100]
                 ]
             res = [response.value for response in gevent.iwait(req)]
-            filename = f"{entry_id[n]}.json"
+            filename = f"{entry_id[0] + n}.json"
             df = pd.DataFrame(res)
+            print(df.head())
             df.set_index("entry_id", inplace=True)
             if not os.path.exists(new_directory):
                 os.makedirs(new_directory)
             if to_json:
                 df.to_json(os.path.join(new_directory, filename))
+                print(f"{filename} saved to json")
             if n % 10_000 == 0:
                 time.sleep(5)
 
@@ -93,6 +95,6 @@ if __name__ == "__main__":
     # if LENGTH > 1:
     #     create_gameweek_entries_table(conn=engine, table_name=TABLE_NAME)
 
-    participant_weekly_entry([n for n in range(args.start, args.end)])
+    participant_weekly_entry([n for n in range(args.start, args.end)], to_json=True)
 
 
