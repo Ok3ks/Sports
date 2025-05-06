@@ -5,8 +5,8 @@ name: GW1
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
 on:
-  # schedule: 
-  #   - cron:  '15 18 * * *'
+  schedule: 
+    - cron:  '15 18 * * *'
     
   workflow_dispatch:
     inputs:
@@ -17,11 +17,11 @@ on:
         type: string
 env:
       GW: 1
-      START: 200000
-      END: 300000
+      START: 0
+      END: 10000
 
 jobs:
-  scrap:
+  scrap-and-upload:
     # Allow the job to fetch a GitHub ID token
     permissions:
       id-token: write
@@ -73,30 +73,3 @@ jobs:
         with:
           name: weekly_entry
           path: LiveProject/${{ env.START }}.json
-
-  upload:
-    # Allow the job to fetch a GitHub ID token
-      needs: scrap
-      permissions:
-        id-token: write
-        contents: read
-  
-      runs-on: ubuntu-latest
-      steps: 
-        - id: 'checkout'
-          uses: 'actions/checkout@v4'
-          
-        
-
-        - name: Download outputted json
-          uses: actions/download-artifact@v4
-          with:
-            name: weekly_entry
-            path: LiveProject/${{ env.START }}.json
-            
-        # - id: 'upload-folder'
-        #   uses: 'google-github-actions/upload-cloud-storage@v2'
-        #   with:
-        #     path: LiveProject/${{ env.GW }}.json # modularize
-        #     destination: 'wrapped_participants_entry'
-    
