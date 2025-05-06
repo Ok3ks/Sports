@@ -59,7 +59,6 @@ def participant_weekly_entry(entry_id: list[int] | int, to_json=False, upload=Tr
             filename = f"{entry_id[0] + n}.json"
             destination_path = os.path.join(new_directory, filename)
 
-
             df = pd.DataFrame(res)
             df.set_index("entry_id", inplace=True)
             if not os.path.exists(new_directory):
@@ -67,13 +66,13 @@ def participant_weekly_entry(entry_id: list[int] | int, to_json=False, upload=Tr
             if to_json:
                 df.to_json(destination_path)
                 print(f"{filename} saved to json")
+
             if n % 10_000 == 0:
                 time.sleep(5)
             if upload:
                 print(bucket.exists())
-                blob = bucket.blob(filename)
+                blob = bucket.blob(f"{args.gameweek_id}/filename")
                 blob.upload_from_filename(destination_path)
-
 
             START += 100
             # chaining tuples obtained from spawned processes
