@@ -47,6 +47,15 @@ jobs:
           source venv/bin/activate
           pip install -r LiveProject/requirements.txt
           which python
+
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          create_credentials_file: true
+          workload_identity_provider: '${{secrets.WORKLOAD_IDENTITY_PROVIDERS }}'
+          service_account: '${{ secrets.AUTH_SERVICE_ACCOUNT }}'
+          process_gcloudignore: false
     
       - name: 'Scrap Weekly Entry'
         run: |
@@ -77,14 +86,7 @@ jobs:
         - id: 'checkout'
           uses: 'actions/checkout@v4'
           
-        - id: 'auth'
-          name: 'Authenticate to Google Cloud'
-          uses: 'google-github-actions/auth@v2'
-          with:
-            create_credentials_file: true
-            workload_identity_provider: '${{secrets.WORKLOAD_IDENTITY_PROVIDERS }}'
-            service_account: '${{ secrets.AUTH_SERVICE_ACCOUNT }}'
-            process_gcloudignore: false
+        
 
         - name: Download outputted json
           uses: actions/download-artifact@v4
@@ -92,9 +94,9 @@ jobs:
             name: weekly_entry
             path: LiveProject/${{ env.START }}.json
             
-        - id: 'upload-folder'
-          uses: 'google-github-actions/upload-cloud-storage@v2'
-          with:
-            path: LiveProject/${{ env.GW }}.json # modularize
-            destination: 'wrapped_participants_entry'
+        # - id: 'upload-folder'
+        #   uses: 'google-github-actions/upload-cloud-storage@v2'
+        #   with:
+        #     path: LiveProject/${{ env.GW }}.json # modularize
+        #     destination: 'wrapped_participants_entry'
     
