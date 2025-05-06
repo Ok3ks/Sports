@@ -37,6 +37,8 @@ def create_gameweek_entries_table(conn="", table_name=""):
     return conn
 
 
+
+
 bucket=bucket_client()
 
 def participant_weekly_entry(entry_id: list[int] | int, to_json=False, upload=True):
@@ -54,7 +56,7 @@ def participant_weekly_entry(entry_id: list[int] | int, to_json=False, upload=Tr
                     for i in entry_id[START:START+100]
                 ]
             res = [response.value for response in gevent.iwait(req)]
-            filename = f"{args.gameweek_id}/{entry_id[0] + n}.json"
+            filename = f"{entry_id[0] + n}.json"
             destination_path = os.path.join(new_directory, filename)
 
 
@@ -105,3 +107,5 @@ if __name__ == "__main__":
     #     create_gameweek_entries_table(conn=engine, table_name=TABLE_NAME)
 
     participant_weekly_entry([n for n in range(args.start, args.end)], to_json=True, upload=True)
+
+
