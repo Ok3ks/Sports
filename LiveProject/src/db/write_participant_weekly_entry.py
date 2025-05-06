@@ -71,7 +71,7 @@ def participant_weekly_entry(entry_id: list[int] | int, to_json=False, upload=Tr
                 time.sleep(5)
             if upload:
                 print(bucket.exists())
-                blob = bucket.blob(f"{args.gameweek_id}/filename")
+                blob = bucket.blob(f"{args.gameweek_id}/{filename}")
                 blob.upload_from_filename(destination_path)
 
             START += 100
