@@ -114,7 +114,7 @@ def get_gw_transfers(alist: List[int], gw: Union[int, List[int]], all=False) -> 
                 )
     return row
 
-def bucket_client(bucket_name="wrapped_participant_entry"):
+def bucket_client(bucket_name="wrapped_participants_entry"):
     client = storage.Client()
     bucket = client.get_bucket(bucket_name)
     return bucket
