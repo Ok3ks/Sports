@@ -105,6 +105,6 @@ if __name__ == "__main__":
     # if LENGTH > 1:
     #     create_gameweek_entries_table(conn=engine, table_name=TABLE_NAME)
 
-    participant_weekly_entry([n for n in range(args.start, args.end)], to_json=True, upload=False)
+    participant_weekly_entry([n for n in range(args.start, args.end)], to_json=True, upload=True)
 
 
