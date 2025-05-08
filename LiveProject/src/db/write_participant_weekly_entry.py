@@ -67,7 +67,7 @@ def participant_weekly_entry(entry_id: list[int] | int, to_json=False, upload=Tr
                 df.to_json(destination_path)
                 print(f"{filename} saved to json")
 
-            if n == len(entry_id)//4:
+            if n % (len(entry_id)//4) == 0:
                 time.sleep(5)
             if upload:
                 print(bucket.exists())
