@@ -39,7 +39,7 @@ def create_gameweek_entries_table(conn="", table_name=""):
 
 
 
-bucket=bucket_client()
+# bucket=bucket_client()
 
 def participant_weekly_entry(entry_id: list[int] | int, to_json=False, upload=True):
     """Downloads weekly entry for a list of entry Id"""
@@ -69,10 +69,10 @@ def participant_weekly_entry(entry_id: list[int] | int, to_json=False, upload=Tr
 
             if n % 10_000 == 0:
                 time.sleep(5)
-            if upload:
-                print(bucket.exists())
-                blob = bucket.blob(f"{args.gameweek_id}/{filename}")
-                blob.upload_from_filename(destination_path)
+            # if upload:
+                # print(bucket.exists())
+                # blob = bucket.blob(f"{args.gameweek_id}/{filename}")
+                # blob.upload_from_filename(destination_path)
 
             START += 100
             # chaining tuples obtained from spawned processes
@@ -105,6 +105,6 @@ if __name__ == "__main__":
     # if LENGTH > 1:
     #     create_gameweek_entries_table(conn=engine, table_name=TABLE_NAME)
 
-    participant_weekly_entry([n for n in range(args.start, args.end)], to_json=True, upload=True)
+    participant_weekly_entry([n for n in range(args.start, args.end)], to_json=True, upload=False)
 
 
