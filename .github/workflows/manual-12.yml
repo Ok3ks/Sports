@@ -17,11 +17,11 @@ on:
         type: string
 env:
       GW: 12
-      START: 1
-      END: 1000
+      START: 100000
+      END: 200000
 
 jobs:
-  scrap:
+  scrap-and-upload:
     # Allow the job to fetch a GitHub ID token
     permissions:
       id-token: write
@@ -35,8 +35,6 @@ jobs:
         with: 
           ref: docker-production-sqlite
 
-      
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -49,6 +47,15 @@ jobs:
           source venv/bin/activate
           pip install -r LiveProject/requirements.txt
           which python
+
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          create_credentials_file: true
+          workload_identity_provider: '${{secrets.WORKLOAD_IDENTITY_PROVIDERS }}'
+          service_account: '${{ secrets.AUTH_SERVICE_ACCOUNT }}'
+          process_gcloudignore: false
     
       - name: 'Scrap Weekly Entry'
         run: |
@@ -56,54 +63,6 @@ jobs:
             source init_env.sh
             cd LiveProject
             echo ${{ env.START }}.json
-            touch error.log
             touch  ${{ env.START }}.json
             echo ${{ github.event.schedule }}
-            python src/db/write_participant_weekly_entry.py -g $GW -t 1 -s $START -e $END > ${{ env.GW }}-${{ env.START }}.json 2>error.log
-      # make dynamic
-
-      - name: 'Upload scrapped weekly entry'
-        uses: actions/upload-artifact@v4
-        with:
-          name: weekly_entry
-          path: LiveProject/${{ env.GW }}-${{ env.START }}.json
-
-      - name: 'Upload Logs'
-        uses: actions/upload-artifact@v4
-        with:
-          name: weekly_entry
-          path: LiveProject/error.log
-
-  upload:
-    # Allow the job to fetch a GitHub ID token
-      needs: scrap
-      permissions:
-        id-token: write
-        contents: read
-  
-      runs-on: ubuntu-latest
-      steps: 
-        - id: 'checkout'
-          uses: 'actions/checkout@v4'
-          
-        - id: 'auth'
-          name: 'Authenticate to Google Cloud'
-          uses: 'google-github-actions/auth@v2'
-          with:
-            create_credentials_file: true
-            workload_identity_provider: '${{secrets.WORKLOAD_IDENTITY_PROVIDERS }}'
-            service_account: '${{ secrets.AUTH_SERVICE_ACCOUNT }}'
-            process_gcloudignore: false
-
-        - name: Download outputted json
-          uses: actions/download-artifact@v4
-          with:
-            name: weekly_entry
-            path: LiveProject/${{ env.GW }}-${{ env.START }}.json
-            
-        - id: 'upload-folder'
-          uses: 'google-github-actions/upload-cloud-storage@v2'
-          with:
-            path: LiveProject/${{ env.GW }}-${{ env.START }}.json # modularize
-            destination: 'wrapped_participants_entry'
-    
+            python src/db/write_participant_weekly_entry.py -g $GW -t 1 -s $START -e $END
