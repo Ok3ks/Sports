@@ -4,7 +4,7 @@ name: GW5
 
 on:
   schedule: 
-    - cron:  '15 22 * * *'
+    - cron:  '15 15 * * *'
     
   workflow_dispatch:
     inputs:
@@ -15,8 +15,8 @@ on:
         type: string
 env:
       GW: 5
-      START: 600000
-      END: 700000
+      START: 700000
+      END: 800000
 
 jobs:
   scrap-and-upload:
