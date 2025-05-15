@@ -39,14 +39,14 @@ def create_gameweek_entries_table(conn="", table_name=""):
 
 
 
-# bucket=bucket_client()
+bucket=bucket_client()
 
 def participant_weekly_entry(entry_id: list[int] | int, to_json=False, upload=True):
     """Downloads weekly entry for a list of entry Id"""
     new_directory = f"data/participant/{args.gameweek_id}"
     if type(entry_id) is list:
         START = 0
-        for n in range(0, len(entry_id), 100):
+        for n in range(0, len(entry_id), 200):
             # optimum number of spawned threads to 100
             req = [
                 gevent.spawn(
@@ -97,13 +97,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     import time
-
-    # league_participant_info(args.league_id, engine)
-    # list_of_entry_ids, LENGTH = get_entry_ids(
-    #     table_name=f"League_{str(args.league_id)}"
-    # )
-    # if LENGTH > 1:
-    #     create_gameweek_entries_table(conn=engine, table_name=TABLE_NAME)
 
     participant_weekly_entry([n for n in range(args.start, args.end)], to_json=True, upload=False)
 
