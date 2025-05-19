@@ -40,6 +40,7 @@ WORKDIR /sports/LiveProject
 
 COPY src/ ./src/ 
 COPY LiveProject/ ./LiveProject/
+COPY db.sqlite3 ./
 
 COPY report_app ./report_app/
 

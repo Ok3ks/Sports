@@ -10,7 +10,7 @@
 
 fpl-frontend/
 reports/weekly_report
-**/db.sqlite3
+
 
 **temp_venv
 **/temp_venv
