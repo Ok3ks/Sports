@@ -32,7 +32,7 @@ jobs:
       - id: 'checkout'
         uses: 'actions/checkout@v4'
         with: 
-          ref: docker-production-sqlite
+          ref: scraping-branch
 
       - name: Set up Python
         uses: actions/setup-python@v5
