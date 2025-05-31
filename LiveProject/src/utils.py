@@ -114,11 +114,6 @@ def get_gw_transfers(alist: List[int], gw: Union[int, List[int]], all=False) -> 
                 )
     return row
 
-def bucket_client(bucket_name="wrapped_participants_entry"):
-    client = storage.Client()
-    bucket = client.get_bucket(bucket_name)
-    return bucket
-
 
 def get_participant_entry(entry_id: int, gw: int) -> dict:
     """Calls an Endpoint to retrieve a participants entry"""
