@@ -38,7 +38,6 @@ def create_gameweek_entries_table(conn="", table_name=""):
 
 
 
-
 bucket=bucket_client()
 
 def participant_weekly_entry(entry_id: list[int] | int, to_json=False, upload=True):
