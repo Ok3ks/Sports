@@ -19,14 +19,14 @@ def league_participant_weekly_entry( league_id : int, gameweek: list[int] | int 
     if not os.path.exists(new_directory):
         os.makedirs(new_directory)
 
-    if type(gameweek) == None:
-        gameweek = [i for i in range(1,38)]
+    if gameweek is None:
+        gameweek = [i for i in range(1, 39)]
 
     if type(gameweek) is list:
         for gw in gameweek: 
             res = league.get_all_participant_entries(gw),
             res = [*res]
-            filename = f"{gameweek}_entries.json"
+            filename = f"{gw}_entries.json"
             destination_path = os.path.join(new_directory, filename)
 
             df = pd.DataFrame(res)
@@ -37,21 +37,21 @@ def league_participant_weekly_entry( league_id : int, gameweek: list[int] | int 
             if gw % (len(gameweek)//4) == 0:
                 time.sleep(5)
 
-            if upload:
-                print(bucket.exists())
-                blob = bucket.blob(f"{args.league_id}/{filename}")
-                blob.upload_from_filename(destination_path)
+            # if upload:
+            #     print(bucket.exists())
+            #     blob = bucket.blob(f"{args.league_id}/{filename}")
+            #     blob.upload_from_filename(destination_path)
 
-    else :
+    else:
         res = league.get_all_participant_entries(gw=gameweek)
         if to_json:
             res = [*res]
             filename = f"{gameweek}_entries.json"
             destination_path = os.path.join(new_directory, filename)
-            with open(filename, 'w') as outs:
-                json.dump(res, outs)
-    
-
+            df = pd.DataFrame(res)
+            if to_json:
+                df.to_json(destination_path)
+                print(f"{filename} saved to json")
 
 
 if __name__ == "__main__":
