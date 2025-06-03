@@ -155,7 +155,7 @@ team_name_to_code = {
 }
 
 
-def create_connection(db, db_type="sqlite"):
+def create_connection(db, path, db_type="sqlite"):
     """
         Create Direct Database connection using
         either postgresql, mysql or sqlite
@@ -165,7 +165,7 @@ def create_connection(db, db_type="sqlite"):
     if db_type == "sqlite":
         try:
             conn = sqlite3.connect(
-                os.getenv("DB_PATH"),
+                path,
                 check_same_thread=True,
                 timeout=10,
                 uri=True)

@@ -9,5 +9,4 @@ export REDISHOST=localhost
 export REDISPORT="6379"
 # export REDIS_PASSWORD=None
 
-export DB_PATH="LiveProject/src/db/db.sqlite3"
 export IS_SQLITE=True
