@@ -17,8 +17,8 @@ on:
         type: string
 env:
       GW: 21
-      START: 2900000
-      END: 3100000
+      START: 3100000
+      END: 3300000
 
 jobs:
   scrap-and-upload:
@@ -33,7 +33,7 @@ jobs:
       - id: 'checkout'
         uses: 'actions/checkout@v4'
         with: 
-          ref: docker-production-sqlite
+          ref: scraping-branch
 
       - name: Set up Python
         uses: actions/setup-python@v5

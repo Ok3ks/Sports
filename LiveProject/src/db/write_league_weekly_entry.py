@@ -5,10 +5,8 @@ import logging
 import json
 from src.db.participant_info_table import league_participant_info
 import pandas as pd
-from src.utils import bucket_client
 
 LOGGER = logging.getLogger(__name__)
-bucket = bucket_client()
 
 def league_participant_weekly_entry( league_id : int, gameweek: list[int] | int | None = None, to_json=False, upload=True):
     """Downloads weekly entry for a list of entry Id"""
@@ -37,12 +35,7 @@ def league_participant_weekly_entry( league_id : int, gameweek: list[int] | int 
             if gw % (len(gameweek)//4) == 0:
                 time.sleep(5)
 
-            # if upload:
-            #     print(bucket.exists())
-            #     blob = bucket.blob(f"{args.league_id}/{filename}")
-            #     blob.upload_from_filename(destination_path)
-
-    else:
+    else :
         res = league.get_all_participant_entries(gw=gameweek)
         if to_json:
             res = [*res]

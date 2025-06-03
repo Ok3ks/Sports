@@ -5,7 +5,6 @@ import logging
 import gevent
 from src.db.participant_info_table import league_participant_info
 import pandas as pd
-from src.utils import bucket_client
 
 LOGGER = logging.getLogger(__name__)
 
@@ -37,9 +36,6 @@ def create_gameweek_entries_table(conn="", table_name=""):
     return conn
 
 
-
-bucket=bucket_client()
-
 def participant_weekly_entry(entry_id: list[int] | int, to_json=False, upload=True):
     """Downloads weekly entry for a list of entry Id"""
     new_directory = f"data/participant/{args.gameweek_id}"
@@ -68,10 +64,6 @@ def participant_weekly_entry(entry_id: list[int] | int, to_json=False, upload=Tr
 
             if n % (len(entry_id)//4) == 0:
                 time.sleep(5)
-            if upload:
-                print(bucket.exists())
-                blob = bucket.blob(f"{args.gameweek_id}/{filename}")
-                blob.upload_from_filename(destination_path)
 
             START += 100
             # chaining tuples obtained from spawned processes
