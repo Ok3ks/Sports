@@ -12,7 +12,7 @@ env:
   PROJECT_NAME: fpl-analysis-tool
   ARTIFACT_REPO_NAME: fpl
   IMAGE_NAME: fpl-backend
-  REVISION: GW38_3
+  REVISION: GW38_old_docker
   REGION: europe-west2
 
 jobs: 
