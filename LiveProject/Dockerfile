@@ -5,17 +5,22 @@ FROM base AS builder
 WORKDIR /sports/app
 
 # upgrade pip to the latest version
-# RUN apt-get update --allow-unauthenticated
-    # && apt-get install -y build-essential libstdc++6 libgdal-dev gdal-bin \
-    # && rm -rf /var/lib/apt/lists/*
+RUN apt-get update \
+    && apt-get install -y build-essential libstdc++6 libgdal-dev gdal-bin \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set environment variables for GDAL
-# ENV GDAL_CONFIG=/usr/bin/gdal-config
+ENV GDAL_CONFIG=/usr/bin/gdal-config
 
-ARG DB_PATH
+ARG DB_PORT
+ARG DB_USERNAME
+ARG DB_PASSWORD
+ARG DB_HOST
+ARG DB_DATABASE
+ARG DB_DRIVER_NAME
 ARG DJANGO_SECRET_KEY
-ARG IS_SQLITE
-
+ARG REDISHOST
+ARG REDISPORT
 
 #setup environments
 COPY requirements.txt .
@@ -40,12 +45,10 @@ WORKDIR /sports/LiveProject
 
 COPY src/ ./src/ 
 COPY LiveProject/ ./LiveProject/
-COPY db.sqlite3 ./
-
 COPY report_app ./report_app/
 
 
 # ENV GOOGLE_ENTRYPOINT="/venv/bin/gunicorn --bind=8000 LiveProject.wsgi:application"
 
 EXPOSE 8000
-ENTRYPOINT ["/venv/bin/gunicorn", "--config=python:LiveProject.gunicorn"]
+# ENTRYPOINT ["/venv/bin/gunicorn", "--config=python:LiveProject.gunicorn"]
