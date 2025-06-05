@@ -1,7 +1,11 @@
 from __future__ import annotations
 
-import multiprocessing
-
-bind = "0.0.0.0:8000"
-workers = multiprocessing.cpu_count() * 2 + 1
+bind = ":8000"
+workers = 6
 wsgi_app = "LiveProject.wsgi:application"
+timeout = 300
+max_requests = 120
+threads = 4
+spew = True
+loglevel = 'info'
+

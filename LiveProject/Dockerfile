@@ -51,4 +51,4 @@ COPY report_app ./report_app/
 # ENV GOOGLE_ENTRYPOINT="/venv/bin/gunicorn --bind=8000 LiveProject.wsgi:application"
 
 EXPOSE 8000
-# ENTRYPOINT ["/venv/bin/gunicorn", "--config=python:LiveProject.gunicorn"]
+ENTRYPOINT ["/venv/bin/gunicorn", "--config=python:LiveProject.gunicorn"]
