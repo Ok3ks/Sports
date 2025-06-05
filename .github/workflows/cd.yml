@@ -12,7 +12,7 @@ env:
   PROJECT_NAME: fpl-analysis-tool
   ARTIFACT_REPO_NAME: fpl
   IMAGE_NAME: fpl-backend
-  REVISION: GW38_no_psycopg2
+  REVISION: GW38_no_spew_baked_multi
   REGION: europe-west2
 
 jobs: 
