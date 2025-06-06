@@ -12,7 +12,11 @@ env:
   PROJECT_NAME: fpl-analysis-tool
   ARTIFACT_REPO_NAME: fpl
   IMAGE_NAME: fpl-backend
+<<<<<<< Updated upstream
   REVISION: GW38_please_work
+=======
+  REVISION: GW38_3
+>>>>>>> Stashed changes
   REGION: europe-west2
 
 jobs: 
