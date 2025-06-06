@@ -12,7 +12,7 @@ colorama==0.4.6 ; python_version >= "3.12" and python_version < "4.0" and sys_pl
 django-cors-headers==4.4.0 ; python_version >= "3.12" and python_version < "4.0"
 django-livereload==1.7 ; python_version >= "3.12" and python_version < "4.0"
 django==5.1 ; python_version >= "3.12" and python_version < "4.0"
-fastparquet==2024.11.0
+fastparquet==2024.11.0 ; python_version >= "3.12" and python_version < "4.0"
 gevent==24.11.1 ; python_version >= "3.12" and python_version < "4.0"
 google-api-core==2.24.2 ; python_version >= "3.12" and python_version < "4.0"
 google-auth==2.40.0 ; python_version >= "3.12" and python_version < "4.0"
