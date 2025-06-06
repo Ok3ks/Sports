@@ -51,7 +51,7 @@ def participant_weekly_entry(entry_id: list[int] | int, to_json=False, upload=Tr
                     for i in entry_id[START:START+100]
                 ]
             res = [response.value for response in gevent.iwait(req)]
-            filename = f"{entry_id[0] + n}.json"
+            filename = f"{entry_id[0] + n}.pqt"
             destination_path = os.path.join(new_directory, filename)
 
             df = pd.DataFrame(res)
@@ -59,8 +59,8 @@ def participant_weekly_entry(entry_id: list[int] | int, to_json=False, upload=Tr
             if not os.path.exists(new_directory):
                 os.makedirs(new_directory)
             if to_json:
-                df.to_json(destination_path)
-                print(f"{filename} saved to json")
+                df.to_parquet(destination_path, compression="brotli")
+                print(f"{filename} saved ")
 
             if n % (len(entry_id)//4) == 0:
                 time.sleep(5)

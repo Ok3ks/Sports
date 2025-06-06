@@ -19,13 +19,13 @@ def league_participants( league_id : int, to_json=False, upload=True):
 
 
     res = league.obtain_league_participants(),
-    filename = "participant.json"
+    filename = "participant.pqt"
     destination_path = os.path.join(new_directory, filename)
 
     df = pd.DataFrame(res)
     if to_json:
         df.to_parquet(destination_path, compression="brotli")
-        print(f"{filename} saved to json")
+        print(f"{filename} saved")
 
 
 if __name__ == "__main__":

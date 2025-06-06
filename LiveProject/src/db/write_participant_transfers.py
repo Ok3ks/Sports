@@ -24,7 +24,7 @@ def participant_transfers(entry_id: list[int] | int, gw: int, to_json=False) -> 
                     all=True)
                 ]
             res = [response.value for response in gevent.iwait(req)]
-            filename = f"{entry_id[n]}_transfers.json"
+            filename = f"{entry_id[n]}_transfers.pqt"
             if not os.path.exists(new_directory):
                 os.makedirs(new_directory)
             df = pd.DataFrame(res)
