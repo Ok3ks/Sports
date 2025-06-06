@@ -29,7 +29,7 @@ def league_participant_weekly_entry( league_id : int, gameweek: list[int] | int 
 
             df = pd.DataFrame(res)
             if to_json:
-                df.to_json(destination_path)
+                df.to_parquet(destination_path, compression="brotli")
                 print(f"{filename} saved to json")
 
             if gw % (len(gameweek)//4) == 0:
@@ -43,7 +43,7 @@ def league_participant_weekly_entry( league_id : int, gameweek: list[int] | int 
             destination_path = os.path.join(new_directory, filename)
             df = pd.DataFrame(res)
             if to_json:
-                df.to_json(destination_path)
+                df.to_parquet(destination_path, compression="brotli")
                 print(f"{filename} saved to json")
 
 

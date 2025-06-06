@@ -28,10 +28,9 @@ def participant_transfers(entry_id: list[int] | int, gw: int, to_json=False) -> 
             if not os.path.exists(new_directory):
                 os.makedirs(new_directory)
             df = pd.DataFrame(res)
-            print(df.to_json())
 
             if to_json:
-                df.to_json(os.path.join(new_directory, filename))
+                df.to_parquet(os.path.join(new_directory, filename), compression="brotli")
                 print(f"done {filename}")
     return df
 

@@ -24,7 +24,7 @@ def league_participants( league_id : int, to_json=False, upload=True):
 
     df = pd.DataFrame(res)
     if to_json:
-        df.to_json(destination_path)
+        df.to_parquet(destination_path, compression="brotli")
         print(f"{filename} saved to json")
 
 
