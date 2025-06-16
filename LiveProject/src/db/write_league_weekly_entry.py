@@ -53,8 +53,8 @@ if __name__ == "__main__":
     import time
 
     parser = argparse.ArgumentParser("Writing participant entries into DB")
-    parser.add_argument("-l", "--league_id", type=int, help="Gameweek entry", required=True)
-    parser.add_argument("-g", "--gameweek_id", type=int, help="Number of processes")
+    parser.add_argument("-l", "--league_id", type=int, help="league_id", required=True)
+    parser.add_argument("-g", "--gameweek_id", type=int, help="gameweek entry")
     args = parser.parse_args()
 
     if args.gameweek_id:
