@@ -17,8 +17,8 @@ on:
         type: string
 env:
       GW: 38
-      START: ${{secrets.N }} * 200000 * 24
-      END: ${{secrets.N }} * 200000 * 24 + (200000)
+      START: ${{secrets.N }}
+      END: ${{secrets.N }}
 
 jobs:
   scrap-and-upload:
@@ -30,11 +30,11 @@ jobs:
     runs-on: ubuntu-latest
       
     steps:
-      - id: 'set start env'
+      - name: set start env
         run: |
           echo ::set-env name=START::$(($START*200_000* 24))
       
-      - id: 'set end env'
+      - name: set end env
         run: |
           echo ::set-env name=END::$(($START + 200_000)
       
