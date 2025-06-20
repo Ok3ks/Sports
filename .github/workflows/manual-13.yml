@@ -5,8 +5,8 @@ name: GW13
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
 on:
-  schedule: 
-    - cron:  '15 6 * * *'
+  # schedule: 
+  #   - cron:  '15 6 * * *'
     
   workflow_dispatch:
     inputs:

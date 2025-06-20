@@ -4,8 +4,8 @@ name: GW4
 
 
 on:
-  schedule: 
-    - cron:  '15 14 * * *'
+  # schedule: 
+  #   - cron:  '15 14 * * *'
     
   workflow_dispatch:
     inputs:

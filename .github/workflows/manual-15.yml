@@ -5,8 +5,8 @@ name: GW15
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
 on:
-  schedule: 
-    - cron:  '15 8 * * *'
+  # schedule: 
+  #   - cron:  '15 8 * * *'
     
   workflow_dispatch:
     inputs:

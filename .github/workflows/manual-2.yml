@@ -5,8 +5,8 @@ name: GW2
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
 on:
-  schedule: 
-    - cron:  '15 19 * * *'
+  # schedule: 
+  #   - cron:  '15 19 * * *'
     
   workflow_dispatch:
     inputs:
