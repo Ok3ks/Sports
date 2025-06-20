@@ -6,7 +6,7 @@ name: GW38
 # or API.
 on:
   schedule: 
-    - cron:  '15 0 * * *'
+    - cron:  '15 11 * * *'
     
   workflow_dispatch:
     inputs:
@@ -17,8 +17,8 @@ on:
         type: string
 env:
       GW: 38
-      START: ${{secrets.N }}
-      END: ${{secrets.N }}
+      START: 2200000
+      END: 2400000
 
 jobs:
   scrap-and-upload:
@@ -30,14 +30,6 @@ jobs:
     runs-on: ubuntu-latest
       
     steps:
-      - name: set start env
-        run: |
-          echo "START=$START * 200000 * 24" >> $GITHUB_ENV
-      
-      - name: set end env
-        run: |
-          echo "END=$START + 200000" >> $GITHUB_ENV
-      
       - id: 'checkout'
         uses: 'actions/checkout@v4'
         with: 
