@@ -6,7 +6,7 @@ name: GW26
 # or API.
 on:
   schedule: 
-    - cron:  '15 1 * * *'
+    # - cron:  '15 1 * * *'
     
   workflow_dispatch:
     inputs:
@@ -17,8 +17,8 @@ on:
         type: string
 env:
       GW: 38
-      START: (${{secrets.N }} + 1 )* 200000 * 24
-      END: (${{secrets.N }} + 1 ) * 200000 * 24 + (200000)
+      # START: (${{secrets.N }} + 1 )* 200000 * 24
+      # END: (${{secrets.N }} + 1 ) * 200000 * 24 + (200000)
 
 jobs:
   scrap-and-upload:
