@@ -36,7 +36,7 @@ jobs:
       
       - name: set end env
         run: |
-          echo "END=(($START * 200000* 24 + 200000))" >> $GITHUB_ENV
+          echo "END=$START + 200000" >> $GITHUB_ENV
       
       - id: 'checkout'
         uses: 'actions/checkout@v4'
