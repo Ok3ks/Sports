@@ -32,11 +32,11 @@ jobs:
     steps:
       - name: set start env
         run: |
-          echo ::set-env name=START::$(($START*200000* 24))
+          echo "START=$START * 200000 * 24" >> $START
       
       - name: set end env
         run: |
-          echo ::set-env name=END::$(($START + 200000)
+          echo "START=(($START * 200000* 24 + 200000))" >> $START
       
       - id: 'checkout'
         uses: 'actions/checkout@v4'
