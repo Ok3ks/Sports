@@ -30,6 +30,14 @@ jobs:
     runs-on: ubuntu-latest
       
     steps:
+      - id: 'set start env'
+        run: |
+          echo ::set-env name=START::$(($START*200_000* 24))
+      
+      - id: 'set end env'
+        run: |
+          echo ::set-env name=END::$(($START + 200_000)
+      
       - id: 'checkout'
         uses: 'actions/checkout@v4'
         with: 
