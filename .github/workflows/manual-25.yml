@@ -32,11 +32,11 @@ jobs:
     steps:
       - name: set start env
         run: |
-          echo "START=$START * 200000 * 24" >> $START
+          echo "START=$START * 200000 * 24" >> $GITHUB_ENV
       
       - name: set end env
         run: |
-          echo "START=(($START * 200000* 24 + 200000))" >> $START
+          echo "END=(($START * 200000* 24 + 200000))" >> $GITHUB_ENV
       
       - id: 'checkout'
         uses: 'actions/checkout@v4'
