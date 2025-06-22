@@ -12,7 +12,7 @@ from ariadne import (
 # from .models import (Players, Gameweek_Scores)
 from src.db.db import get_gameweek_stats, get_player_gql
 from src.fpl_wrap import ParticipantReport
-from src.gameview import groupby
+from src.gameview import parse_stats
 from src.report import LeagueWeeklyReport
 from src.utils import get_curr_event
 import functools
@@ -31,10 +31,10 @@ def resolve_gameweek_stats(*_, gameweek):
 
 
 @query.field("gameViewReport")
-def resolve_season_stats(*_, use_gameweek: bool, use_position: bool, use_team: bool):
+def resolve_season_stats(*_, gameweek):
     """Retrieve season statistics for all players by either gameweek, position, or team"""
-    if use_gameweek & use_position:
-        return groupby(groups={"gameweek", "position"})
+    return parse_stats(filter={"gameweek": gameweek})
+
 
 
 @query.field("player")
@@ -75,7 +75,6 @@ def resolve_participant(*_, entry_id, gameweek=None):
 @query.field("leagueWeeklyReport")
 def resolve_league_gameweek_report(*_, league_id, gameweek):
     """Retrieve a Player's gameweek score based on player_id"""
-
 
     report = LeagueWeeklyReport(gameweek, league_id)
     report.get_data()

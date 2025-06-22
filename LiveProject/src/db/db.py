@@ -292,6 +292,15 @@ def get_player_team_map(session=session) -> dict:
         obj = session.execute(statement_1).all()
         obj = {i[0]: i[1] for i in obj}
         return obj
+    
+    
+def get_player_name_map(session=session) -> dict:
+    """Return a mapping of Player id to Name"""
+    with session() as session:
+        statement_1 = text('SELECT player_id, player_name FROM EPL_2024_PLAYER_INFO')
+        obj = session.execute(statement_1).all()
+        obj = {i[0]: i[1] for i in obj}
+        return obj
 
 
 def get_player_position_map(session=session) -> dict:
