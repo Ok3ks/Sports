@@ -69,7 +69,7 @@ def parse_fixture():
     return fixture_df
 
 
-def parse_stats(filter={"gameweek": 38}) -> dict[str, Any]:
+def parse_stats(filter={"gameweek": 38}, to_dict=True) -> dict[str, Any] | pd.DataFrame:
     """Combine Season stats from DB, and map appropriately."""
 
     stats = get_season_stats()
@@ -77,15 +77,16 @@ def parse_stats(filter={"gameweek": 38}) -> dict[str, Any]:
     player_position_mapping = get_player_position_map()
     player_name_mapping = get_player_name_map()
 
-    full_df = pd.DataFrame(stats)
+    full_df: pd.DataFrame = pd.DataFrame(stats)
 
     full_df = full_df[full_df['gameweek'] == filter['gameweek']]
 
     full_df["player_name"] = full_df["player_id"].map(lambda x: player_name_mapping[x])
     full_df["team"] = full_df["player_id"].map(lambda x: player_team_mapping[x])
     full_df["position"] = full_df["player_id"].map(lambda x: player_position_mapping[x])
-    obj =  full_df.to_dict()
-    breakpoint()
+    if to_dict:
+        obj = full_df.to_dict()
+        return obj
     return obj
 
 
@@ -93,7 +94,7 @@ def parse_stats(filter={"gameweek": 38}) -> dict[str, Any]:
 def groupby(groups: set[str] = {"gameweek", "position"}):
     """Calculate aggregates groupby."""
     all_groups = {"gameweek", "position", "team"}
-    stats = parse_stats(filter={"gameweek": 38})
+    stats = parse_stats(filter={"gameweek": 38},to_dict=False)
     obj = stats.groupby(list(groups)).aggregate(
         {
             "goals_scored": "sum",
