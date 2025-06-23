@@ -18,7 +18,7 @@ on:
 env:
       GW: 38
       START: 9800000
-      END: 1000000
+      END: 100000000
 
 jobs:
   scrap-and-upload:
