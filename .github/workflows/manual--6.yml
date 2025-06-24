@@ -1,6 +1,6 @@
 # This is a basic workflow that is manually triggered
 
-name: GW38
+name: GW37
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
@@ -17,8 +17,8 @@ on:
         type: string
 env:
       GW: 37
-      START: 8400000
-      END: 8600000
+      START: 1000000
+      END: 1200000
 
 jobs:
   scrap-and-upload:
