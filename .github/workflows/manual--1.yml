@@ -6,7 +6,7 @@ name: GW37
 # or API.
 on:
   schedule: 
-    - cron:  '15 0 * * *'
+    # - cron:  '15 0 * * *'
     
   workflow_dispatch:
     inputs:
@@ -16,9 +16,9 @@ on:
         required: true
         type: string
 env:
-      GW: 37
-      START: 6600000
-      END: 6800000
+      GW: 36
+      START: 2000000 
+      END: 2200000
 
 jobs:
   scrap-and-upload:

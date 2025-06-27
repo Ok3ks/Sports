@@ -6,7 +6,7 @@ name: GW37
 # or API.
 on:
   schedule: 
-    - cron:  '15 11 * * *'
+    - cron:  '15 9 * * *'
     
   workflow_dispatch:
     inputs:
@@ -17,8 +17,9 @@ on:
         type: string
 env:
       GW: 37
-      START: 8800000
-      END: 9000000
+      START: 9000000
+      END: 9200000
+
 jobs:
   scrap-and-upload:
     # Allow the job to fetch a GitHub ID token
