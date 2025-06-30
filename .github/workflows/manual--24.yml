@@ -6,7 +6,7 @@ name: GW38
 # or API.
 on:
   schedule: 
-    - cron:  '15 23 * * *'
+    # - cron:  '15 23 * * *'
     
   workflow_dispatch:
     inputs:
