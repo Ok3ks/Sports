@@ -17,8 +17,8 @@ on:
         type: string
 env:
       GW: 35
-      START: 11400000
-      END: 11600000
+      START: 7600000
+      END: 7800000
 
 jobs:
   scrap-and-upload:
