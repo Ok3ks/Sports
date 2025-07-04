@@ -17,8 +17,9 @@ on:
         type: string
 env:
       GW: 35
-      START: 3200000
-      END: 3400000
+      START: 1400000
+      END: 1600000
+      
 jobs:
   scrap-and-upload:
     # Allow the job to fetch a GitHub ID token
