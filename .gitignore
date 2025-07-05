@@ -14,3 +14,5 @@ reports/weekly_report
 
 **temp_venv
 **/temp_venv
+**/misc/data_scrap
+**/*.json
