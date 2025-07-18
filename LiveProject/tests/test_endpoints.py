@@ -1,4 +1,4 @@
-from src.urls import (
+from ..src.urls import (
     GW_URL,
     FIXTURE_URL,
     TRANSFER_URL,
@@ -35,6 +35,13 @@ def test_gameweek_endpoint(gw_fixture):
 
     stats_keys = set(r["elements"][0]["stats"].keys())
     stats_keys_prev = [
+        "mng_win",
+        "mng_underdog_draw",
+        "mng_loss",
+        "mng_draw",
+        "mng_goals_scored",
+        "mng_underdog_win",
+        "mng_clean_sheets",
         "minutes",
         "goals_scored",
         "assists",
