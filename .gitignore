@@ -1,8 +1,18 @@
 #cache
 *cache
-**/__pycache__/*
-*.pyc
-*auth.sh
+(__pycache__/*)
+**.pyc
+
+
+
+**-credential-**
+**.DS_Store
 
 fpl-frontend/
 reports/weekly_report
+
+
+**temp_venv
+**/temp_venv
+**/misc/data_scrap
+**/*.json
