@@ -8,5 +8,6 @@ Tools/Frameworks Used:
 - Django + GraphQL to create APIs,
 - Pytest to write test,
 - Poetry for Environment Management, 
-- Github Actions for Continuous Integration and Continuous Deployment
+- [WIP] Github Actions for Continuous Integration and Continuous Deployment
 - Docker for Infrastructure Management
+- Redis as KV store
