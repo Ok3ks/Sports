@@ -1,3 +1,4 @@
+import gevent
 import requests
 from urllib3.util import Retry
 from requests.adapters import HTTPAdapter
@@ -436,6 +437,7 @@ class League:
         self.league_name = ""
         self.has_next = True
         self.PAGE_COUNT = 1
+        self.entry_ids = []
 
     def obtain_league_participants(self, refresh=False):
         """This function uses the league url as an endpoint to query for participants of a league at a certain date.
@@ -453,7 +455,9 @@ class League:
 
                 self.league_name = obj["league"]["name"]
 
-                self.participants.extend(obj["standings"]["results"])
+                self.participants.extend(obj["standings"]["results"]) 
+                # No need for multiprocessing since 0(n) to get number of page counts, sacrificing memory for time by using above
+                # play around with yield after length reaches certain amount?
                 self.has_next = obj["standings"]["has_next"]
                 self.PAGE_COUNT += 1
                 LOGGER.info(
@@ -464,6 +468,51 @@ class League:
 
                 self.league_name = obj["league"]["name"]
         self.entry_ids = [participant["entry"] for participant in self.participants]
+        return self.participants
+    
+    def obtain_league_participants_mp(self, refresh=False):
+
+        """Redundant"""
+        """This function is a multithreaded version of obtaining league participants of a league"""
+        def scrap_individual_page(PAGE_COUNT):
+            """Scraps individual entries"""
+            entry_ids = []
+            participants = []
+
+            r = wget(LEAGUE_URL.format(self.league_id, PAGE_COUNT))
+            assert r.status_code == 200, "error connecting to the endpoint"
+            obj = r.json()
+            LOGGER.info(r.status_code)
+            LOGGER.info(r.headers)
+            del r
+
+            participants.extend(obj["standings"]["results"])
+            return participants
+            
+        if refresh or len(self.participants) == 0:
+            r = wget(LEAGUE_URL.format(self.league_id, 1))
+            assert r.status_code == 200, "error connecting to the endpoint"
+            obj = r.json()
+            self.league_name = obj["league"]["name"]
+            
+            self.has_next = True
+            while self.has_next:
+                self.PAGE_COUNT += 1
+                self.has_next = obj["standings"]["has_next"]
+                LOGGER.info(
+                "Page Count {}".format(
+                    self.PAGE_COUNT
+                )
+            )
+            LOGGER.info(
+                "Number of pages of participants {} have been extracted".format(
+                    self.PAGE_COUNT
+                )
+            )
+        req = [gevent.spawn(scrap_individual_page, count) for count in range(self.PAGE_COUNT)]
+        res = [response.value for response in gevent.iwait(req)]
+        print(res) #TODO: Test
+
         return self.participants
 
     def get_league_count(self):
@@ -521,8 +570,8 @@ class League:
             
 
         # optimization 2
-        for participant in self.participants:
-            yield get_participant_entry(participant["entry"], gw)
+        # for participant in self.participants:
+        #     yield get_participant_entry(participant["entry"], gw)
 
     def get_gw_transfers(self, gw, refresh=False, thread=None):
         self.transfers = []
