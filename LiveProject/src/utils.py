@@ -61,17 +61,20 @@ def parse_transfers(item: dict, row: dict) -> dict:
 
 def check_gw(gw: Union[int, List[int]]) -> tuple:
     out = []
-    if type(gw) == int and gw >= 1 and gw <= 38:
-        return (True, gw)
 
-    elif type(gw) == list:
+    if gw is list:
         for i in gw:
             if check_gw(i)[0]:
                 out.append(i)
+            else:
+                pass
         return (True, out)
     else:
-        print("Gameweek has to be in the range 1 to 38")
-        return (False, None)
+        if gw is int and gw >= 1 and gw <= 38:
+            return (True, gw)
+        else:
+            logging.info(f"{gw} is out of range")
+            return (False, None)
 
 
 class GameweekError(Exception):
@@ -408,10 +411,7 @@ class Participant:
             curr_gw = get_curr_event()[0]
             gw = curr_gw
 
-        try:
-            valid, gw = check_gw(gw)
-        except TypeError:
-            valid, gw = False, None
+        valid, gw = check_gw(gw)
 
         if valid:
             if type(gw) == list:
