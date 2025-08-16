@@ -1,4 +1,4 @@
-from ..src.urls import (
+from src.urls import (
     GW_URL,
     FIXTURE_URL,
     TRANSFER_URL,
@@ -10,7 +10,7 @@ from ..src.urls import (
 )
 
 import requests
-from ..src.utils import to_json
+from src.utils import to_json
 from ...paths import MOCK_DIR
 
 
