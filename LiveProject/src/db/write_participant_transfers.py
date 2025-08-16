@@ -14,7 +14,7 @@ def participant_transfers(entry_id: list[int] | int, gw: int, to_json=False) -> 
     new_directory = "data/participant/"
     if type(entry_id) is list:
         entry_id = entry_id[0].split(",")
-        for n in range(0, len(entry_id)):
+        for n in range(0, len(entry_id), 100):
             # optimum number of spawned threads to 100
             req = [
                 gevent.spawn(
