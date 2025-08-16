@@ -35,13 +35,6 @@ def test_gameweek_endpoint(gw_fixture):
 
     stats_keys = set(r["elements"][0]["stats"].keys())
     stats_keys_prev = [
-        "mng_win",
-        "mng_underdog_draw",
-        "mng_loss",
-        "mng_draw",
-        "mng_goals_scored",
-        "mng_underdog_win",
-        "mng_clean_sheets",
         "minutes",
         "goals_scored",
         "assists",
@@ -66,7 +59,7 @@ def test_gameweek_endpoint(gw_fixture):
         "expected_goals_conceded",
         "total_points",
         "in_dreamteam",
-        #25-26
+        # 25-26
         'defensive_contribution',
         'tackles',
         'recoveries',

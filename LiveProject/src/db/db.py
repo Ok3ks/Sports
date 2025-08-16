@@ -27,7 +27,7 @@ class Base(DeclarativeBase):
 
 
 class PlayerInfo(Base):
-    __tablename__ = "EPL_2024_PLAYER_INFO"
+    __tablename__ = "EPL_2025_PLAYER_INFO"
 
     player_id: Mapped[int] = mapped_column(Integer, primary_key=True)
     team_code: Mapped[int] = mapped_column(Integer)
@@ -71,13 +71,6 @@ class GameweekScore(Base):
     expected_assists: Mapped[String] = mapped_column(String)
     expected_goal_involvements: Mapped[String] = mapped_column(String)
     expected_goals_conceded: Mapped[String] = mapped_column(String)
-    mng_win: Mapped[int] = mapped_column(Integer)
-    mng_draw: Mapped[int] = mapped_column(Integer)
-    mng_loss: Mapped[int] = mapped_column(Integer)
-    mng_underdog_win: Mapped[int] = mapped_column(Integer)
-    mng_underdog_draw: Mapped[int] = mapped_column(Integer)
-    mng_clean_sheets: Mapped[int] = mapped_column(Integer)
-    mng_goals_scored: Mapped[int] = mapped_column(Integer)
     total_points: Mapped[int] = mapped_column(Integer)
     in_dreamteam: Mapped[int] = mapped_column(Integer)
     gameweek: Mapped[int] = mapped_column(Integer)
@@ -91,7 +84,7 @@ class GameweekScore(Base):
 
 
 class Fixtures(Base):
-    __tablename__ = "2024_2025_FIXTURES"
+    __tablename__ = "2025_2026_FIXTURES"
 
     homedifficulty: Mapped[int] = mapped_column(Integer)
     awaydifficulty: Mapped[int] = mapped_column(Integer)
@@ -282,7 +275,7 @@ def get_teams(session=session):
 def get_teams_id(session=session) -> dict:
     """Return a mapping of team id to teams"""
     with session() as session:
-        statement_1 = text('SELECT team_id,team FROM EPL_2024_PLAYER_INFO')
+        statement_1 = text('SELECT team_id,team FROM EPL_2025_PLAYER_INFO')
         obj = session.execute(statement_1).all()
         obj = {i[0]: i[1] for i in obj}
         return obj
@@ -291,7 +284,7 @@ def get_teams_id(session=session) -> dict:
 def get_player_team_map(session=session) -> dict:
     """Return a mapping of Player id to teams"""
     with session() as session:
-        statement_1 = text('SELECT player_id, team FROM EPL_2024_PLAYER_INFO')
+        statement_1 = text('SELECT player_id, team FROM EPL_2025_PLAYER_INFO')
         obj = session.execute(statement_1).all()
         obj = {i[0]: i[1] for i in obj}
         return obj
@@ -299,7 +292,7 @@ def get_player_team_map(session=session) -> dict:
 def get_player_name_map(session=session) -> dict:
     """Return a mapping of Player id to Name"""
     with session() as session:
-        statement_1 = text('SELECT player_id, player_name FROM EPL_2024_PLAYER_INFO')
+        statement_1 = text('SELECT player_id, player_name FROM EPL_2025_PLAYER_INFO')
         obj = session.execute(statement_1).all()
         obj = {i[0]: i[1] for i in obj}
         return obj
@@ -309,7 +302,7 @@ def get_player_position_map(session=session) -> dict:
     """Return a mapping of Player id to teams"""
     with session() as session:
         statement_1 = text(
-            'SELECT player_id, position FROM "EPL_2024_PLAYER_INFO"'
+            'SELECT player_id, position FROM "EPL_2025_PLAYER_INFO"'
         )
         obj = session.execute(statement_1).all()
         obj = {i[0]: i[1] for i in obj}
@@ -384,7 +377,7 @@ def get_season_stats(session=session):
 
 def get_fixtures(session=session):
     """Return all fixtures."""
-    stmt = text(f'SELECT  * FROM 2024_2025_FIXTURES')
+    stmt = text(f'SELECT  * FROM 2025_2026_FIXTURES')
     with session() as session:
         c = session.execute(stmt).all()
     return c

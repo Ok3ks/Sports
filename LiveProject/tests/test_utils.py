@@ -6,13 +6,12 @@ from src.utils import (
     League,
     GameweekError,
 )
+import requests
 import pytest
-
 import json
 from os.path import join
 import os
 from src.urls import FPL_URL
-import requests
 
 
 def test_to_json(transfer_obj, filepath):
