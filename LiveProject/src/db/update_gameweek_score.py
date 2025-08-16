@@ -1,7 +1,4 @@
-from sqlite3 import OperationalError
-import sqlite3
 import pandas as pd
-import sqlalchemy
 from src.db.db import (
     create_connection_engine,
     get_gameweek_scores,

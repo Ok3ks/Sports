@@ -1,7 +1,6 @@
 # from utils import Gameweek, Player, League
 import sqlite3
 from types import NoneType
-
 from sqlite3 import Error  # type: ignore
 from sqlalchemy import (
     Integer,
@@ -82,6 +81,10 @@ class GameweekScore(Base):
     total_points: Mapped[int] = mapped_column(Integer)
     in_dreamteam: Mapped[int] = mapped_column(Integer)
     gameweek: Mapped[int] = mapped_column(Integer)
+    defensive_contribution: Mapped[int] = mapped_column(Integer)
+    tackles: Mapped[int] = mapped_column(Integer)
+    recoveries: Mapped[int] = mapped_column(Integer)
+    clearances_blocks_interceptions: Mapped[int] = mapped_column(Integer)
 
     def __repr__(self) -> str:
         return f"GameweekScore(player_id={self.player_id}, goals_scored={self.goals_scored}, total_points={self.total_points}, gameweek={self.gameweek}, dreamteam={self.in_dreamteam})"
@@ -292,8 +295,7 @@ def get_player_team_map(session=session) -> dict:
         obj = session.execute(statement_1).all()
         obj = {i[0]: i[1] for i in obj}
         return obj
-    
-    
+
 def get_player_name_map(session=session) -> dict:
     """Return a mapping of Player id to Name"""
     with session() as session:

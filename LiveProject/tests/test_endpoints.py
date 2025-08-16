@@ -66,6 +66,11 @@ def test_gameweek_endpoint(gw_fixture):
         "expected_goals_conceded",
         "total_points",
         "in_dreamteam",
+        #25-26
+        'defensive_contribution',
+        'tackles',
+        'recoveries',
+        'clearances_blocks_interceptions'
     ]
 
     assert len(stats_keys.difference(set(stats_keys_prev))) == 0, (
@@ -660,6 +665,13 @@ def test_fpl_url_endpoint():
         "cost_change_event",
         "code",
         "region",
+        #25-26
+        'defensive_contribution_per_90',
+        'birth_date',
+        'tackles',
+        'recoveries',
+        'defensive_contribution',
+        'clearances_blocks_interceptions'
     ]
 
     diff = set(elements_keys).difference(set(elements_keys_prev))
