@@ -46,8 +46,8 @@ jobs:
       - name: 'Update DB and info' # depends on endpoint
         run: |
             source venv/bin/activate
-            # source init_env.sh
-            # source startup.sh # should be standalone job for when container restarts
+            source init_env.sh
+            source startup.sh # should be standalone job for when container restarts
 
       - id: 'auth'
         name: 'Authenticate to Google Cloud'
