@@ -12,7 +12,7 @@ env:
   PROJECT_NAME: fpl-analysis-tool
   ARTIFACT_REPO_NAME: fpl
   IMAGE_NAME: fpl-backend
-  REVISION: GW38_3
+  REVISION: 25_GW1
   REGION: europe-west2
 
 jobs: 
@@ -28,7 +28,7 @@ jobs:
       - id: 'checkout'
         uses: 'actions/checkout@v4'
         with: 
-          ref: docker-production-sqlite
+          ref: develop
 
       - name: Set up Python
         uses: actions/setup-python@v5

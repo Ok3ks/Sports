@@ -1,4 +1,4 @@
-from LiveProject.src.report import LeagueWeeklyReport
+from src.report import LeagueWeeklyReport
 import pandas as pd
 
 

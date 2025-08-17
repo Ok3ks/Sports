@@ -5,13 +5,16 @@ GraphQL schema definitions.
 type Query {
   player(id: Int!, gameweek: Int!): Player!
   players(ids: [Int!]!, gameweek: Int!): [Player!]
+
   gameweekScore(gameweek: Int!): PlayerGameweekScore!
-  allGameweekScore: [PlayerGameweekScore!]!
+  gameviewReport: [PlayerGameweekScore!]!
+
   leagueWeeklyReport(leagueId: Int!, gameweek:Int!): LeagueWeeklyReport!
   participantReport(entryId:Int!, gameweek:Int): ParticipantReport!
   gameViewReport(Gameweek:[Int!]): GameViewReport!
   Differential(gameweek:Int!): DifferentialPlayer
 }
+
 
 type Player {
   playerId: Int!
@@ -61,6 +64,12 @@ type PlayerInfo {
     half:  Int!
 }
 
+type gameviewReport {
+    goals_scored: [Int!]
+    total_points: [Int!]
+    assists: [Int!]
+
+}
 type ParticipantReport{
   autoSubIn: [String]
   autoSubOut: [String]

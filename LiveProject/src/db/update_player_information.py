@@ -56,7 +56,7 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "-t", "--table_name", type=str, help="Table name",
-        default="EPL_2024_PLAYER_INFO"
+        default="EPL_2025_PLAYER_INFO"
     )
     parser.add_argument(
         "-db", "--db_name", type=str, help="Database name",

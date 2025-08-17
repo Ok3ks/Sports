@@ -1,4 +1,4 @@
-from ..src.urls import (
+from src.urls import (
     GW_URL,
     FIXTURE_URL,
     TRANSFER_URL,
@@ -10,7 +10,7 @@ from ..src.urls import (
 )
 
 import requests
-from ..src.utils import to_json
+from src.utils import to_json
 from ...paths import MOCK_DIR
 
 
@@ -35,13 +35,6 @@ def test_gameweek_endpoint(gw_fixture):
 
     stats_keys = set(r["elements"][0]["stats"].keys())
     stats_keys_prev = [
-        "mng_win",
-        "mng_underdog_draw",
-        "mng_loss",
-        "mng_draw",
-        "mng_goals_scored",
-        "mng_underdog_win",
-        "mng_clean_sheets",
         "minutes",
         "goals_scored",
         "assists",
@@ -66,6 +59,11 @@ def test_gameweek_endpoint(gw_fixture):
         "expected_goals_conceded",
         "total_points",
         "in_dreamteam",
+        # 25-26
+        'defensive_contribution',
+        'tackles',
+        'recoveries',
+        'clearances_blocks_interceptions'
     ]
 
     assert len(stats_keys.difference(set(stats_keys_prev))) == 0, (
@@ -660,6 +658,13 @@ def test_fpl_url_endpoint():
         "cost_change_event",
         "code",
         "region",
+        #25-26
+        'defensive_contribution_per_90',
+        'birth_date',
+        'tackles',
+        'recoveries',
+        'defensive_contribution',
+        'clearances_blocks_interceptions'
     ]
 
     diff = set(elements_keys).difference(set(elements_keys_prev))
