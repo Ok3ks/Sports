@@ -24,7 +24,6 @@ ARG REDISPORT
 
 #setup environments
 COPY requirements.txt .
-COPY db.sqlite3 . 
 RUN python3 -m venv /venv
 RUN /venv/bin/pip install -r requirements.txt
 
@@ -47,6 +46,8 @@ WORKDIR /sports/LiveProject
 COPY src/ ./src/ 
 COPY LiveProject/ ./LiveProject/
 COPY report_app ./report_app/
+COPY db.sqlite3 . 
+COPY .gitignore .
  
 
 
