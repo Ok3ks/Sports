@@ -31,6 +31,7 @@ class LeagueWeeklyReport(League):
         self.one_df = pd.DataFrame(self.get_all_participant_entries(self.gw))
         self.f = pd.DataFrame(self.get_gw_transfers(self.gw))
         self.f = self.f.T
+        self.f = self.f.fillna("0")
 
     @lru_cache(10)
     @profile
@@ -287,7 +288,7 @@ class LeagueWeeklyReport(League):
                         player_out = self.no_chips.iloc[-i, :]["element_out"]
                         points_lost = int(self.no_chips.iloc[-i, :]["delta"])
                         participant_id = str(self.no_chips.iloc[-i, :]["entry_id"])
-
+    
                         worst_transfer_in.append(
                             {
                                 "entry_id": participant_id,
