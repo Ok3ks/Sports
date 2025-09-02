@@ -1,7 +1,6 @@
 import requests
 from urllib3.util import Retry
 from requests.adapters import HTTPAdapter
-from requests import get as wget
 import pandas as pd
 import json
 import numpy as np
@@ -11,10 +10,16 @@ from .urls import GW_URL, TRANSFER_URL, FPL_URL, FPL_PLAYER
 from .urls import LEAGUE_URL, FPL_PLAYER
 
 from .db.db import get_player, get_player_team_code
-from .db.db import team_short_name_mapping, team_name_to_code
 from typing import List, Union
 import logging
-from google.cloud import storage
+import ssl
+
+class TLSAdapter(HTTPAdapter):
+    def init_poolmanager(self, *args, **kwargs):
+        context = ssl.create_default_context()
+        context.minimum_version = ssl.TLSVersion.TLSv1_2  # Enforcing TLSv1.2 or higher
+        kwargs['ssl_context'] = context
+        return super().init_poolmanager(*args, **kwargs)
 
 
 LOGGER = logging.getLogger(__name__)
@@ -26,7 +31,7 @@ retries = Retry(
     status_forcelist=[502, 503, 504],
     allowed_methods={"GET"},
 )
-r = s.mount("https://fantasy.premierleague.com/api/", HTTPAdapter(max_retries=retries))
+s.mount("https://", TLSAdapter(max_retries=3))
 
 
 def to_json(x: dict, fp):
@@ -94,7 +99,7 @@ def get_gw_transfers(alist: List[int], gw: Union[int, List[int]], all=False) -> 
     row = {}
     if valid:
         for entry_id in alist:
-            r = wget(TRANSFER_URL.format(entry_id))
+            r = s.get(TRANSFER_URL.format(entry_id))
             if r.status_code == 200:
                 obj = r.json()
                 # updates by gameweek
@@ -140,8 +145,8 @@ def get_participant_entry(entry_id: int, gw: int) -> dict | None:
         }
 
     if valid:
-        # optimization, imported get directly from requests, but changed name to wget for easy reference
-        r = wget(FPL_PLAYER.format(entry_id, gw))
+        # optimization, imported get directly from requests, but changed name to s.get for easy reference
+        r = s.get(FPL_PLAYER.format(entry_id, gw))
         # optimization - assigning size of dictionary before hand to prevent resizing of dictionaries
         if r.status_code == 200:
             
@@ -200,7 +205,7 @@ def get_participant_entry(entry_id: int, gw: int) -> dict | None:
 
 
 def get_curr_event():
-    r = wget(FPL_URL)
+    r = s.get(FPL_URL)
 
     curr_event = []
     r = r.json()
@@ -222,7 +227,7 @@ def get_gw_transfers_scrap(alist: List[int], gw: Union[int, List[int]], all=Fals
     if valid:
         for entry_id in alist:
             obj_row = {}
-            r = wget(TRANSFER_URL.format(entry_id))
+            r = s.get(TRANSFER_URL.format(entry_id))
             if r.status_code == 200:
                 obj = r.json()
                 # updates by gameweek
@@ -251,8 +256,8 @@ class Gameweek:
         self.gw = gw
 
     def get_payload(self):
-        temp = wget(GW_URL.format(self.gw))
-        temp_2 = wget(FPL_URL)
+        temp = s.get(GW_URL.format(self.gw))
+        temp_2 = s.get(FPL_URL)
 
         self.json = temp.json()
         self.gw_json = temp_2.json()
@@ -349,7 +354,7 @@ class Participant:
             valid, gw = False, None
 
         if all or valid:
-            r = wget(TRANSFER_URL.format(self.participant))
+            r = s.get(TRANSFER_URL.format(self.participant))
             LOGGER.info(r.status_code)
             if r.status_code == 200:
                 obj = r.json()
@@ -443,8 +448,8 @@ class League:
         if refresh or len(self.participants) == 0:
             self.has_next = True
             while self.has_next:
-                r = wget(LEAGUE_URL.format(self.league_id, self.PAGE_COUNT))
-                assert r.status_code == 200, "error connecting to the endpoint"
+                r = s.get(LEAGUE_URL.format(self.league_id, self.PAGE_COUNT))
+                # assert r.status_code == 200, "error connecting to the endpoint"
                 obj = r.json()
                 LOGGER.info(r.status_code)
                 LOGGER.info(r.headers)
@@ -494,7 +499,7 @@ class League:
         """MultiProcessing version of get league participants"""
         out = []
 
-        r = wget(LEAGUE_URL.format(self.league_id, PAGE_COUNT))
+        r = s.get(LEAGUE_URL.format(self.league_id, PAGE_COUNT))
         obj = r.json()
         if r.status_code == 200:
             out.extend(obj["standings"]["results"])
@@ -519,7 +524,6 @@ class League:
         if refresh or len(self.participants) == 0:
             self.obtain_league_participants()
             
-
         # optimization 2
         for participant in self.participants:
             yield get_participant_entry(participant["entry"], gw)
