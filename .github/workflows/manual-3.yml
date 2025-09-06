@@ -4,8 +4,8 @@ name: GW3
 
 
 on:
-  # schedule: 
-  #   - cron:  '15 13 * * *'
+  schedule: 
+    - cron:  '15 3 * * *'
     
   workflow_dispatch:
     inputs:
@@ -15,9 +15,9 @@ on:
         required: true
         type: string
 env:
-      GW: 3
-      START: 3700000
-      END: 3900000
+      GW: "${{secrets.GW}}"
+      START: 400000
+      END: 600000
 
 jobs:
   scrap-and-upload:

@@ -5,8 +5,8 @@ name: GW12
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
 on:
-  # schedule: 
-  #   - cron:  '15 5 * * *'
+  schedule: 
+    - cron:  '15 12 * * *'
     
   workflow_dispatch:
     inputs:
@@ -16,9 +16,9 @@ on:
         required: true
         type: string
 env:
-      GW: 12
-      START: 3700000
-      END: 3900000
+      GW: "${{secrets.GW}}"
+      START: 2200000
+      END: 2400000
 
 jobs:
   scrap-and-upload:
