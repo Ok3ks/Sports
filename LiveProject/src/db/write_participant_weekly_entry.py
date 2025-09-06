@@ -57,7 +57,7 @@ def participant_weekly_entry(entry_id: list[int] | int, to_json=False, upload=Tr
                     for i in entry_id[START:START+100]
                 ]
             res = [response.value for response in gevent.iwait(req)]
-            filename = f"{entry_id[0] + n}.json"
+            filename = f"{entry_id[0] + n}.pqt"
             destination_path = os.path.join(new_directory, filename)
 
             df = pd.DataFrame(res)
