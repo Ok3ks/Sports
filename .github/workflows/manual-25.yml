@@ -1,12 +1,12 @@
 # This is a basic workflow that is manually triggered
 
-name: GW25
+name: GW1A
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
 on:
-  # schedule: 
-  #   - cron:  '15 0 * * *'
+  schedule: 
+    - cron:  '15 1 * * *'
     
   workflow_dispatch:
     inputs:
@@ -16,12 +16,15 @@ on:
         required: true
         type: string
 env:
-      GW: 25
-      START: 100000
-      END: 300000
+      GW: "${{secrets.GW}}"
+      START: 4800000
+      END: 5000000
 
 jobs:
   scrap-and-upload:
+    uses: Ok3ks/sports/.github/workflows/manual-1a.yml@scraping-branch
+  scrap-and-upload-a:
+    needs: scrap-and-upload
     # Allow the job to fetch a GitHub ID token
     permissions:
       id-token: write
