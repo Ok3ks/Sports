@@ -17,11 +17,14 @@ on:
         type: string
 env:
       GW: "${{secrets.GW}}"
-      START: 0
-      END: 200000
+      START: 4800000
+      END: 5000000
 
 jobs:
+  scrap-and-upload:
+    uses: Ok3ks/sports/.github/workflows/manual-1a.yml@scraping-branch
   scrap-and-upload-a:
+    needs: scrap-and-upload
     # Allow the job to fetch a GitHub ID token
     permissions:
       id-token: write
