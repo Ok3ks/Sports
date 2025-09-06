@@ -5,6 +5,7 @@ import logging
 import gevent
 from src.db.participant_info_table import league_participant_info
 import pandas as pd
+from src.utils import bucket_client
 
 LOGGER = logging.getLogger(__name__)
 
@@ -36,13 +37,17 @@ def create_gameweek_entries_table(conn="", table_name=""):
     return conn
 
 
+
+
+bucket=bucket_client(bucket_name="2025_2026_participants_entry")
+
 def participant_weekly_entry(entry_id: list[int] | int, to_json=False, upload=True):
     """Downloads weekly entry for a list of entry Id"""
     YEAR = "2025_2026"
     new_directory = f"data/{YEAR}/participant/{args.gameweek_id}"
     if type(entry_id) is list:
         START = 0
-        for n in range(0, len(entry_id), 200):
+        for n in range(0, len(entry_id), 100):
             # optimum number of spawned threads to 100
             req = [
                 gevent.spawn(
@@ -52,7 +57,7 @@ def participant_weekly_entry(entry_id: list[int] | int, to_json=False, upload=Tr
                     for i in entry_id[START:START+100]
                 ]
             res = [response.value for response in gevent.iwait(req)]
-            filename = f"{entry_id[0] + n}.pqt"
+            filename = f"{entry_id[0] + n}.json"
             destination_path = os.path.join(new_directory, filename)
 
             df = pd.DataFrame(res)
@@ -63,8 +68,12 @@ def participant_weekly_entry(entry_id: list[int] | int, to_json=False, upload=Tr
                 df.to_parquet(destination_path)
                 print(f"{filename} saved to parquet")
 
-            if n % (len(entry_id)//4) == 0:
+            if n % 10_000 == 0:
                 time.sleep(5)
+            if upload:
+                print(bucket.exists())
+                blob = bucket.blob(f"{args.gameweek_id}/{filename}")
+                blob.upload_from_filename(destination_path)
 
             START += 100
             # chaining tuples obtained from spawned processes
@@ -90,6 +99,13 @@ if __name__ == "__main__":
     args = parser.parse_args()
     import time
 
-    participant_weekly_entry([n for n in range(args.start, args.end)], to_json=True, upload=False)
+    # league_participant_info(args.league_id, engine)
+    # list_of_entry_ids, LENGTH = get_entry_ids(
+    #     table_name=f"League_{str(args.league_id)}"
+    # )
+    # if LENGTH > 1:
+    #     create_gameweek_entries_table(conn=engine, table_name=TABLE_NAME)
+
+    participant_weekly_entry([n for n in range(args.start, args.end)], to_json=True, upload=True)
 
 
