@@ -5,13 +5,16 @@ GraphQL schema definitions.
 type Query {
   player(id: Int!, gameweek: Int!): Player!
   players(ids: [Int!]!, gameweek: Int!): [Player!]
+
   gameweekScore(gameweek: Int!): PlayerGameweekScore!
-  allGameweekScore: [PlayerGameweekScore!]!
+  gameviewReport: [PlayerGameweekScore!]!
+
   leagueWeeklyReport(leagueId: Int!, gameweek:Int!): LeagueWeeklyReport!
   participantReport(entryId:Int!, gameweek:Int): ParticipantReport!
-  gameViewReport(useGameweek:Boolean!, usePosition:Boolean!, useTeam:Boolean!): GameViewReport!
+  gameViewReport(Gameweek:[Int!]): GameViewReport!
   Differential(gameweek:Int!): DifferentialPlayer
 }
+
 
 type Player {
   playerId: Int!
@@ -61,6 +64,12 @@ type PlayerInfo {
     half:  Int!
 }
 
+type gameviewReport {
+    goals_scored: [Int!]
+    total_points: [Int!]
+    assists: [Int!]
+
+}
 type ParticipantReport{
   autoSubIn: [String]
   autoSubOut: [String]
@@ -85,12 +94,36 @@ type ParticipantReport{
 }
 
 type GameViewReport {
-  gameweek: [String]
+  gameweek: [Int]
   position: [String]
   team: [String]
-  goalsScored: [String]
-  totalPoints: [String]
-  assists: [String]
+  goalsScored: [Int]
+  totalPoints: [Int]
+  assists: [Int]
+  playerId: [Int]
+  playerName: [String]
+  minutes: [Int]
+  cleanSheets: [Int]
+  goalsConceded: [Int]
+  ownGoals: [Int]
+  penaltiesSaved: [Int]
+  penaltiesMissed: [Int]
+  yellowCards: [Int]
+  redCards: [Int]
+  saves: [Int]
+  bonus: [Int]
+  bps: [Int]
+  influence: [Int]
+  creativity: [Int]
+  threat: [Int]
+  ictIndex: [Int]
+  starts: [Int]
+  expectedGoals: [Int]
+  expectedAssists: [Int]
+  expectedGoalInvolvements: [Int]
+  expectedGoalsConceded: [Int]
+  mngGoalsScored: [Int]
+  inDreamteam: [Boolean]
 }
 
 type LeagueWeeklyReport {

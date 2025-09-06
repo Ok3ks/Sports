@@ -61,17 +61,19 @@ def parse_transfers(item: dict, row: dict) -> dict:
 
 def check_gw(gw: Union[int, List[int]]) -> tuple:
     out = []
-    if type(gw) == int and gw >= 1 and gw <= 38:
-        return (True, gw)
-
-    elif type(gw) == list:
+    if gw is list:
         for i in gw:
             if check_gw(i)[0]:
                 out.append(i)
+            else:
+                pass
         return (True, out)
     else:
-        print("Gameweek has to be in the range 1 to 38")
-        return (False, None)
+        if (1 <= gw < 38 ):
+            return (True, gw)
+        else:
+            logging.info(f"{gw} is out of range")
+            return (False, None)
 
 
 class GameweekError(Exception):
@@ -114,25 +116,15 @@ def get_gw_transfers(alist: List[int], gw: Union[int, List[int]], all=False) -> 
                 )
     return row
 
-def bucket_client(bucket_name="wrapped_participants_entry"):
-    client = storage.Client()
-    bucket = client.get_bucket(bucket_name)
-    return bucket
 
-
-def get_participant_entry(entry_id: int, gw: int) -> dict:
+def get_participant_entry(entry_id: int, gw: int) -> dict | None:
     """Calls an Endpoint to retrieve a participants entry"""
     try:
         valid, gw = check_gw(gw)
     except TypeError:
         valid, gw = False, None
 
-    if valid:
-        # optimization, imported get directly from requests, but changed name to wget for easy reference
-        r = wget(FPL_PLAYER.format(entry_id, gw))
-
-        # optimization - assigning size of dictionary before hand to prevent resizing of dictionaries
-        team_list = {
+    team_list = {
             "auto_sub_in": "",
             "auto_sub_out": "",
             "gw": gw,
@@ -147,6 +139,10 @@ def get_participant_entry(entry_id: int, gw: int) -> dict:
             "captain": None,
         }
 
+    if valid:
+        # optimization, imported get directly from requests, but changed name to wget for easy reference
+        r = wget(FPL_PLAYER.format(entry_id, gw))
+        # optimization - assigning size of dictionary before hand to prevent resizing of dictionaries
         if r.status_code == 200:
             
             obj = r.json()
@@ -200,6 +196,7 @@ def get_participant_entry(entry_id: int, gw: int) -> dict:
             print("{} does not exist".format(entry_id))
 
     return team_list
+
 
 
 def get_curr_event():
@@ -413,10 +410,7 @@ class Participant:
             curr_gw = get_curr_event()[0]
             gw = curr_gw
 
-        try:
-            valid, gw = check_gw(gw)
-        except TypeError:
-            valid, gw = False, None
+        valid, gw = check_gw(gw)
 
         if valid:
             if type(gw) == list:
@@ -461,6 +455,7 @@ class League:
                 self.participants.extend(obj["standings"]["results"])
                 self.has_next = obj["standings"]["has_next"]
                 self.PAGE_COUNT += 1
+        
                 LOGGER.info(
                     "All participants on page {} have been extracted".format(
                         self.PAGE_COUNT
@@ -523,6 +518,7 @@ class League:
 
         if refresh or len(self.participants) == 0:
             self.obtain_league_participants()
+            
 
         # optimization 2
         for participant in self.participants:

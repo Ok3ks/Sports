@@ -1,8 +1,9 @@
 import json
-from typing import List
+from typing import List, Any
 import pandas as pd
 
 from src.db.db import (
+    get_player_name_map,
     get_player_position_map,
     get_player_team_map,
     get_season_stats,
@@ -68,24 +69,32 @@ def parse_fixture():
     return fixture_df
 
 
-def parse_stats():
+def parse_stats(filter={"gameweek": 38}, to_dict=True) -> dict[str, Any] | pd.DataFrame:
     """Combine Season stats from DB, and map appropriately."""
 
     stats = get_season_stats()
     player_team_mapping = get_player_team_map()
     player_position_mapping = get_player_position_map()
-    full_df = pd.DataFrame(stats)
+    player_name_mapping = get_player_name_map()
 
+    full_df: pd.DataFrame = pd.DataFrame(stats)
+
+    full_df = full_df[full_df['gameweek'] == filter['gameweek']]
+
+    full_df["player_name"] = full_df["player_id"].map(lambda x: player_name_mapping[x])
     full_df["team"] = full_df["player_id"].map(lambda x: player_team_mapping[x])
     full_df["position"] = full_df["player_id"].map(lambda x: player_position_mapping[x])
-    return full_df
+    if to_dict:
+        obj = full_df.to_dict()
+        return obj
+    return obj
 
 
 # ToDo : add kwargs to function to customise groupbys
 def groupby(groups: set[str] = {"gameweek", "position"}):
     """Calculate aggregates groupby."""
     all_groups = {"gameweek", "position", "team"}
-    stats = parse_stats()
+    stats = parse_stats(filter={"gameweek": 38},to_dict=False)
     obj = stats.groupby(list(groups)).aggregate(
         {
             "goals_scored": "sum",
@@ -116,4 +125,4 @@ def groupby(groups: set[str] = {"gameweek", "position"}):
 
 
 if __name__ == "__main__":
-    print(groupby())
+    print(parse_stats())

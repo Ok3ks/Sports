@@ -5,8 +5,8 @@ name: GW18
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
 on:
-  schedule: 
-    - cron:  '15 11 * * *'
+  # schedule: 
+  #   - cron:  '15 11 * * *'
     
   workflow_dispatch:
     inputs:
@@ -22,7 +22,6 @@ env:
 
 jobs:
   scrap-and-upload:
-    # Allow the job to fetch a GitHub ID token
     permissions:
       id-token: write
       contents: read

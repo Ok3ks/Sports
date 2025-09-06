@@ -1,12 +1,12 @@
 # This is a basic workflow that is manually triggered
 
-name: GW36
+name: GW37
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
 on:
-  # schedule: 
-  #   - cron:  '15 0 * * *'
+  schedule: 
+    # - cron:  '15 9 * * *'
     
   workflow_dispatch:
     inputs:
@@ -16,9 +16,9 @@ on:
         required: true
         type: string
 env:
-      GW: 36
-      START: 1
-      END: 100000
+      GW: 32
+      START: 1800000
+      END: 2000000
 
 jobs:
   scrap-and-upload:

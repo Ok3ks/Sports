@@ -4,8 +4,8 @@ name: GW3
 
 
 on:
-  schedule: 
-    - cron:  '15 13 * * *'
+  # schedule: 
+  #   - cron:  '15 13 * * *'
     
   workflow_dispatch:
     inputs:

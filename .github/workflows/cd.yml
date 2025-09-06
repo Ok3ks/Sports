@@ -12,7 +12,7 @@ env:
   PROJECT_NAME: fpl-analysis-tool
   ARTIFACT_REPO_NAME: fpl
   IMAGE_NAME: fpl-backend
-  REVISION: GW38
+  REVISION: 25_GW1
   REGION: europe-west2
 
 jobs: 
@@ -46,8 +46,6 @@ jobs:
       - name: 'Update DB and info' # depends on endpoint
         run: |
             source venv/bin/activate
-            # source init_env.sh
-            # source startup.sh # should be standalone job for when container restarts
 
       - id: 'auth'
         name: 'Authenticate to Google Cloud'

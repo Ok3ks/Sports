@@ -4,11 +4,6 @@ from os.path import realpath
 
 
 @pytest.fixture(scope="module")
-def league_fixture():
-    return int(538731)
-
-
-@pytest.fixture(scope="module")
 def auto_sub_fixture():
     return {
         "auto_subs": {
@@ -864,17 +859,17 @@ def filepath():
 
 @pytest.fixture(scope="module")
 def participant():
-    return int(1802621)
+    return int(145257)
 
 
 @pytest.fixture(scope="module")
 def h2h_league():
-    return int(1660738)
+    return int(2049961)
 
 
 @pytest.fixture(scope="module")
 def classic_league():
-    return int(538731)
+    return int(1491605)
 
 
 @pytest.fixture(scope="module")
@@ -884,7 +879,7 @@ def gw_fixture():
 
 @pytest.fixture(scope="module")
 def span_fixture():
-    return [8, 10, 3]
+    return [1, 1, 1]
 
 
 @pytest.fixture(scope="module")
