@@ -449,24 +449,26 @@ class League:
             self.has_next = True
             while self.has_next:
                 r = s.get(LEAGUE_URL.format(self.league_id, self.PAGE_COUNT))
-                # assert r.status_code == 200, "error connecting to the endpoint"
-                obj = r.json()
-                LOGGER.info(r.status_code)
-                LOGGER.info(r.headers)
-                del r
+                if r.status_code == 200:
+                    # assert r.status_code == 200, "error connecting to the endpoint"
+                    obj = r.json()
+                    LOGGER.info(r.status_code)
+                    LOGGER.info(r.headers)
+                    del r
 
-                self.league_name = obj["league"]["name"]
+                    self.league_name = obj["league"]["name"]
 
-                self.participants.extend(obj["standings"]["results"])
-                self.has_next = obj["standings"]["has_next"]
-                self.PAGE_COUNT += 1
-        
-                LOGGER.info(
-                    "All participants on page {} have been extracted".format(
-                        self.PAGE_COUNT
+                    self.participants.extend(obj["standings"]["results"])
+                    self.has_next = obj["standings"]["has_next"]
+                    self.PAGE_COUNT += 1
+            
+                    LOGGER.info(
+                        "All participants on page {} have been extracted".format(
+                            self.PAGE_COUNT
+                        )
                     )
-                )
-
+                else:
+                    raise EnvironmentError(msg=r.status_code)
                 self.league_name = obj["league"]["name"]
         self.entry_ids = [participant["entry"] for participant in self.participants]
         return self.participants
