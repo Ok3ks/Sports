@@ -2,7 +2,6 @@
 
 from src.utils import League
 import logging
-import json
 from src.db.participant_info_table import league_participant_info
 import pandas as pd
 
@@ -19,19 +18,18 @@ def league_participants( league_id : int, to_json=False, upload=True):
 
 
     res = league.obtain_league_participants(),
-    filename = "participant.pqt"
+    filename = "participant.json"
     destination_path = os.path.join(new_directory, filename)
 
     df = pd.DataFrame(res)
     if to_json:
-        df.to_parquet(destination_path, compression="brotli")
-        print(f"{filename} saved")
+        df.to_json(destination_path)
+        print(f"{filename} saved to json")
 
 
 if __name__ == "__main__":
     import argparse
     import os
-    import time
 
     parser = argparse.ArgumentParser("Writing participant entries into DB")
     parser.add_argument("-l", "--league_id", type=int, help="Gameweek entry", required=True)

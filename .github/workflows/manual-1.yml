@@ -5,8 +5,8 @@ name: GW1
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
 on:
-  # schedule: 
-  #   - cron:  '15 18 * * *'
+  schedule: 
+    - cron:  '15 1 * * *'
     
   workflow_dispatch:
     inputs:
@@ -16,12 +16,12 @@ on:
         required: true
         type: string
 env:
-      GW: 1
-      START: 4300000
-      END: 4500000
+      GW: "${{secrets.GW}}"
+      START: 0
+      END: 200000
 
 jobs:
-  scrap-and-upload:
+  scrap-and-upload-a:
     # Allow the job to fetch a GitHub ID token
     permissions:
       id-token: write
@@ -62,7 +62,16 @@ jobs:
             source venv/bin/activate
             source init_env.sh
             cd LiveProject
-            echo ${{ env.START }}.json
-            touch  ${{ env.START }}.json
+            echo ${{ env.START }}.pqt
+            touch  ${{ env.START }}.pqt
             echo ${{ github.event.schedule }}
             python src/db/write_participant_weekly_entry.py -g $GW -t 1 -s $START -e $END
+              # make dynamic
+
+      - name: 'Upload scrapped weekly entry'
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly_entry
+          path: LiveProject/${{ env.START }}.pq
+
+              

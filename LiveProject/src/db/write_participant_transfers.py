@@ -25,11 +25,13 @@ def participant_transfers(entry_id: list[int] | int, gw: int, to_json=False) -> 
                 ]
             res = [response.value for response in gevent.iwait(req)]
             filename = f"{entry_id[n]}_transfers.pqt"
+            filename = f"{entry_id[n]}_transfers.pq"
             if not os.path.exists(new_directory):
                 os.makedirs(new_directory)
             df = pd.DataFrame(res)
 
             if to_json:
+                df.to_parquet(os.path.join(new_directory, filename), compression="brotli")
                 df.to_parquet(os.path.join(new_directory, filename), compression="brotli")
                 print(f"done {filename}")
     return df
