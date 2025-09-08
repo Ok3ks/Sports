@@ -19,8 +19,8 @@ on:
         type: string
 env:
       GW: "${{secrets.GW}}"
-      START: 200000
-      END: 400000
+      START: 5000000
+      END: 5200000
 
 jobs:
   scrap-and-upload:
