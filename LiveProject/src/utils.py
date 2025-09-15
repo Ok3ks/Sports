@@ -468,7 +468,8 @@ class League:
                         )
                     )
                 else:
-                    raise EnvironmentError(msg=r.status_code)
+                    LOGGER.error(r.text)
+                    # raise EnvironmentError(msg=r.status_code)
                 self.league_name = obj["league"]["name"]
         self.entry_ids = [participant["entry"] for participant in self.participants]
         return self.participants
