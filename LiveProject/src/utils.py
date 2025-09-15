@@ -205,7 +205,8 @@ def get_participant_entry(entry_id: int, gw: int) -> dict | None:
 
 
 def get_curr_event():
-    r = s.get(FPL_URL)
+    r = requests.get(FPL_URL)
+    logging.INFO(r)
 
     curr_event = []
     r = r.json()
