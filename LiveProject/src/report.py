@@ -40,6 +40,7 @@ class LeagueWeeklyReport(League):
 
         self.o_df = self.one_df[~self.one_df["players"].isna()]
 
+
         # optimization 4 - loaded all player rows into memory at once
         self.player_points = get_player_stats_from_db(self.gw)
         # del player_set
@@ -285,7 +286,7 @@ class LeagueWeeklyReport(League):
                     for i in range(1, n):
                         player_in = self.no_chips.iloc[-i, :]["element_in"]
                         player_out = self.no_chips.iloc[-i, :]["element_out"]
-                        points_lost = int(self.no_chips.iloc[-i, :]["delta"])
+                        points_delta = int(self.no_chips.iloc[-i, :]["delta"])
                         participant_id = str(self.no_chips.iloc[-i, :]["entry_id"])
                         event_transfer_cost = self.o_df.iloc[-i, :]['event_transfers_cost']
 
@@ -300,7 +301,7 @@ class LeagueWeeklyReport(League):
                                 "team_name": self.participants_name[participant_id],
                                 "player_in": player_in,
                                 "player_out": player_out,
-                                "points_delta": points_lost - event_transfer_cost,
+                                "points_delta": points_delta - event_transfer_cost,
                                 "point_hit": event_transfer_cost,
                             }
                         )
@@ -321,14 +322,19 @@ class LeagueWeeklyReport(League):
                         participant_id = str(self.no_chips.iloc[i, :]["entry_id"])
                         point_hit = str(self.no_chips.iloc[-i, :]['event_transfers_cost'])
 
+                        if "N" in str(event_transfer_cost):
+                            event_transfer_cost = 0
+                        else:
+                            event_transfer_cost = int(event_transfer_cost)
+    
                         best_transfer_in.append(
                             {
                                 "entry_id": participant_id,
                                 "team_name": self.participants_name[participant_id],
                                 "player_in": player_in,
                                 "player_out": player_out,
-                                "points_delta": points_delta,
-                                "point_hit": point_hit
+                                "points_delta": points_delta - event_transfer_cost,
+                                "point_hit": event_transfer_cost,
                             }
                         )
             return {"best_transfer_in": best_transfer_in}

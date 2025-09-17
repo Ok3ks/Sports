@@ -73,6 +73,7 @@ def participant_weekly_entry(entry_id: list[int] | int, to_json=False, upload=Tr
         filename = f"{entry_id}.json"
         with open(filename, 'w') as outs:
             json.dump(res, outs)
+        print(f"{filename} saved")
     
 
 
@@ -89,6 +90,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     import time
 
-    participant_weekly_entry([n for n in range(args.start, args.end)], to_json=True, upload=False)
+    participant_weekly_entry(args.start, to_json=True, upload=False)
 
 
