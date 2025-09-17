@@ -63,7 +63,7 @@ jobs:
       - name: 'Build and push container'
         run: |
           cd LiveProject
-          docker build . -t ${{ env.IMAGE_NAME }}:${{ env.REVISION }}
+          docker build . -t ${{ env.IMAGE_NAME }}:${{ env.REVISION }} --no-cache
           docker tag ${{ env.IMAGE_NAME }}:${{ env.REVISION }} ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_NAME }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ env.REVISION }}
           echo "pushing ${{ env.REGION-docker.pkg.dev }}/${{ env.PROJECT_NAME }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ env.REVISION }} to Artifacts Registry"
           docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_NAME }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ env.REVISION }}
