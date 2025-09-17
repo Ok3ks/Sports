@@ -32,7 +32,7 @@ class LeagueWeeklyReport(League):
         self.f = pd.DataFrame(self.get_gw_transfers(self.gw))
         self.f = self.f.T
         self.f = self.f.fillna("0")
-        self.one_df = self.one_df.fillna("0")
+        self.one_df = self.one_df.fillna(0)
 
     @lru_cache(10)
     @profile
