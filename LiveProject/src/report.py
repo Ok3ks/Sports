@@ -288,7 +288,7 @@ class LeagueWeeklyReport(League):
                         player_out = self.no_chips.iloc[-i, :]["element_out"]
                         points_delta = int(self.no_chips.iloc[-i, :]["delta"])
                         participant_id = str(self.no_chips.iloc[-i, :]["entry_id"])
-                        event_transfer_cost = self.o_df.iloc[-i, :]['event_transfers_cost']
+                        event_transfer_cost = self.no_chips.iloc[-i, :]['event_transfers_cost']
 
                         if "N" in str(event_transfer_cost):
                             event_transfer_cost = 0
