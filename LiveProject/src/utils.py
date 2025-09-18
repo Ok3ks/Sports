@@ -121,15 +121,25 @@ def get_gw_transfers(alist: List[int], gw: Union[int, List[int]], all=False) -> 
                 )
     return row
 
+def bucket_client(bucket_name="wrapped_participants_entry"):
+    client = storage.Client()
+    bucket = client.get_bucket(bucket_name)
+    return bucket
 
-def get_participant_entry(entry_id: int, gw: int) -> dict | None:
+
+def get_participant_entry(entry_id: int, gw: int) -> dict:
     """Calls an Endpoint to retrieve a participants entry"""
     try:
         valid, gw = check_gw(gw)
     except TypeError:
         valid, gw = False, None
 
-    team_list = {
+    if valid:
+        # optimization, imported get directly from requests, but changed name to wget for easy reference
+        r = wget(FPL_PLAYER.format(entry_id, gw))
+
+        # optimization - assigning size of dictionary before hand to prevent resizing of dictionaries
+        team_list = {
             "auto_sub_in": "",
             "auto_sub_out": "",
             "gw": gw,
@@ -201,7 +211,6 @@ def get_participant_entry(entry_id: int, gw: int) -> dict | None:
             print("{} does not exist".format(entry_id))
 
     return team_list
-
 
 
 def get_curr_event():
@@ -416,7 +425,10 @@ class Participant:
             curr_gw = get_curr_event()[0]
             gw = curr_gw
 
-        valid, gw = check_gw(gw)
+        try:
+            valid, gw = check_gw(gw)
+        except TypeError:
+            valid, gw = False, None
 
         if valid:
             if type(gw) == list:

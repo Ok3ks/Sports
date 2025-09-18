@@ -5,6 +5,7 @@ import logging
 import gevent
 from src.db.participant_info_table import league_participant_info
 import pandas as pd
+from src.utils import bucket_client
 
 LOGGER = logging.getLogger(__name__)
 
@@ -36,12 +37,17 @@ def create_gameweek_entries_table(conn="", table_name=""):
     return conn
 
 
+
+
+bucket=bucket_client(bucket_name="2025_2026_participants_entry")
+
 def participant_weekly_entry(entry_id: list[int] | int, to_json=False, upload=True):
     """Downloads weekly entry for a list of entry Id"""
-    new_directory = f"data/participant/{args.gameweek_id}"
+    YEAR = "2025_2026"
+    new_directory = f"data/{YEAR}/participant/{args.gameweek_id}"
     if type(entry_id) is list:
         START = 0
-        for n in range(0, len(entry_id), 200):
+        for n in range(0, len(entry_id), 100):
             # optimum number of spawned threads to 100
             req = [
                 gevent.spawn(
@@ -59,18 +65,22 @@ def participant_weekly_entry(entry_id: list[int] | int, to_json=False, upload=Tr
             if not os.path.exists(new_directory):
                 os.makedirs(new_directory)
             if to_json:
-                df.to_parquet(destination_path, compression="brotli")
-                print(f"{filename} saved ")
+                df.to_parquet(destination_path)
+                print(f"{filename} saved to parquet")
 
-            if n % (len(entry_id)//4) == 0:
+            if n % 10_000 == 0:
                 time.sleep(5)
+            if upload:
+                print(bucket.exists())
+                blob = bucket.blob(f"{args.gameweek_id}/{filename}")
+                blob.upload_from_filename(destination_path)
 
             START += 100
             # chaining tuples obtained from spawned processes
     else:
         import json
         res = get_participant_entry(gw=args.gameweek_id, entry_id=entry_id)
-        filename = f"{entry_id}.json"
+        filename = f"{entry_id}.pqt"
         with open(filename, 'w') as outs:
             json.dump(res, outs)
         print(f"{filename} saved")
