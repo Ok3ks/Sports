@@ -4,6 +4,7 @@ from requests.adapters import HTTPAdapter
 import pandas as pd
 import json
 import numpy as np
+from google.cloud import storage
 
 
 from .urls import GW_URL, TRANSFER_URL, FPL_URL, FPL_PLAYER
@@ -135,8 +136,8 @@ def get_participant_entry(entry_id: int, gw: int) -> dict:
         valid, gw = False, None
 
     if valid:
-        # optimization, imported get directly from requests, but changed name to wget for easy reference
-        r = wget(FPL_PLAYER.format(entry_id, gw))
+        # optimization, imported get directly from requests
+        r = s.get(FPL_PLAYER.format(entry_id, gw))
 
         # optimization - assigning size of dictionary before hand to prevent resizing of dictionaries
         team_list = {
