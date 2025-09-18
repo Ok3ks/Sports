@@ -12,7 +12,7 @@ env:
   PROJECT_NAME: fpl-analysis-tool
   ARTIFACT_REPO_NAME: fpl
   IMAGE_NAME: fpl-backend
-  REVISION: 25_GW1
+  REVISION: 25_Master
   REGION: europe-west2
 
 jobs: 
@@ -42,10 +42,6 @@ jobs:
           source venv/bin/activate
           pip install -r LiveProject/requirements.txt
           which python
-    
-      - name: 'Update DB and info' # depends on endpoint
-        run: |
-            source venv/bin/activate
 
       - id: 'auth'
         name: 'Authenticate to Google Cloud'
@@ -63,7 +59,7 @@ jobs:
       - name: 'Build and push container'
         run: |
           cd LiveProject
-          docker build . -t ${{ env.IMAGE_NAME }}:${{ env.REVISION }}
+          docker build . -t ${{ env.IMAGE_NAME }}:${{ env.REVISION }} --no-cache
           docker tag ${{ env.IMAGE_NAME }}:${{ env.REVISION }} ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_NAME }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ env.REVISION }}
           echo "pushing ${{ env.REGION-docker.pkg.dev }}/${{ env.PROJECT_NAME }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ env.REVISION }} to Artifacts Registry"
           docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_NAME }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ env.REVISION }}

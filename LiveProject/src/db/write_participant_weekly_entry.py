@@ -83,6 +83,7 @@ def participant_weekly_entry(entry_id: list[int] | int, to_json=False, upload=Tr
         filename = f"{entry_id}.pqt"
         with open(filename, 'w') as outs:
             json.dump(res, outs)
+        print(f"{filename} saved")
     
 
 
@@ -99,13 +100,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     import time
 
-    # league_participant_info(args.league_id, engine)
-    # list_of_entry_ids, LENGTH = get_entry_ids(
-    #     table_name=f"League_{str(args.league_id)}"
-    # )
-    # if LENGTH > 1:
-    #     create_gameweek_entries_table(conn=engine, table_name=TABLE_NAME)
-
-    participant_weekly_entry([n for n in range(args.start, args.end)], to_json=True, upload=True)
+    participant_weekly_entry(args.start, to_json=True, upload=False)
 
 

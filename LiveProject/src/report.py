@@ -31,6 +31,7 @@ class LeagueWeeklyReport(League):
         self.one_df = pd.DataFrame(self.get_all_participant_entries(self.gw))
         self.f = pd.DataFrame(self.get_gw_transfers(self.gw))
         self.f = self.f.T
+        self.f = self.f.fillna("0")
 
     @lru_cache(10)
     @profile
@@ -38,6 +39,7 @@ class LeagueWeeklyReport(League):
         """Transforms weekly score into Dataframe, and returns weekly dataframe"""
 
         self.o_df = self.one_df[~self.one_df["players"].isna()]
+
 
         # optimization 4 - loaded all player rows into memory at once
         self.player_points = get_player_stats_from_db(self.gw)
@@ -280,22 +282,27 @@ class LeagueWeeklyReport(League):
 
                 if "element_in" in self.f.keys() and "element_out" in self.f.keys():
                     self.no_chips = self.no_chips.sort_values(
-                        by="delta", ascending=False
-                    )
+                        by="delta", ascending=False)
                     for i in range(1, n):
                         player_in = self.no_chips.iloc[-i, :]["element_in"]
                         player_out = self.no_chips.iloc[-i, :]["element_out"]
-                        points_lost = int(self.no_chips.iloc[-i, :]["delta"])
+                        points_delta = int(self.no_chips.iloc[-i, :]["delta"])
                         participant_id = str(self.no_chips.iloc[-i, :]["entry_id"])
+                        event_transfer_cost = self.no_chips.iloc[-i, :]['event_transfers_cost']
 
+                        if "N" in str(event_transfer_cost):
+                            event_transfer_cost = 0
+                        else:
+                            event_transfer_cost = int(event_transfer_cost)
+    
                         worst_transfer_in.append(
                             {
                                 "entry_id": participant_id,
                                 "team_name": self.participants_name[participant_id],
                                 "player_in": player_in,
                                 "player_out": player_out,
-                                "points_delta": points_lost + (-int(self.o_df.iloc[-i, :]['event_transfers_cost'])),
-                                "point_hit": int(self.o_df.iloc[-i, :]['event_transfers_cost']),
+                                "points_delta": points_delta - event_transfer_cost,
+                                "point_hit": event_transfer_cost,
                             }
                         )
             return {"worst_transfer_in": worst_transfer_in}
@@ -313,16 +320,21 @@ class LeagueWeeklyReport(League):
                         player_out = self.no_chips.iloc[i, :]["element_out"]
                         points_delta = int(self.no_chips.iloc[i, :]["delta"])
                         participant_id = str(self.no_chips.iloc[i, :]["entry_id"])
-                        point_hit = str(self.no_chips.iloc[-i, :]['event_transfers_cost'])
+                        event_transfer_cost = str(self.no_chips.iloc[-i, :]['event_transfers_cost'])
 
+                        if "N" in str(event_transfer_cost):
+                            event_transfer_cost = 0
+                        else:
+                            event_transfer_cost = int(event_transfer_cost)
+    
                         best_transfer_in.append(
                             {
                                 "entry_id": participant_id,
                                 "team_name": self.participants_name[participant_id],
                                 "player_in": player_in,
                                 "player_out": player_out,
-                                "points_delta": points_delta,
-                                "point_hit": point_hit
+                                "points_delta": points_delta - event_transfer_cost,
+                                "point_hit": event_transfer_cost,
                             }
                         )
             return {"best_transfer_in": best_transfer_in}
