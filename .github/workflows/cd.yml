@@ -70,4 +70,4 @@ jobs:
 
       - name: 'Deploy container with cloud run'
         run: |
-          gcloud run deploy ${{ env.SERVICE_NAME }} --image ${{ env.REGION }}-docker.pkg.dev }}/${{ env.PROJECT_NAME }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }} --platform managed --region ${{ env.REGION }} --allow-unauthenticated
+          gcloud run deploy ${{ env.SERVICE_NAME }} --image ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_NAME }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }} --platform managed --region ${{ env.REGION }} --allow-unauthenticated
