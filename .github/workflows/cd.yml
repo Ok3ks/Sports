@@ -13,7 +13,7 @@ env:
   ARTIFACT_REPO_NAME: fpl
   IMAGE_NAME: fpl-backend
   REVISION: 25_Master
-  REGION: europe-west9
+  REGION: europe-west2
   SERVICE_NAME: redeployed-backend
 
 jobs: 
