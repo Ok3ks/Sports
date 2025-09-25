@@ -63,11 +63,11 @@ jobs:
           cd LiveProject
           docker build . -t ${{ env.IMAGE_NAME }}:${{ env.REVISION }} --no-cache
           docker tag ${{ env.IMAGE_NAME }}:${{ env.REVISION }} ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_NAME }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ env.REVISION }}
-          echo "pushing ${{ env.REGION-docker.pkg.dev }}/${{ env.PROJECT_NAME }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ env.REVISION }} to Artifacts Registry"
+          echo "pushing ${{ env.REGION}}-docker.pkg.dev/${{ env.PROJECT_NAME }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ env.REVISION }} to Artifacts Registry"
           digest=$(docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_NAME }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ env.REVISION }} | grep -oP 'digest:\s*\K(sha256:[0-9a-f]+)')
           echo "Image pushed with digest: $digest"
           echo "digest=$digest" >> "$GITHUB_OUTPUT"
 
       - name: 'Deploy container with cloud run'
         run: |
-          gcloud run deploy ${{ env.SERVICE_NAME }} --image ${{ env.REGION-docker.pkg.dev }}/${{ env.PROJECT_NAME }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }} --platform managed --region ${{ env.REGION }} --allow-unauthenticated
+          gcloud run deploy ${{ env.SERVICE_NAME }} --image ${{ env.REGION }}-docker.pkg.dev }}/${{ env.PROJECT_NAME }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }} --platform managed --region ${{ env.REGION }} --allow-unauthenticated
