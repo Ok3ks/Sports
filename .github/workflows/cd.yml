@@ -70,4 +70,4 @@ jobs:
 
       - name: 'Deploy container with cloud run'
         run: |
-          gcloud run deploy ${{ env.SERVICE_NAME }} --region=${{ env.REGION }} --image=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_NAME }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}  --config=LiveProject/cloud_run_backend.yaml
+          gcloud run services replace LiveProject/cloud_run_backend.yaml --region=${{ env.REGION }}
