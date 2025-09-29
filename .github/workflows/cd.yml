@@ -70,4 +70,4 @@ jobs:
 
       - name: 'Deploy container with cloud run'
         run: |
-          gcloud run services replace LiveProject/cloud_run_backend.yaml --region=${{ env.REGION }}
+          gcloud run services replace LiveProject/cloud_run_backend.yaml --region=europe-west9
