@@ -1,0 +1,71 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: redeployed-backend
+  namespace: '987818742353'
+  selfLink: >-
+    /apis/serving.knative.dev/v1/namespaces/987818742353/services/redeployed-backend
+  uid: 29e8e7f0-f97a-4bb7-91d2-3b7099685eab
+  resourceVersion: AAY/qJYX8Bs
+  generation: 14
+  creationTimestamp: '2025-09-17T10:58:40.189635Z'
+  labels:
+    run.googleapis.com/satisfiesPzs: 'true'
+    cloud.googleapis.com/location: europe-west9
+  annotations:
+    serving.knative.dev/creator: freelanceokeks@gmail.com
+    serving.knative.dev/lastModifier: freelanceokeks@gmail.com
+    run.googleapis.com/client-name: cloud-console
+    run.googleapis.com/operation-id: 7690e867-5398-4d3f-be31-a6367fc36d2f
+    run.googleapis.com/ingress: all
+    run.googleapis.com/ingress-status: all
+    run.googleapis.com/invoker-iam-disabled: 'true'
+    run.googleapis.com/urls: >-
+      ["https://redeployed-backend-987818742353.europe-west9.run.app","https://redeployed-backend-yekomza2pq-od.a.run.app"]
+spec:
+  template:
+    metadata:
+      labels:
+        client.knative.dev/nonce: 8f120e62-7146-431e-a7c2-4ee43daab93d
+        run.googleapis.com/startupProbeType: Default
+      annotations:
+        run.googleapis.com/client-name: cloud-console
+        autoscaling.knative.dev/maxScale: '2'
+        autoscaling.knative.dev/minScale: '1'
+        run.googleapis.com/execution-environment: gen2
+        run.googleapis.com/sessionAffinity: 'true'
+        run.googleapis.com/startup-cpu-boost: 'true'
+    spec:
+      containerConcurrency: 8
+      timeoutSeconds: 300
+      serviceAccountName: 987818742353-compute@developer.gserviceaccount.com
+      containers:
+      - name: fpl-backend-1
+        image: >-
+          europe-west2-docker.pkg.dev/fpl-analysis-tool/fpl/fpl-backend:25_Master
+        command:
+        - gunicorn
+        args:
+        - '--config'
+        - LiveProject/gunicorn.py
+        ports:
+        - name: http1
+          containerPort: 8000
+        env:
+        - name: DJANGO_SECRET_KEY
+          value: projects/987818742353/secrets/DJANGO_SECRET_KEY
+        - name: IS_SQLITE
+          value: 'True'
+        resources:
+          limits:
+            cpu: 2000m
+            memory: 8Gi
+        startupProbe:
+          timeoutSeconds: 240
+          periodSeconds: 240
+          failureThreshold: 1
+          tcpSocket:
+            port: 8000
+  traffic:
+  - percent: 100
+    latestRevision: true

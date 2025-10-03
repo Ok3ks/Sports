@@ -14,6 +14,7 @@ env:
   IMAGE_NAME: fpl-backend
   REVISION: 25_Master
   REGION: europe-west2
+  SERVICE_NAME: redeployed-backend
 
 jobs: 
   build:
@@ -57,11 +58,16 @@ jobs:
           gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
 
       - name: 'Build and push container'
+        id: build
         run: |
           cd LiveProject
           docker build . -t ${{ env.IMAGE_NAME }}:${{ env.REVISION }} --no-cache
           docker tag ${{ env.IMAGE_NAME }}:${{ env.REVISION }} ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_NAME }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ env.REVISION }}
-          echo "pushing ${{ env.REGION-docker.pkg.dev }}/${{ env.PROJECT_NAME }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ env.REVISION }} to Artifacts Registry"
-          docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_NAME }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ env.REVISION }}
-          echo "Image pushed"
+          echo "pushing ${{ env.REGION}}-docker.pkg.dev/${{ env.PROJECT_NAME }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ env.REVISION }} to Artifacts Registry"
+          digest=$(docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_NAME }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ env.REVISION }} | grep -oP 'digest:\s*\K(sha256:[0-9a-f]+)')
+          echo "Image pushed with digest: $digest"
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
 
+      - name: 'Deploy container with cloud run'
+        run: |
+          gcloud run services replace LiveProject/cloud_run_backend.yaml --region=europe-west9
