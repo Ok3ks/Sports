@@ -20,14 +20,14 @@ if "line_profiler" not in dir() and "profile" not in dir():
 class LeagueWeeklyReport(League):
     #
     @profile
-    def __init__(self, gw: int, league_id: int):
+    def __init__(self, gw: int, league_id: int) -> None:
         super().__init__(league_id)
         self.gw = gw
         # self.participants = self.obtain_league_participants()
 
     @lru_cache()
     @profile
-    def get_data(self):
+    def get_data(self) -> None:
         self.one_df = pd.DataFrame(self.get_all_participant_entries(self.gw))
         self.f = pd.DataFrame(self.get_gw_transfers(self.gw))
         self.f = self.f.T
@@ -94,13 +94,13 @@ class LeagueWeeklyReport(League):
 
         return self.f
 
-    def captain_minutes(self):
+    def captain_minutes(self) -> None:
         self.o_df["cap_minutes"] = [
             check_minutes(x, self.gw)[0] for x in self.o_df["captain"]
         ]
 
     @profile
-    def add_auto_sub(self):
+    def add_auto_sub(self) -> None:
         if "auto_sub_in" in self.f.columns:
 
             # optimization 1 - switching dictionaries to tuples
@@ -116,7 +116,7 @@ class LeagueWeeklyReport(League):
             )
 
     @profile
-    def create_report(self, display=True):
+    def create_report(self, display: bool=True):
         self.captain = self.o_df["captain"].value_counts().to_dict()
 
         self.captain = [{"player": k, "count": v} for k, v in self.captain.items()]
@@ -168,7 +168,7 @@ class LeagueWeeklyReport(League):
 
             n = min(len(rise_df), 3)
             for i in range(0, n):
-                temp = {}
+                temp: dict[str, int] = {}
                 cur_rank = int(rise_df.iloc[i, :]["rank"])
                 last_rank = int(rise_df.iloc[i, :]["last_rank"])
                 participant_name = str(rise_df.iloc[i, :]["player_name"])
@@ -181,7 +181,7 @@ class LeagueWeeklyReport(League):
             n = min(len(fall_df), 3)
 
             for i in range(0, n):
-                temp = {}
+                temp: dict[str, int] = {}
                 cur_rank = int(fall_df.iloc[i, :]["rank"])
                 last_rank = int(fall_df.iloc[i, :]["last_rank"])
                 participant_name = str(fall_df.iloc[i, :]["player_name"])

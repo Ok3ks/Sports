@@ -14,41 +14,41 @@ import os
 from src.urls import FPL_URL
 
 
-def test_to_json(transfer_obj, filepath):
+def test_to_json(transfer_obj, filepath) -> None:
     output_name = "test.json"
     to_json(transfer_obj, join(filepath, output_name))
     assert output_name in os.listdir(filepath)
 
 
-def test_from_json(filepath):
+def test_from_json(filepath) -> None:
     output_name = "test.json"
     with open(join(filepath, output_name), "r") as ins:
         obj = json.load(ins)
     assert type(obj) == dict
 
 
-def test_get_basic_stats(values):
+def test_get_basic_stats(values) -> None:
     pass
 
 
-def test_parse_transfers(transfer_obj):
+def test_parse_transfers(transfer_obj) -> None:
     pass
 
 
-def test_check_gw_int_is_true(gw_fixture):
+def test_check_gw_int_is_true(gw_fixture) -> None:
     pass
 
 
-def test_check_gw_span_is_true(span_fixture):
+def test_check_gw_span_is_true(span_fixture) -> None:
     pass
 
 
 @pytest.mark.parametrize("diff_fixture", [40])
-def test_check_gw_is_false(diff_fixture):
+def test_check_gw_is_false(diff_fixture) -> None:
     assert check_gw(diff_fixture) == (False, None), "Only 38 games in a season"
 
 
-def test_get_curr_event():
+def test_get_curr_event() -> None:
     r = requests.get(FPL_URL)
     assert (
         r.status_code == 200
@@ -64,13 +64,13 @@ def test_get_curr_event():
     assert inter_.intersection(check_set) == inter_
 
 
-def test_get_diff_gw_transfers(participant, span_fixture):
+def test_get_diff_gw_transfers(participant, span_fixture) -> None:
     row = get_gw_transfers([participant], span_fixture)
     assert list(row[span_fixture[0]].keys())[0] == participant
     assert set(row.keys()).union(set(span_fixture)) == set(span_fixture)
 
 
-def test_get_all_gw_transfers(participant, span_fixture):
+def test_get_all_gw_transfers(participant, span_fixture) -> None:
     row = get_gw_transfers([participant], span_fixture, all=True)
     if row:
         keys = list(row.keys())
@@ -82,7 +82,7 @@ def test_get_all_gw_transfers(participant, span_fixture):
         raise Exception("Error retrieving rows")
 
 
-def test_get_participant_entry(participant, gw_fixture):
+def test_get_participant_entry(participant, gw_fixture) -> None:
     pass
 
 
@@ -90,19 +90,19 @@ class TestParticipant:
     def test_init(
         self,
         participant,
-    ):
+    ) -> None:
         pass
 
-    def test_get_gw_transfers(self):
+    def test_get_gw_transfers(self) -> None:
         pass
 
-    def test_get_span_week_transfers(self):
+    def test_get_span_week_transfers(self) -> None:
         pass
 
-    def test_get_all_week_transfers(self):
+    def test_get_all_week_transfers(self) -> None:
         pass
 
-    def test_get_all_week_entries(self, participant, span_fixture, gw_fixture):
+    def test_get_all_week_entries(self, participant, span_fixture, gw_fixture) -> None:
         test = Participant(participant, gw_fixture)
         test_list = test.get_all_week_entries(span_fixture)
         test_int = test.get_all_week_entries(gw_fixture)
@@ -113,7 +113,7 @@ class TestParticipant:
     @pytest.mark.parametrize("gameweek_list,gameweek_int", [([1, 10, 39], [13])])
     def test_get_all_week_entries_incl_invalid(
         self, participant, gameweek_list, gameweek_int
-    ):
+    ) -> None:
         test = Participant(participant, gameweek_int)
 
         with pytest.raises(GameweekError):
@@ -121,19 +121,19 @@ class TestParticipant:
 
 
 class TestLeague:
-    def test_init(self, league_fixture):
+    def test_init(self, league_fixture) -> None:
         test = League(league_fixture)
         assert test.league_id == 538731
         assert test.participants == []
         pass
 
-    def test_league_obtain_league_participants_empty(self):
+    def test_league_obtain_league_participants_empty(self) -> None:
         # Endpoint tests validates this
         pass
 
     def test_league_obtain_league_participants_fill(
         self, league_fixture, league_fill_fixture
-    ):
+    ) -> None:
         test = League(league_fixture)
         test.participants = league_fill_fixture
 
@@ -163,7 +163,7 @@ class TestLeague:
         assert test.entry_ids != None
         assert type(test.entry_ids) == list
 
-    def test_league_get_participant_name(self, league_fixture, league_fill_fixture):
+    def test_league_get_participant_name(self, league_fixture, league_fill_fixture) -> None:
         test = League(league_fixture)
         test.participants = league_fill_fixture
         names = test.get_participant_name()
@@ -174,12 +174,12 @@ class TestLeague:
         assert type(list(test.participant_name.values())[0]) == str
         assert type(names) == dict
 
-    def test_league_get_all_participant_entries(self, league_fixture):
+    def test_league_get_all_participant_entries(self, league_fixture) -> None:
         test = League(league_fixture)
         test_all_entries = test.get_all_participant_entries(10)
         # assert test_all_entries.__str__ is Generator
 
-    def test_league_get_gw_transfers(self, league_fixture):
+    def test_league_get_gw_transfers(self, league_fixture) -> None:
         pass
 
 

@@ -10,7 +10,7 @@ import logging
 LOGGER = logging.getLogger(__name__)
 
 
-def league_participant_info(league_id: int, connection=None, PAGE_COUNT=207700, to_json=False):
+def league_participant_info(league_id: int, connection=None, PAGE_COUNT=207700, to_json=False) -> None:
     """Extracts Participants of a league """
     test = League(league_id)
     while test.has_next:

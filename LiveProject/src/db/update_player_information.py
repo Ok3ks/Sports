@@ -4,7 +4,7 @@ from src.urls import FPL_URL
 import pandas as pd
 
 
-def update_db_player_info(engine, table_name, half=1):
+def update_db_player_info(engine, table_name, half=1) -> None:
     """This function retrieves current information of players
     from the API"""
 

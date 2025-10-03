@@ -1,3 +1,4 @@
+from google.cloud.storage.bucket import Bucket
 import requests
 from urllib3.util import Retry
 from requests.adapters import HTTPAdapter
@@ -16,7 +17,7 @@ import logging
 import ssl
 
 class TLSAdapter(HTTPAdapter):
-    def init_poolmanager(self, *args, **kwargs):
+    def init_poolmanager(self, *args, **kwargs) -> None:
         context = ssl.create_default_context()
         context.minimum_version = ssl.TLSVersion.TLSv1_2  # Enforcing TLSv1.2 or higher
         kwargs['ssl_context'] = context
@@ -35,7 +36,7 @@ retries = Retry(
 s.mount("https://", TLSAdapter(max_retries=3))
 
 
-def to_json(x: dict, fp):
+def to_json(x: dict, fp) -> None:
     with open(fp, "w") as outs:
         json.dump(x, outs)
     print(f"{x.keys()} stored in Json successfully. Find here {fp}")
@@ -85,7 +86,7 @@ def check_gw(gw: Union[int, List[int]]) -> tuple:
 class GameweekError(Exception):
     """Custom exception for invalid gameweek"""
 
-    def __init__(self, message="Gameweek is not valid (Should be in range 1,38)"):
+    def __init__(self, message: str="Gameweek is not valid (Should be in range 1,38)") -> None:
         super().__init__(message)
 
 
@@ -122,7 +123,7 @@ def get_gw_transfers(alist: List[int], gw: Union[int, List[int]], all=False) -> 
                 )
     return row
 
-def bucket_client(bucket_name="wrapped_participants_entry"):
+def bucket_client(bucket_name: str="wrapped_participants_entry") -> Bucket:
     client = storage.Client()
     bucket = client.get_bucket(bucket_name)
     return bucket
@@ -226,7 +227,7 @@ def get_curr_event():
             curr_event.append((event["finished"], event["data_checked"]))
     return curr_event
 
-def get_gw_transfers_scrap(alist: List[int], gw: Union[int, List[int]], all=False) -> dict:
+def get_gw_transfers_scrap(alist: List[int], gw: Union[int, List[int]], all: bool=False) -> dict:
     """Input is a list of entry_id. Gw is the gameweek number.
     'all' toggles between extracting all gameweeks or not"""
 
@@ -263,17 +264,17 @@ def get_gw_transfers_scrap(alist: List[int], gw: Union[int, List[int]], all=Fals
 
     return row
 class Gameweek:
-    def __init__(self, gw=1):
+    def __init__(self, gw: int=1) -> None:
         self.gw = gw
 
-    def get_payload(self):
+    def get_payload(self) -> None:
         temp = s.get(GW_URL.format(self.gw))
         temp_2 = s.get(FPL_URL)
 
         self.json = temp.json()
         self.gw_json = temp_2.json()
 
-    def parse_payload(self):
+    def parse_payload(self) -> None:
         out = []
 
         for item in self.json["elements"]:
@@ -290,7 +291,7 @@ class Gameweek:
             if int(item["id"]) == int(self.gw):
                 self.status = item
 
-    def highest_scoring_player(self):
+    def highest_scoring_player(self) -> None:
         highest = self.week_df.sort_values(by="total_points", ascending=False).iloc[
             0, :
         ]
@@ -298,13 +299,13 @@ class Gameweek:
         print(get_player(highest["id"]).team)
         del highest
 
-    def dream_team(self):
+    def dream_team(self) -> None:
         dream_team = self.week_df[self.week_df["in_dreamteam"] == True]
         print(dream_team)
         for i in dream_team.itertuples():
             print(i[-3], get_player(i[-3]).player_name)
 
-    def highest_xg(self):
+    def highest_xg(self) -> None:
         highest_xg = self.week_df.sort_values(
             by="expected_goals", ascending=False
         ).iloc[0, :]
@@ -312,7 +313,7 @@ class Gameweek:
         print(get_player(highest_xg["id"]).team)
         print(get_player(highest_xg["id"]).player_name)
 
-    def highest_xgc(self):
+    def highest_xgc(self) -> None:
         highest_xgc = self.week_df.sort_values(
             by="expected_goals_conceded", ascending=False
         ).iloc[0, :]
@@ -320,7 +321,7 @@ class Gameweek:
         print(get_player(highest_xgc["id"]).team)
         print(get_player(highest_xgc["id"]).player_name)
 
-    def highest_xa(self):
+    def highest_xa(self) -> None:
         highest_xa = self.week_df.sort_values(
             by="expected_assists", ascending=False
         ).iloc[0, :]
@@ -328,7 +329,7 @@ class Gameweek:
         print(get_player(highest_xa["id"]).team)
         print(get_player(highest_xa["id"]).player_name)
 
-    def gameweek_status(self):
+    def gameweek_status(self) -> None:
         if self.status["is_current"]:
             print(self.gw, "Current Gameweek")
         else:
@@ -350,7 +351,7 @@ class Gameweek:
 
 
 class Participant:
-    def __init__(self, entry_id, gw):
+    def __init__(self, entry_id, gw) -> None:
         self.participant = entry_id
         self.gw = gw
 
@@ -421,7 +422,7 @@ class Participant:
         print("getting all entries up to {}".format(curr_gw))
         return self.get_gw_transfers(curr_gw, all=True)
 
-    def get_all_week_entries(self, gw: Union[int, List[int]], all=False) -> list:
+    def get_all_week_entries(self, gw: Union[int, List[int]], all: bool=False) -> list:
         if all:
             curr_gw = get_curr_event()[0]
             gw = curr_gw
@@ -447,7 +448,7 @@ class Participant:
 
 
 class League:
-    def __init__(self, league_id):
+    def __init__(self, league_id) -> None:
         self.league_id = league_id
         self.participants = []
         self.res = None
@@ -455,7 +456,7 @@ class League:
         self.has_next = True
         self.PAGE_COUNT = 1
 
-    def obtain_league_participants(self, refresh=False):
+    def obtain_league_participants(self, refresh: bool=False):
         """This function uses the league url as an endpoint to query for participants of a league at a certain date.
         Should be used to update participants table in DB"""
 
@@ -488,13 +489,13 @@ class League:
         self.entry_ids = [participant["entry"] for participant in self.participants]
         return self.participants
 
-    def get_league_count(self):
+    def get_league_count(self) -> int | None:
         if len(self.participants > 1):
             return len(self.participants)
         else:
             LOGGER.info("Obtain league participants first before getting league count")
 
-    def get_participant_name(self, refresh=False) -> dict:
+    def get_participant_name(self, refresh: bool=False) -> dict:
         """Creates participant id to name hash table"""
         if refresh or len(self.participants) == 0:
             self.obtain_league_participants()
@@ -535,7 +536,7 @@ class League:
         for participant in batch:
             yield get_participant_entry(participant["entry"], self.gw)
 
-    def get_all_participant_entries(self, gw, refresh=False, thread=None):
+    def get_all_participant_entries(self, gw, refresh: bool=False, thread=None):
         self.gw = gw
 
         if refresh or len(self.participants) == 0:
@@ -545,7 +546,7 @@ class League:
         for participant in self.participants:
             yield get_participant_entry(participant["entry"], gw)
 
-    def get_gw_transfers(self, gw, refresh=False, thread=None):
+    def get_gw_transfers(self, gw, refresh: bool=False, thread=None):
         self.transfers = []
         if refresh or len(self.participants) == 0:
             self.obtain_league_participants()

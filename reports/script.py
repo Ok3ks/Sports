@@ -13,14 +13,14 @@ keys = obj.keys()
 print(keys)
 
 
-def plural(value):
+def plural(value) -> str:
     if value > 1:
         return str(value) + " players"
     else:
         return str(value) + " player"
 
 
-def text_output():
+def text_output() -> None:
     """Output"""
     for key, values in obj.items():
         if key == "captain":

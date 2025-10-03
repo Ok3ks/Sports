@@ -13,7 +13,7 @@ import logging
 
 LOGGER = logging.getLogger(__name__)
 
-def update_db_gameweek_score(conn, gw):
+def update_db_gameweek_score(conn, gw) -> None:
     """This function retrieves current information of players
     from the API"""
 

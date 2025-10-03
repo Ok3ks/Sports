@@ -69,7 +69,7 @@ def parse_fixture():
     return fixture_df
 
 
-def parse_stats(filter={"gameweek": 38}, to_dict=True) -> dict[str, Any] | pd.DataFrame:
+def parse_stats(filter: dict[str, int]={"gameweek": 38}, to_dict: bool=True) -> dict[str, Any] | pd.DataFrame:
     """Combine Season stats from DB, and map appropriately."""
 
     stats = get_season_stats()
@@ -91,7 +91,7 @@ def parse_stats(filter={"gameweek": 38}, to_dict=True) -> dict[str, Any] | pd.Da
 
 
 # ToDo : add kwargs to function to customise groupbys
-def groupby(groups: set[str] = {"gameweek", "position"}):
+def groupby(groups: set[str] = {"gameweek", "position"}) -> list[dict[str, list[str]]]:
     """Calculate aggregates groupby."""
     all_groups = {"gameweek", "position", "team"}
     stats = parse_stats(filter={"gameweek": 38},to_dict=False)
@@ -103,7 +103,7 @@ def groupby(groups: set[str] = {"gameweek", "position"}):
         }
     )
     ref = obj.reset_index().to_dict("list")
-    out = {}
+    out: dict[str, list[str]] = {}
     for key, value in ref.items():
         if key[1] != "":
             value.append(key[1])

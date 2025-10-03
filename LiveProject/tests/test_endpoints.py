@@ -14,7 +14,7 @@ from src.utils import to_json
 from ...paths import MOCK_DIR
 
 
-def test_gameweek_endpoint(gw_fixture):
+def test_gameweek_endpoint(gw_fixture) -> None:
     # digit greater than 1 less than 38
     gameweek_url = GW_URL.format(gw_fixture)
     assert gameweek_url == "https://fantasy.premierleague.com/api/event/1/live/"
@@ -85,7 +85,7 @@ def test_gameweek_endpoint(gw_fixture):
     to_json(r, f"{MOCK_DIR}/endpoints/gameweek_endpoint.json")
 
 
-def test_fixture_endpoint():
+def test_fixture_endpoint() -> None:
     r = requests.get(FIXTURE_URL)
     assert r.status_code == 200, "endpoint unavailable"
     r = r.json()
@@ -123,7 +123,7 @@ def test_fixture_endpoint():
     to_json(out_dict, f"{MOCK_DIR}/endpoints/fixture_endpoint.json")
 
 
-def test_transfer_endpoint(participant):
+def test_transfer_endpoint(participant) -> None:
     """Tests transfer endpoint given a valid entry_id.
     Response is a list of transfers for previous gameweeks"""
     r = requests.get(TRANSFER_URL.format(participant))
@@ -154,7 +154,7 @@ def test_transfer_endpoint(participant):
     to_json(out_dict, f"{MOCK_DIR}/endpoints/transfer_endpoint.json")
 
 
-def test_history_endpoint(participant):
+def test_history_endpoint(participant) -> None:
     """Extracts a players history for prior seasons given an id"""
 
     r = requests.get(HISTORY_URL.format(participant))
@@ -211,7 +211,7 @@ def test_history_endpoint(participant):
     to_json(r, f"{MOCK_DIR}/endpoints/history_endpoint.json")
 
 
-def test_h2h_league_endpoint(h2h_league):
+def test_h2h_league_endpoint(h2h_league) -> None:
     """"""
 
     r = requests.get(H2H_LEAGUE.format(h2h_league))
@@ -262,7 +262,7 @@ def test_h2h_league_endpoint(h2h_league):
     to_json(r, f"{MOCK_DIR}/endpoints/h2h_league_endpoint.json")
 
 
-def test_league_endpoint(classic_league):
+def test_league_endpoint(classic_league) -> None:
     page = 1
     r = requests.get(LEAGUE_URL.format(classic_league, page))
 
@@ -332,7 +332,7 @@ def test_league_endpoint(classic_league):
     to_json(r, f"{MOCK_DIR}/endpoints/league_endpoint.json")
 
 
-def test_fpl_player_endpoint(participant, gw_fixture):
+def test_fpl_player_endpoint(participant, gw_fixture) -> None:
     r = requests.get(FPL_PLAYER.format(participant, gw_fixture))
     assert r.status_code == 200, "Endpoint unavailable, check player_id and gameweek"
 
@@ -386,7 +386,7 @@ def test_fpl_player_endpoint(participant, gw_fixture):
     to_json(r, f"{MOCK_DIR}/endpoints/player_endpoint.json")
 
 
-def test_fpl_url_endpoint():
+def test_fpl_url_endpoint() -> None:
     r = requests.get(FPL_URL)
     assert r.status_code == 200, "Endpoint unavailable"
 

@@ -15,7 +15,7 @@ from src.db.db import (
 class ParticipantReport(Participant):
     """Creates a report from start of a gameweek to a span gameweek"""
 
-    def __init__(self, gw: int, entry_id: int):
+    def __init__(self, gw: int, entry_id: int) -> None:
         super().__init__(entry_id, gw)
         self.gw = gw
         self.entry_id = entry_id
@@ -104,7 +104,7 @@ class ParticipantReport(Participant):
         self.f = self.o_df.merge(self.f, on="gw", how="right")
         return self.f
 
-    def add_auto_sub(self):
+    def add_auto_sub(self) -> None:
         # self.f["auto_sub_in_player"] = self.f["auto_sub_in"]  # .map(lambda x: x["in"])
         # self.f["auto_sub_out_player"] = self.f[
         #     "auto_sub_out"
@@ -132,7 +132,7 @@ class ParticipantReport(Participant):
             for event in range(1, self.gw + 1)
         ]
 
-    def prep_for_gql(self):
+    def prep_for_gql(self) -> None:
         self.output = self.o_df.to_dict("list")
         for key, value in self.output.items():
             if key in ["captain", "vice_captain", "highest_scoring_player"]:
@@ -141,7 +141,7 @@ class ParticipantReport(Participant):
                     for gameweek, player_id in enumerate(value)
                 ]
 
-    def create_report(self, display=False):
+    def create_report(self, display: bool=False):
         # output = self.output.to_dict("list")
         # r = create_cache_engine()  # save to cache
         # r.set(

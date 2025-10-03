@@ -29,12 +29,12 @@ class Fixture(Base):
     homedifficulty: Mapped[str] = mapped_column(String)
     awaydifficulty: Mapped[str] = mapped_column(String)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"""{self.home} {self.homegoals} vs {self.awaygoals} 
             {self.away}. Date {self.date}"""
 
 
-def update_season_fixture(engine=None, table_name="2024_2025_FIXTURES"):
+def update_season_fixture(engine=None, table_name: str="2024_2025_FIXTURES"):
     """This function retrieves current information of players
     from the API"""
 

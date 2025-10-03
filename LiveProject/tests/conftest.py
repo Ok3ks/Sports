@@ -4,7 +4,7 @@ from os.path import realpath
 
 
 @pytest.fixture(scope="module")
-def auto_sub_fixture():
+def auto_sub_fixture() -> dict[str, dict[str, dict[str, list[int]]]]:
     return {
         "auto_subs": {
             "0": {"in": [], "out": []},
@@ -57,7 +57,7 @@ def auto_sub_fixture():
 
 
 @pytest.fixture(scope="module")
-def league_weekly_score():
+def league_weekly_score() -> dict[str, dict[str, dict[str, list[int]]] | dict[str, int] | dict[str, str] | dict[str, None]]:
     return {
         "auto_subs": {
             "0": {"in": [], "out": []},
@@ -493,7 +493,7 @@ def league_weekly_score():
 
 
 @pytest.fixture(scope="module")
-def league_weekly_transfer():
+def league_weekly_transfer() -> dict[str, dict[str, list[int]]]:
     return {
         "1086398": {"element_in": [355], "element_out": [343]},
         "1802621": {"element_in": [294], "element_out": [362]},
@@ -555,7 +555,7 @@ def league_weekly_transfer():
 
 
 @pytest.fixture(scope="module")
-def league_participants():
+def league_participants() -> list[dict[str, int | str]]:
     return [
         {
             "id": 37378749,
@@ -814,7 +814,7 @@ def league_participants():
 
 
 @pytest.fixture(scope="module")
-def league_fill_fixture():
+def league_fill_fixture() -> list[dict[str, int | str]]:
     return [
         {
             "id": 37378749,
@@ -853,42 +853,42 @@ def league_fill_fixture():
 
 
 @pytest.fixture(scope="module")
-def filepath():
+def filepath() -> str:
     return realpath(REPORT_DIR)
 
 
 @pytest.fixture(scope="module")
-def participant():
+def participant() -> int:
     return int(145257)
 
 
 @pytest.fixture(scope="module")
-def h2h_league():
+def h2h_league() -> int:
     return int(2049961)
 
 
 @pytest.fixture(scope="module")
-def classic_league():
+def classic_league() -> int:
     return int(1491605)
 
 
 @pytest.fixture(scope="module")
-def gw_fixture():
+def gw_fixture() -> int:
     return int(1)
 
 
 @pytest.fixture(scope="module")
-def span_fixture():
+def span_fixture() -> list[int]:
     return [1, 1, 1]
 
 
 @pytest.fixture(scope="module")
-def values():
+def values() -> list[float | int]:
     return [1.0, 2.0, 17, 3.0, 26, 2.0, 1, 10]
 
 
 @pytest.fixture(scope="module")
-def transfer_obj():
+def transfer_obj() -> dict[str, int]:
     return {
         "element_in": 5,
         "element_in_cost": 76,

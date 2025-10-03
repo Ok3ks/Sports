@@ -8,7 +8,7 @@ import pandas as pd
 
 LOGGER = logging.getLogger(__name__)
 
-def league_participant_weekly_entry( league_id : int, gameweek: list[int] | int | None = None, to_json=False, upload=True):
+def league_participant_weekly_entry( league_id : int, gameweek: list[int] | int | None = None, to_json: bool=False, upload: bool=True) -> None:
     """Downloads weekly entry for a list of entry Id"""
 
     new_directory = f"data/league/{args.league_id}"

@@ -1,3 +1,23 @@
+from shutil import Error
+from binascii import Error
+from django.core.checks.messages import Error
+from sqlparse.tokens import Error
+from google.protobuf.text_format import Error
+from google.protobuf.descriptor import Error
+from _pytest._py.error import Error
+from django.db.utils import Error
+from pytz.exceptions import Error
+from google.protobuf.message import Error
+from _csv import Error
+from sqlite3 import Error
+from configparser import Error
+from copy import Error
+from locale import Error
+from test.support import Error
+from concurrent.futures._base import Error
+from google.protobuf.descriptor_database import Error
+from sqlalchemy.orm.session import sessionmaker
+from sqlalchemy.sql._elements_constructors import text
 """Multiprocessing script to write weekly entries to database"""
 
 from src.utils import get_participant_entry
@@ -10,7 +30,7 @@ from src.utils import bucket_client
 LOGGER = logging.getLogger(__name__)
 
 
-def create_gameweek_entries_table(conn="", table_name=""):
+def create_gameweek_entries_table(conn: str="", table_name: str="") -> str:
     """Creates a table with columns, player_id, position, team, and player_name"""
     try:
         create_table_sql = text(f"""CREATE TABLE IF NOT EXISTS {table_name} (
@@ -41,7 +61,7 @@ def create_gameweek_entries_table(conn="", table_name=""):
 
 bucket=bucket_client(bucket_name="2025_2026_participants_entry")
 
-def participant_weekly_entry(entry_id: list[int] | int, to_json=False, upload=True):
+def participant_weekly_entry(entry_id: list[int] | int, to_json=False, upload=True) -> None:
     """Downloads weekly entry for a list of entry Id"""
     YEAR = "2025_2026"
     new_directory = f"data/{YEAR}/participant/{args.gameweek_id}"
