@@ -42,7 +42,7 @@ spec:
       containers:
       - name: fpl-backend-1
         image: >-
-          europe-west2-docker.pkg.dev/fpl-analysis-tool/fpl/fpl-backend@sha256:149de6c16fb0310bc64090bbb33e5b0548487f1349e40734d275a2c4425bbc1f
+          europe-west2-docker.pkg.dev/fpl-analysis-tool/fpl/fpl-backend:25_Master
         command:
         - gunicorn
         args:
