@@ -91,14 +91,15 @@ def parse_stats(filter={"gameweek": 38}, to_dict=True, path: str = "" , upload=F
         obj = full_df.to_dict("records") 
     output_path = pathlib.Path(args.path) if args.path else pathlib.Path(f"data/gameview/")
     output_path.mkdir(parents=True, exist_ok=True)
+    filename = f"{filter['gameweek']}.json"
 
-    with open(output_path/f"{args.path}.json", "w") as outs:
+    with open(output_path/filename, "w") as outs:
         json.dump(obj, outs)
 
     if upload:
         bucket=bucket_client(bucket_name="2025_2026")
-        blob = bucket.blob(f"{args.path}.json")
-        blob.upload_from_filename(output_path/f"{args.path}.json")
+        blob = bucket.blob(filename)
+        blob.upload_from_filename(output_path/filename)
 
     return obj
 
@@ -107,7 +108,7 @@ def parse_stats(filter={"gameweek": 38}, to_dict=True, path: str = "" , upload=F
 def groupby(groups: set[str] = {"gameweek", "position"}):
     """Calculate aggregates groupby."""
     all_groups = {"gameweek", "position", "team"}
-    stats = parse_stats(filter={"gameweek": 38},to_dict=False)
+    stats = parse_stats(filter={"gameweek": 38}, to_dict=False)
     obj = stats.groupby(list(groups)).aggregate(
         {
             "goals_scored": "sum",
