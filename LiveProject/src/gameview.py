@@ -97,7 +97,7 @@ def parse_stats(filter={"gameweek": 38}, to_dict=True, path: str = "" , upload=F
 
     if upload:
         bucket=bucket_client(bucket_name="2025_2026")
-        blob = bucket.blob(output_path/f"{args.path}.json")
+        blob = bucket.blob(f"{args.path}.json")
         blob.upload_from_filename(output_path/f"{args.path}.json")
 
     return obj
