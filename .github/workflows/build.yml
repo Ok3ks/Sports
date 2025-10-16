@@ -23,7 +23,7 @@ jobs:
       - id: 'checkout'
         uses: 'actions/checkout@v4'
         with: 
-          ref: gameweek-report
+          ref: develop
 
       - name: Set up Python
         uses: actions/setup-python@v5
