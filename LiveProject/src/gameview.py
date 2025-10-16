@@ -1,7 +1,10 @@
 import json
+import os
 from typing import List, Any
 import pandas as pd
+import pathlib
 
+from src.utils import bucket_client
 from src.db.db import (
     get_player_name_map,
     get_player_position_map,
@@ -69,7 +72,7 @@ def parse_fixture():
     return fixture_df
 
 
-def parse_stats(filter={"gameweek": 38}, to_dict=True) -> dict[str, Any] | pd.DataFrame:
+def parse_stats(filter={"gameweek": 38}, to_dict=True, path: str = "" , upload=False) -> dict[str, Any] | pd.DataFrame:
     """Combine Season stats from DB, and map appropriately."""
 
     stats = get_season_stats()
@@ -78,15 +81,25 @@ def parse_stats(filter={"gameweek": 38}, to_dict=True) -> dict[str, Any] | pd.Da
     player_name_mapping = get_player_name_map()
 
     full_df: pd.DataFrame = pd.DataFrame(stats)
-
     full_df = full_df[full_df['gameweek'] == filter['gameweek']]
 
     full_df["player_name"] = full_df["player_id"].map(lambda x: player_name_mapping[x])
     full_df["team"] = full_df["player_id"].map(lambda x: player_team_mapping[x])
     full_df["position"] = full_df["player_id"].map(lambda x: player_position_mapping[x])
+
     if to_dict:
-        obj = full_df.to_dict()
-        return obj
+        obj = full_df.to_dict("records") 
+    output_path = pathlib.Path(args.path) if args.path else pathlib.Path(f"data/gameview/")
+    output_path.mkdir(parents=True, exist_ok=True)
+
+    with open(output_path/f"{args.path}.json", "w") as outs:
+        json.dump(obj, outs)
+
+    if upload:
+        bucket=bucket_client(bucket_name="2025_2026")
+        blob = bucket.blob(f"{output_path}")
+        blob.upload_from_filename(output_path)
+
     return obj
 
 
@@ -113,16 +126,21 @@ def groupby(groups: set[str] = {"gameweek", "position"}):
     del ref
     last_key = list(all_groups.difference(groups))[0]
     out.update({last_key: [""]})
-    print(out)
     return [out]
 
 
-# def fixture_plots(fixture_df):
-# """ """
-# return fixture_df.groupby(["homedifficulty", "awaydifficulty"]).aggregate(
-# {"homewin": "sum", "draw": "sum", "awaywin": "sum"}
-# ).plot(kind="bar")
-
-
 if __name__ == "__main__":
-    print(parse_stats())
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-g", "--gameweek_id", type=int, help="Gameweek entry")
+    parser.add_argument("-p", "--path", type=str, help="Path to save json")
+    parser.add_argument("-u", "--upload", type=bool, help="Boolean: Upload/Not")
+    args = parser.parse_args()
+
+    parse_stats(
+            filter={
+                "gameweek": args.gameweek_id
+                }, to_dict=True, path=args.path, upload=args.upload)
+    
+    
