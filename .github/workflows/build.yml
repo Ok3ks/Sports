@@ -11,7 +11,7 @@ env:
   GW: ${{secrets.GW}}
 
 jobs:
-  scrap-and-upload:
+  gameweek-report:
     # Allow the job to fetch a GitHub ID token
     permissions:
       id-token: write
