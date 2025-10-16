@@ -5,7 +5,7 @@ on:
     inputs:
       name:
         description: 'Create gameweek report'
-        default: 'Scrap Participants Entry'
+        default: 'Create gameweek report'
         required: true
         type: string
 env:
@@ -24,7 +24,7 @@ jobs:
       - id: 'checkout'
         uses: 'actions/checkout@v4'
         with: 
-          ref: develop
+          ref: gameweek-report
 
       - name: Set up Python
         uses: actions/setup-python@v5
