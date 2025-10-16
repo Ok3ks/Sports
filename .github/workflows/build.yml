@@ -8,7 +8,7 @@ on:
         required: true
         type: string
 env:
-  GW: ${{secrets.GW}}
+  GW: 1
 
 jobs:
   gameweek-report:
@@ -47,7 +47,7 @@ jobs:
           service_account: '${{ secrets.AUTH_SERVICE_ACCOUNT }}'
           process_gcloudignore: false
     
-      - name: 'Scrap Weekly Entry'
+      - name: 'Create Gameweek Report'
         run: |
             source venv/bin/activate
             source init_env.sh
