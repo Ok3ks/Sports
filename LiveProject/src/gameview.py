@@ -3,6 +3,7 @@ import os
 from typing import List, Any
 import pandas as pd
 
+from LiveProject.src.utils import bucket_client
 from src.db.db import (
     get_player_name_map,
     get_player_position_map,
@@ -70,7 +71,7 @@ def parse_fixture():
     return fixture_df
 
 
-def parse_stats(filter={"gameweek": 38}, to_dict=True, path: str = "" ) -> dict[str, Any] | pd.DataFrame:
+def parse_stats(filter={"gameweek": 38}, to_dict=True, path: str = "" , upload=False) -> dict[str, Any] | pd.DataFrame:
     """Combine Season stats from DB, and map appropriately."""
 
     stats = get_season_stats()
@@ -91,6 +92,11 @@ def parse_stats(filter={"gameweek": 38}, to_dict=True, path: str = "" ) -> dict[
     output_path = f"{args.path}.json" if args.path else f"data/gameview/{args.gameweek_id}.json"
     with open(output_path, "w") as outs:
         json.dump(obj, outs)
+
+    if upload:
+        bucket=bucket_client(bucket_name="2025_2026")
+        blob = bucket.blob(f"{output_path}")
+        blob.upload_from_filename(output_path)
 
     return obj
 
@@ -126,13 +132,15 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-g", "--gameweek_id", type=int, help="Gameweek entry")
-    parser.add_argument("-p", "--path", type=str, help="Path to save j sson")
+    parser.add_argument("-p", "--path", type=str, help="Path to save json")
+    parser.add_argument("u", "--upload", type=bool, help="Boolean: Upload/Not")
     args = parser.parse_args()
 
     parse_stats(
             filter={
                 "gameweek": args.gameweek_id
                 }, to_dict=True,
-                path=args.path)
+                path=args.path,
+                upload=args.upload)
     
     
