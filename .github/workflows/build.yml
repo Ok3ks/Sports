@@ -1,6 +1,5 @@
 name: Gameweek Report
 on:
-    
   workflow_dispatch:
     inputs:
       name:
