@@ -2,8 +2,9 @@ import json
 import os
 from typing import List, Any
 import pandas as pd
+import pathlib
 
-from LiveProject.src.utils import bucket_client
+from src.utils import bucket_client
 from src.db.db import (
     get_player_name_map,
     get_player_position_map,
@@ -88,9 +89,10 @@ def parse_stats(filter={"gameweek": 38}, to_dict=True, path: str = "" , upload=F
 
     if to_dict:
         obj = full_df.to_dict("records") 
-    
-    output_path = f"{args.path}.json" if args.path else f"data/gameview/{args.gameweek_id}.json"
-    with open(output_path, "w") as outs:
+    output_path = pathlib.Path(args.path) if args.path else pathlib.Path(f"data/gameview/")
+    output_path.mkdir(parents=True, exist_ok=True)
+
+    with open(output_path/f"{args.path}.json", "w") as outs:
         json.dump(obj, outs)
 
     if upload:
@@ -133,14 +135,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-g", "--gameweek_id", type=int, help="Gameweek entry")
     parser.add_argument("-p", "--path", type=str, help="Path to save json")
-    parser.add_argument("u", "--upload", type=bool, help="Boolean: Upload/Not")
+    parser.add_argument("-u", "--upload", type=bool, help="Boolean: Upload/Not")
     args = parser.parse_args()
 
     parse_stats(
             filter={
                 "gameweek": args.gameweek_id
-                }, to_dict=True,
-                path=args.path,
-                upload=args.upload)
+                }, to_dict=True, path=args.path, upload=args.upload)
     
     
