@@ -8,7 +8,7 @@ on:
         required: true
         type: string
 env:
-  GW: 1
+  GW: 2
 
 jobs:
   gameweek-report:
