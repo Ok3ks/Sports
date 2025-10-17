@@ -1,5 +1,8 @@
 name: Gameweek Report
 on:
+  push:
+    paths:
+      - '.github/workflows/build.yml' 
   workflow_dispatch:
     inputs:
       name:
