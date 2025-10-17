@@ -11,7 +11,7 @@ on:
         required: true
         type: string
 env:
-  GW: 3
+  GW: 4
 
 jobs:
   gameweek-report:
