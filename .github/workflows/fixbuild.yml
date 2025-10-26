@@ -1,4 +1,4 @@
-name: Gameweek Report
+name: Fixtures/Results
 on:
   push:
     paths:
@@ -10,9 +10,9 @@ on:
         default: 'Update Fixtures/Result'
         required: true
         type: string
-        
+
 jobs:
-  gameweek-report:
+  fixtures:
     # Allow the job to fetch a GitHub ID token
     permissions:
       id-token: write
