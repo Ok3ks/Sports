@@ -64,7 +64,7 @@ def parse_fixture( to_dict=True, upload=False):
     fixture_df["awaywin"] = fixture_df["awaywin"].astype(int)
 
     season = "2025_2026"
-    
+
     if to_dict:
         obj = fixture_df.to_dict("records") 
     output_path = pathlib.Path(args.path) if args.path else pathlib.Path(f"data/gameview/")
@@ -152,7 +152,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.fixture:
-        parse_fixture()
+        parse_fixture(to_dict=True, upload=args.upload)
     else:
         parse_stats(
             filter={
