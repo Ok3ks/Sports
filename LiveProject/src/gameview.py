@@ -15,10 +15,9 @@ from src.db.db import (
 )
 
 
-def parse_fixture():
+def parse_fixture( to_dict=True, upload=False):
     """Parse Fixtures from DB."""
     fixture = get_fixtures()
-    team_id_to_name = get_teams_id()
 
     fixture_df = pd.DataFrame(fixture)
     fixture_df = fixture_df.rename(
@@ -50,11 +49,6 @@ def parse_fixture():
         ]
     ]
 
-    fixture_df["home"] = fixture_df["home"].map(lambda x: team_id_to_name[x])
-    fixture_df["away"] = fixture_df["away"].map(
-        lambda x: team_id_to_name[x]
-    )  # different from full_df
-
     fixture_df["code"] = (
         fixture_df["code"].astype(int).map(lambda x: x - 2444470)
     )  # to match full_df
@@ -68,6 +62,22 @@ def parse_fixture():
     fixture_df["homewin"] = fixture_df["homewin"].astype(int)
     fixture_df["draw"] = fixture_df["draw"].astype(int)
     fixture_df["awaywin"] = fixture_df["awaywin"].astype(int)
+
+    season = "2025_2026"
+    
+    if to_dict:
+        obj = fixture_df.to_dict("records") 
+    output_path = pathlib.Path(args.path) if args.path else pathlib.Path(f"data/gameview/")
+    output_path.mkdir(parents=True, exist_ok=True)
+    filename = f"{season}_fixtures.json"
+
+    with open(output_path/filename, "w") as outs:
+        json.dump(obj, outs)
+
+    if upload:
+        bucket=bucket_client(bucket_name=season) #parameter
+        blob = bucket.blob(filename)
+        blob.upload_from_filename(output_path/filename)
 
     return fixture_df
 
@@ -97,7 +107,7 @@ def parse_stats(filter={"gameweek": 38}, to_dict=True, path: str = "" , upload=F
         json.dump(obj, outs)
 
     if upload:
-        bucket=bucket_client(bucket_name="2025_2026")
+        bucket=bucket_client(bucket_name="2025_2026") #parameter
         blob = bucket.blob(filename)
         blob.upload_from_filename(output_path/filename)
 
@@ -132,16 +142,20 @@ def groupby(groups: set[str] = {"gameweek", "position"}):
 
 if __name__ == "__main__":
     import argparse
-
     parser = argparse.ArgumentParser()
+
     parser.add_argument("-g", "--gameweek_id", type=int, help="Gameweek entry")
     parser.add_argument("-p", "--path", type=str, help="Path to save json")
     parser.add_argument("-u", "--upload", type=bool, help="Boolean: Upload/Not")
+    parser.add_argument("-f", "--fixture", type=bool, help="Process Fixtures Only", default=False)
+
     args = parser.parse_args()
 
-    parse_stats(
+    if args.fixture:
+        parse_fixture()
+    else:
+        parse_stats(
             filter={
                 "gameweek": args.gameweek_id
                 }, to_dict=True, path=args.path, upload=args.upload)
-    
     

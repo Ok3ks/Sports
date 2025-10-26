@@ -377,7 +377,7 @@ def get_season_stats(session=session):
 
 def get_fixtures(session=session):
     """Return all fixtures."""
-    stmt = text(f'SELECT  * FROM 2025_2026_FIXTURES')
+    stmt = text(f'SELECT  * FROM "2025_2026_FIXTURES"')
     with session() as session:
         c = session.execute(stmt).all()
     return c

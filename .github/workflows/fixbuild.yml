@@ -1,0 +1,58 @@
+name: Gameweek Report
+on:
+  push:
+    paths:
+      - '.github/workflows/fixbuild.yml' 
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Update Fixtures/Result'
+        default: 'Update Fixtures/Result'
+        required: true
+        type: string
+        
+jobs:
+  gameweek-report:
+    # Allow the job to fetch a GitHub ID token
+    permissions:
+      id-token: write
+      contents: read
+
+    runs-on: ubuntu-latest
+      
+    steps:
+      - id: 'checkout'
+        uses: 'actions/checkout@v4'
+        with: 
+          ref: develop
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: "LiveProject/.python-version"
+
+      - name: Create virtualenv
+        run: |
+          which python
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r LiveProject/requirements.txt
+          which python
+
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          create_credentials_file: true
+          workload_identity_provider: '${{secrets.WORKLOAD_IDENTITY_PROVIDERS }}'
+          service_account: '${{ secrets.AUTH_SERVICE_ACCOUNT }}'
+          process_gcloudignore: false
+    
+      - name: 'Create Gameweek Report'
+        run: |
+            source venv/bin/activate
+            source init_env.sh
+            cd LiveProject
+            echo updating fixtures/results
+            python src/db/update_season_fixture.py
+            python src/gameview.py -f True -u True
