@@ -1,4 +1,4 @@
-name: Gameweek Report
+name: Fixtures/Results
 on:
   push:
     paths:
