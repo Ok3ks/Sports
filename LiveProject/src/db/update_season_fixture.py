@@ -2,7 +2,7 @@
 
 from src.db.db import create_connection_engine
 import requests
-from src.urls import FIXTURE_URL, FPL_URL
+from src.urls import FIXTURE_URL
 
 from sqlalchemy import Integer, Boolean, String
 
@@ -16,7 +16,7 @@ class Base(DeclarativeBase):
 
 
 class Fixture(Base):
-    __tablename__ = "2025_2026_FIXTURES"
+    __tablename__ = "2024_2025_FIXTURES"
 
     code: Mapped[int] = mapped_column(Integer, primary_key=True)
     gameweek: Mapped[int] = mapped_column(Integer)
@@ -34,7 +34,7 @@ class Fixture(Base):
             {self.away}. Date {self.date}"""
 
 
-def update_season_fixture(engine=None, table_name="2025_2026_FIXTURES"):
+def update_season_fixture(engine=None, table_name="2024_2025_FIXTURES"):
     """This function retrieves current information of players
     from the API"""
 
@@ -55,7 +55,7 @@ def update_season_fixture(engine=None, table_name="2025_2026_FIXTURES"):
         },
         axis=1,
     )
-
+    # pd.set_option()
     fixture_df = fixture_df[
         [
             "homedifficulty",
@@ -70,20 +70,12 @@ def update_season_fixture(engine=None, table_name="2025_2026_FIXTURES"):
             "date",
         ]
     ]
-    home = requests.get(FPL_URL)
-    home = home.json()
-    team_id_to_name = {item["id"]: item["name"] for item in home["teams"]}
-
-    fixture_df["home"] = fixture_df["home"].map(lambda x: team_id_to_name[x])
-    fixture_df["away"] = fixture_df["away"].map(
-        lambda x: team_id_to_name[x]
-    )
-    breakpoint()
 
     if engine:
         fixture_df.to_sql(
             table_name, con=engine, if_exists="replace", chunksize=100, index=False
         )
+        print(fixture_df.head())
     else:
         return fixture_df
 
