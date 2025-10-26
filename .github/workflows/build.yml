@@ -55,5 +55,8 @@ jobs:
             source venv/bin/activate
             source init_env.sh
             cd LiveProject
-            echo ${{ env.GW }}.pqt
+            echo ${{ env.GW }} report
+            python src/db/update_player_information.py -ha 1
+            python src/db/update_player_information.py -ha 2
+            python src/db/update_gameweek_score.py -g ${{ env.GW }}
             python src/gameview.py -g ${{ env.GW }} -u True
