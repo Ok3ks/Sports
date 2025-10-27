@@ -30,8 +30,8 @@ spec:
         run.googleapis.com/startupProbeType: Default
       annotations:
         run.googleapis.com/client-name: cloud-console
-        autoscaling.knative.dev/maxScale: '2'
-        autoscaling.knative.dev/minScale: '1'
+        autoscaling.knative.dev/maxScale: '3'
+        autoscaling.knative.dev/minScale: '0'
         run.googleapis.com/execution-environment: gen2
         run.googleapis.com/sessionAffinity: 'true'
         run.googleapis.com/startup-cpu-boost: 'true'
