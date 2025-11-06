@@ -69,9 +69,9 @@ def parse_fixture( to_dict=True, upload=False):
         if to_dict:
             obj = temp_df.to_dict("records") 
         
-        output_path = pathlib.Path(args.path) if args.path else pathlib.Path(f"data/gameview/fixtures")
+        output_path = pathlib.Path(args.path) if args.path else pathlib.Path(f"data/gameview")
         output_path.mkdir(parents=True, exist_ok=True)
-        filename = f"{gameweek}.json"
+        filename = f"{gameweek}_fixture.json"
 
         with open(output_path/filename, "w") as outs:
             json.dump(obj, outs)
