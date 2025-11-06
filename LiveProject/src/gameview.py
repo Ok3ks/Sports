@@ -66,12 +66,13 @@ def parse_fixture( to_dict=True, upload=False):
     season = "2025_2026"
     for gameweek in range(1,38):
         temp_df = fixture_df[fixture_df['gameweek'] == gameweek]
+        temp_df.fillna(0, inplace=True)
         if to_dict:
             obj = temp_df.to_dict("records") 
         
         output_path = pathlib.Path(args.path) if args.path else pathlib.Path(f"data/gameview/")
         output_path.mkdir(parents=True, exist_ok=True)
-        filename = f"fixtures/{gameweek}.json"
+        filename = f"{gameweek}_fixture.json"
 
         with open(output_path/filename, "w") as outs:
             json.dump(obj, outs)
