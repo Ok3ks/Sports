@@ -64,20 +64,22 @@ def parse_fixture( to_dict=True, upload=False):
     fixture_df["awaywin"] = fixture_df["awaywin"].astype(int)
 
     season = "2025_2026"
+    for gameweek in range(1,38):
+        temp_df = fixture_df[fixture_df['gameweek'] == gameweek]
+        if to_dict:
+            obj = temp_df.to_dict("records") 
+        
+        output_path = pathlib.Path(args.path) if args.path else pathlib.Path(f"data/gameview/")
+        output_path.mkdir(parents=True, exist_ok=True)
+        filename = f"fixtures/{gameweek}.json"
 
-    if to_dict:
-        obj = fixture_df.to_dict("records") 
-    output_path = pathlib.Path(args.path) if args.path else pathlib.Path(f"data/gameview/")
-    output_path.mkdir(parents=True, exist_ok=True)
-    filename = f"{season}_fixtures.json"
+        with open(output_path/filename, "w") as outs:
+            json.dump(obj, outs)
 
-    with open(output_path/filename, "w") as outs:
-        json.dump(obj, outs)
-
-    if upload:
-        bucket=bucket_client(bucket_name=season) #parameter
-        blob = bucket.blob(filename)
-        blob.upload_from_filename(output_path/filename)
+        if upload:
+            bucket=bucket_client(bucket_name=season) #parameter
+            blob = bucket.blob(filename)
+            blob.upload_from_filename(output_path/filename)
 
     return fixture_df
 
