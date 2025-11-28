@@ -54,8 +54,11 @@ jobs:
         run: |
             source venv/bin/activate
             source init_env.sh
+            source startup.sh
             cd LiveProject
             echo updating fixtures
             python src/db/update_season_fixture.py
             python src/gameview.py -f True -u True
+
+        
 
