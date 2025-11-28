@@ -59,11 +59,3 @@ jobs:
             python src/db/update_season_fixture.py
             python src/gameview.py -f True -u True
 
-      - name: 'Upload Results'
-        run: |
-            source venv/bin/activate
-            source init_env.sh
-            source startup.sh
-            cd LiveProject
-            echo updating results
-            python src/gameview.py -g ${{ env.GW }} -u True
