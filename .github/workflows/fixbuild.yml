@@ -1,4 +1,4 @@
-name: Fixtures/Results for GW 10
+name: Fixtures/Results for GW 11
 on:
   push:
     paths:
@@ -10,6 +10,8 @@ on:
         default: 'Update Fixtures/Result'
         required: true
         type: string
+env:
+  GW: 11
 
 jobs:
   fixtures:
@@ -63,4 +65,4 @@ jobs:
             source init_env.sh
             cd LiveProject
             echo updating results
-            python src/gameview.py -g 10 -u True
+            python src/gameview.py -g ${{ env.GW }} -u True
