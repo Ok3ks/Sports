@@ -22,7 +22,16 @@ jobs:
 
     runs-on: ubuntu-latest
       
-    steps:
+    steps:        
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          create_credentials_file: true
+          workload_identity_provider: '${{secrets.WORKLOAD_IDENTITY_PROVIDERS }}'
+          service_account: '${{ secrets.AUTH_SERVICE_ACCOUNT }}'
+          process_gcloudignore: false
+        
       - id: 'checkout'
         uses: 'actions/checkout@v4'
         with: 
@@ -40,17 +49,17 @@ jobs:
           source venv/bin/activate
           pip install -r LiveProject/requirements.txt
           which python
-
-      - id: 'auth'
-        name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v2'
-        with:
-          create_credentials_file: true
-          workload_identity_provider: '${{secrets.WORKLOAD_IDENTITY_PROVIDERS }}'
-          service_account: '${{ secrets.AUTH_SERVICE_ACCOUNT }}'
-          process_gcloudignore: false
     
       - name: 'Upload Fixtures'
+        run: |
+            source venv/bin/activate
+            source init_env.sh
+            cd LiveProject
+            echo updating fixtures
+            python src/db/update_season_fixture.py
+            python src/gameview.py -f True -u True
+
+      - name: 'Upload Results'
         run: |
             source venv/bin/activate
             source init_env.sh
@@ -58,7 +67,7 @@ jobs:
             cd LiveProject
             echo updating fixtures
             python src/db/update_season_fixture.py
-            python src/gameview.py -f True -u True
+            python src/gameview.py -u True
 
         
 
