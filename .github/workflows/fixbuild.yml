@@ -63,6 +63,7 @@ jobs:
         run: |
             source venv/bin/activate
             source init_env.sh
+            source startup.sh
             cd LiveProject
             echo updating results
             python src/gameview.py -g ${{ env.GW }} -u True
