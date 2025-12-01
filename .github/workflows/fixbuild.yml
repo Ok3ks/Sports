@@ -1,4 +1,4 @@
-name: Fixtures/Results for GW 12
+name: Fixtures
 on:
   push:
     paths:
@@ -56,11 +56,3 @@ jobs:
             echo updating fixtures
             python src/db/update_season_fixture.py
             python src/gameview.py -f True -u True
-
-      - name: 'Upload Results'
-        run: |
-            source venv/bin/activate
-            source init_env.sh
-            cd LiveProject
-            echo updating results
-            python src/gameview.py -g 12 -u True
