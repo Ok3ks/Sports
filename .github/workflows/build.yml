@@ -56,5 +56,5 @@ jobs:
             echo ${{ env.GW }} report
             python src/db/update_player_information.py -ha 1
             python src/db/update_player_information.py -ha 2
-            python src/db/update_gameweek_score.py -g ${{ env.GW }}
+            python src/db/update_gameweek_score.py -g ${{ secrets.GW }}
             python src/gameview.py -g ${{ secrets.GW }} -u True
