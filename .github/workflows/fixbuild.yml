@@ -1,4 +1,4 @@
-name: Fixtures/Results for GW 10
+name: Fixtures/Results for GW 12
 on:
   push:
     paths:
@@ -63,4 +63,4 @@ jobs:
             source init_env.sh
             cd LiveProject
             echo updating results
-            python src/gameview.py -g 10 -u True
+            python src/gameview.py -g 12 -u True
