@@ -11,3 +11,5 @@ Tools/Frameworks Used:
 - [WIP] Github Actions for Continuous Integration and Continuous Deployment
 - Docker for Infrastructure Management
 - Redis as KV store
+
+![Repo Overview](./overview.png)
