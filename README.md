@@ -11,4 +11,11 @@ Tools/Frameworks Used:
 - [WIP] Github Actions for Continuous Integration and Continuous Deployment
 - Docker for Infrastructure Management
 
-![Repo Overview](./overview.png)
+### Repo Overview
+
+#### Monolith
+![Monolith](./monolith.png)
+
+#### Decoupled
+![Decoupled](./decoupled.png)
+
