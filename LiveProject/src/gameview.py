@@ -85,6 +85,7 @@ def parse_fixture( to_dict=True, upload=False):
 
 
 def parse_stats(filter: dict | None = {"gameweek": 38}, to_dict=True, path: str = "" , upload=False) -> dict[str, Any] | pd.DataFrame:
+def parse_stats(filter: dict | None = {"gameweek": 38}, to_dict=True, path: str = "" , upload=False) -> dict[str, Any] | pd.DataFrame:
     """Combine Season stats from DB, and map appropriately."""
 
     stats = get_season_stats()
@@ -158,6 +159,7 @@ if __name__ == "__main__":
 
     if args.fixture:
         parse_fixture(to_dict=True, upload=args.upload)
+    if args.gameweek_id:
     if args.gameweek_id:
         parse_stats(
             filter={
