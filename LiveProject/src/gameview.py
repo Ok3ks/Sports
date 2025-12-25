@@ -10,7 +10,6 @@ from src.db.db import (
     get_player_position_map,
     get_player_team_map,
     get_season_stats,
-    get_teams_id,
     get_fixtures,
 )
 
@@ -97,6 +96,7 @@ def parse_stats(filter: dict | None = {"gameweek": 38}, to_dict=True, path: str 
 
     if filter:
         for gameweek in range(1,filter['gameweek']):
+            breakpoint()    
             full_df = full_df[full_df['gameweek'] == gameweek]
             full_df["player_name"] = full_df["player_id"].map(lambda x: player_name_mapping[x])
             full_df["team"] = full_df["player_id"].map(lambda x: player_team_mapping[x])
@@ -106,7 +106,7 @@ def parse_stats(filter: dict | None = {"gameweek": 38}, to_dict=True, path: str 
                 obj = full_df.to_dict("records") 
             output_path = pathlib.Path(args.path) if args.path else pathlib.Path(f"data/gameview/")
             output_path.mkdir(parents=True, exist_ok=True)
-            filename = f"{filter['gameweek']}.json"
+            filename = f"{gameweek}.json"
         
             with open(output_path/filename, "w") as outs:
                 json.dump(obj, outs)
