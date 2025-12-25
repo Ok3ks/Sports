@@ -85,7 +85,7 @@ def parse_fixture( to_dict=True, upload=False):
     return fixture_df
 
 
-def parse_stats(filter={"gameweek": 38}, to_dict=True, path: str = "" , upload=False) -> dict[str, Any] | pd.DataFrame:
+def parse_stats(filter: dict | None = {"gameweek": 38}, to_dict=True, path: str = "" , upload=False) -> dict[str, Any] | pd.DataFrame:
     """Combine Season stats from DB, and map appropriately."""
 
     stats = get_season_stats()
@@ -94,25 +94,27 @@ def parse_stats(filter={"gameweek": 38}, to_dict=True, path: str = "" , upload=F
     player_name_mapping = get_player_name_map()
 
     full_df: pd.DataFrame = pd.DataFrame(stats)
-    full_df = full_df[full_df['gameweek'] == filter['gameweek']]
 
-    full_df["player_name"] = full_df["player_id"].map(lambda x: player_name_mapping[x])
-    full_df["team"] = full_df["player_id"].map(lambda x: player_team_mapping[x])
-    full_df["position"] = full_df["player_id"].map(lambda x: player_position_mapping[x])
-
-    if to_dict:
-        obj = full_df.to_dict("records") 
-    output_path = pathlib.Path(args.path) if args.path else pathlib.Path(f"data/gameview/")
-    output_path.mkdir(parents=True, exist_ok=True)
-    filename = f"{filter['gameweek']}.json"
-
-    with open(output_path/filename, "w") as outs:
-        json.dump(obj, outs)
-
-    if upload:
-        bucket=bucket_client(bucket_name="2025_2026") #parameter
-        blob = bucket.blob(filename)
-        blob.upload_from_filename(output_path/filename)
+    if filter:
+        for gameweek in range(1,filter['gameweek']):
+            full_df = full_df[full_df['gameweek'] == gameweek]
+            full_df["player_name"] = full_df["player_id"].map(lambda x: player_name_mapping[x])
+            full_df["team"] = full_df["player_id"].map(lambda x: player_team_mapping[x])
+            full_df["position"] = full_df["player_id"].map(lambda x: player_position_mapping[x])
+        
+            if to_dict:
+                obj = full_df.to_dict("records") 
+            output_path = pathlib.Path(args.path) if args.path else pathlib.Path(f"data/gameview/")
+            output_path.mkdir(parents=True, exist_ok=True)
+            filename = f"{filter['gameweek']}.json"
+        
+            with open(output_path/filename, "w") as outs:
+                json.dump(obj, outs)
+        
+            if upload:
+                bucket=bucket_client(bucket_name="2025_2026") #parameter
+                blob = bucket.blob(filename)
+                blob.upload_from_filename(output_path/filename)
 
     return obj
 
@@ -156,7 +158,7 @@ if __name__ == "__main__":
 
     if args.fixture:
         parse_fixture(to_dict=True, upload=args.upload)
-    else:
+    if args.gameweek_id:
         parse_stats(
             filter={
                 "gameweek": args.gameweek_id
