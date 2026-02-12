@@ -15,15 +15,14 @@ from typing import List, Union
 import logging
 import ssl
 
+LOGGER = logging.getLogger(__name__)
+
 class TLSAdapter(HTTPAdapter):
     def init_poolmanager(self, *args, **kwargs):
         context = ssl.create_default_context()
         context.minimum_version = ssl.TLSVersion.TLSv1_2  # Enforcing TLSv1.2 or higher
         kwargs['ssl_context'] = context
         return super().init_poolmanager(*args, **kwargs)
-
-
-LOGGER = logging.getLogger(__name__)
 
 s = requests.Session()
 retries = Retry(
@@ -38,7 +37,7 @@ s.mount("https://", TLSAdapter(max_retries=3))
 def to_json(x: dict, fp):
     with open(fp, "w") as outs:
         json.dump(x, outs)
-    print(f"{x.keys()} stored in Json successfully. Find here {fp}")
+    LOGGER.info(f"{x.keys()} stored in Json successfully. Find here {fp}")
 
 
 def get_basic_stats(total_points: List[Union[int, float]]):
@@ -78,7 +77,7 @@ def check_gw(gw: Union[int, List[int]]) -> tuple:
         if (1 <= gw < 38 ):
             return (True, gw)
         else:
-            logging.info(f"{gw} is out of range")
+            LOGGER.error(f"{gw} is out of range")
             return (False, None)
 
 
@@ -94,7 +93,7 @@ def get_gw_transfers(alist: List[int], gw: Union[int, List[int]], all=False) -> 
     'all' toggles between extracting all gameweeks or not"""
 
     try:
-        valid, gw = check_gw(gw)
+        valid, gw = check_gw(gw) #excludes invalid gameweeks here
     except TypeError:
         valid, gw = False, None
     row = {}
@@ -130,35 +129,29 @@ def bucket_client(bucket_name="wrapped_participants_entry"):
 
 def get_participant_entry(entry_id: int, gw: int) -> dict:
     """Calls an Endpoint to retrieve a participants entry"""
-    try:
-        valid, gw = check_gw(gw)
-    except TypeError:
-        valid, gw = False, None
+    valid, gw = check_gw(gw)
+    team_list = {
+        "auto_sub_in": "",
+        "auto_sub_out": "",
+        "gw": None,
+        "entry_id": None ,
+        "active_chip": None,
+        "points_on_bench": None,
+        "total_points": None,
+        "event_transfers_cost": None,
+        "players": "",
+        "bench": "",
+        "vice_captain": None,
+        "captain": None,
+    }
 
     if valid:
         # optimization, imported get directly from requests
         r = s.get(FPL_PLAYER.format(entry_id, gw))
 
         # optimization - assigning size of dictionary before hand to prevent resizing of dictionaries
-        team_list = {
-            "auto_sub_in": "",
-            "auto_sub_out": "",
-            "gw": gw,
-            "entry_id": entry_id,
-            "active_chip": None,
-            "points_on_bench": None,
-            "total_points": None,
-            "event_transfers_cost": None,
-            "players": "",
-            "bench": "",
-            "vice_captain": None,
-            "captain": None,
-        }
 
-    if valid:
-        # optimization, imported get directly from requests, but changed name to s.get for easy reference
-        r = s.get(FPL_PLAYER.format(entry_id, gw))
-        # optimization - assigning size of dictionary before hand to prevent resizing of dictionaries
+
         if r.status_code == 200:
             
             obj = r.json()
@@ -170,53 +163,49 @@ def get_participant_entry(entry_id: int, gw: int) -> dict:
                 "event_transfers_cost"
             ]
 
-            if obj["automatic_subs"]:
-                # optimization 1
-                # team_list["auto_subs"] = [(item['element_in'],item['element_out'],) for item in obj['automatic_subs']]
+    if obj["automatic_subs"]:
+        # optimization 1
+        # team_list["auto_subs"] = [(item['element_in'],item['element_out'],) for item in obj['automatic_subs']]
 
-                for item in obj["automatic_subs"]:
-                    if len(team_list["auto_sub_in"]) < 1:
-                        team_list["auto_sub_in"] = str(item["element_in"])
-                    else:
-                        team_list["auto_sub_in"] = (
-                            team_list["auto_sub_in"] + "," + str(item["element_in"])
-                        )
-                    if len(team_list["auto_sub_out"]) < 1:
-                        team_list["auto_sub_out"] = str(item["element_out"])
-                    else:
-                        team_list["auto_sub_out"] = (
-                            team_list["auto_sub_out"] + "," + str(item["element_out"])
-                        )
+        for item in obj["automatic_subs"]:
+            if len(team_list["auto_sub_in"]) < 1:
+                team_list["auto_sub_in"] = str(item["element_in"])
+            else:
+                team_list["auto_sub_in"] = (
+                    team_list["auto_sub_in"] + "," + str(item["element_in"])
+                )
+            if len(team_list["auto_sub_out"]) < 1:
+                team_list["auto_sub_out"] = str(item["element_out"])
+            else:
+                team_list["auto_sub_out"] = (
+                    team_list["auto_sub_out"] + "," + str(item["element_out"])
+                )
 
-            for item in obj["picks"]:
-                if item["multiplier"] != 0:
-                    if len(team_list["players"]) < 1:
-                        team_list["players"] = str(item["element"])
-                    else:
-                        team_list["players"] = (
-                            team_list["players"] + "," + str(item["element"])
-                        )
-                else:
-                    if len(team_list["bench"]) < 1:
-                        team_list["bench"] = str(item["element"])
-                    else:
-                        team_list["bench"] = (
-                            team_list["bench"] + "," + str(item["element"])
-                        )
-                if item["is_captain"]:
-                    team_list["captain"] = int(item["element"])
-                if item["is_vice_captain"]:
-                    team_list["vice_captain"] = int(item["element"])
+    for item in obj["picks"]:
+        if item["multiplier"] != 0:
+            if len(team_list["players"]) < 1:
+                team_list["players"] = str(item["element"])
+            else:
+                team_list["players"] = (
+                    team_list["players"] + "," + str(item["element"])
+                )
         else:
-            print(f"{r.status_code}")
-            print("{} does not exist".format(entry_id))
+            if len(team_list["bench"]) < 1:
+                team_list["bench"] = str(item["element"])
+            else:
+                team_list["bench"] = (
+                    team_list["bench"] + "," + str(item["element"])
+                )
+        if item["is_captain"]:
+            team_list["captain"] = int(item["element"])
+        if item["is_vice_captain"]:
+            team_list["vice_captain"] = int(item["element"])
 
-    return team_list
-
-
-def get_curr_event():
+        return team_list
+    
+def get_curr_event() -> list:
     r = requests.get(FPL_URL)
-    logging.info(r.status_code)
+    LOGGER.info(r.status_code)
 
     curr_event = []
     r = r.json()
@@ -294,50 +283,34 @@ class Gameweek:
         highest = self.week_df.sort_values(by="total_points", ascending=False).iloc[
             0, :
         ]
-        print(get_player(highest["id"]).player_id)
-        print(get_player(highest["id"]).team)
         del highest
 
     def dream_team(self):
         dream_team = self.week_df[self.week_df["in_dreamteam"] == True]
-        print(dream_team)
         for i in dream_team.itertuples():
             print(i[-3], get_player(i[-3]).player_name)
+        return dream_team
 
     def highest_xg(self):
         highest_xg = self.week_df.sort_values(
             by="expected_goals", ascending=False
         ).iloc[0, :]
-        print("\n Higest Xg")
-        print(get_player(highest_xg["id"]).team)
-        print(get_player(highest_xg["id"]).player_name)
+        return highest_xg
 
     def highest_xgc(self):
         highest_xgc = self.week_df.sort_values(
             by="expected_goals_conceded", ascending=False
         ).iloc[0, :]
-        print("\n Highest Xgc")
-        print(get_player(highest_xgc["id"]).team)
-        print(get_player(highest_xgc["id"]).player_name)
+        return highest_xgc
 
     def highest_xa(self):
         highest_xa = self.week_df.sort_values(
             by="expected_assists", ascending=False
         ).iloc[0, :]
-        print("\n Highest xA")
-        print(get_player(highest_xa["id"]).team)
-        print(get_player(highest_xa["id"]).player_name)
+        return highest_xa
 
     def gameweek_status(self):
-        if self.status["is_current"]:
-            print(self.gw, "Current Gameweek")
-        else:
-            if not self.status["Finished"]:
-                print(f"Gameweek {self.gw} is yet to be played")
-            else:
-                print(self.chip_usage())
-                print(self.highest_score())
-                print(self.gameweek_average())
+        return self.status["is_current"] if self.status["is_current"] else self.status["Finished"]
 
     def chip_usage(self):
         return self.status["chip_plays"]
@@ -452,7 +425,6 @@ class League:
         self.participants = []
         self.res = None
         self.league_name = ""
-        self.has_next = True
         self.PAGE_COUNT = 1
 
     def obtain_league_participants(self, refresh=False):
