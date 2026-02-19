@@ -1,21 +1,18 @@
 import requests
 from urllib3.util import Retry
 from requests.adapters import HTTPAdapter
-import pandas as pd
 import json
 import numpy as np
 from google.cloud import storage
+from src.urls import TRANSFER_URL, FPL_URL, FPL_PLAYER
+from src.urls import FPL_PLAYER
 
-
-from .urls import GW_URL, TRANSFER_URL, FPL_URL, FPL_PLAYER
-from .urls import LEAGUE_URL, FPL_PLAYER
-
-from .db.db import get_player, get_player_team_code
-from typing import List, Union
+from typing import List, Union, Any
 import logging
 import ssl
 
 LOGGER = logging.getLogger(__name__)
+
 
 class TLSAdapter(HTTPAdapter):
     def init_poolmanager(self, *args, **kwargs):
@@ -34,24 +31,29 @@ retries = Retry(
 s.mount("https://", TLSAdapter(max_retries=3))
 
 
-def to_json(x: dict, fp):
+def to_json(x: dict, fp):  ## use Path instead
     with open(fp, "w") as outs:
         json.dump(x, outs)
     LOGGER.info(f"{x.keys()} stored in Json successfully. Find here {fp}")
 
 
-def get_basic_stats(total_points: List[Union[int, float]]):
+def get_basic_stats(total_points: List[Union[int, float]]) -> tuple | None:
     """Measures of Central Tendency for Total points"""
-    average = np.mean(total_points)
-    Q3 = np.percentile(total_points, 75)
-    Q1 = np.percentile(total_points, 25)
+    Q1, average, Q3 = None, None, None
+    if len(total_points) >= 1:
+        average = np.mean(total_points)
+        Q3 = np.percentile(total_points, 75)
+        Q1 = np.percentile(total_points, 25)
     return Q1, average, Q3
 
 
 def parse_transfers(item: dict, row: dict) -> dict:
 
     """
-        Update Parsed transfer, Row contains a parsed transfer, and is being updated in get_gw_transfers()
+        Extracts transfers in and out and nests into an obj with key equivalent to item["entry"].
+        - Row is modified in place, with values from item. can be empty or not
+
+        Returns a dictionary with item["entry"] as a key
     """
 
     row[item["entry"]] = row.get(item["entry"], {})
@@ -66,7 +68,7 @@ def parse_transfers(item: dict, row: dict) -> dict:
 
 def check_gw(gw: Union[int, List[int]]) -> tuple:
     out = []
-    if gw is list:
+    if isinstance(gw, list):
         for i in gw:
             if check_gw(i)[0]:
                 out.append(i)
@@ -74,7 +76,7 @@ def check_gw(gw: Union[int, List[int]]) -> tuple:
                 pass
         return (True, out)
     else:
-        if (1 <= gw < 38 ):
+        if (1 <= gw < 38):
             return (True, gw)
         else:
             LOGGER.error(f"{gw} is out of range")
@@ -88,38 +90,45 @@ class GameweekError(Exception):
         super().__init__(message)
 
 
-def get_gw_transfers(alist: List[int], gw: Union[int, List[int]], all=False) -> dict:
+def get_gw_transfers(alist: List[int], gw: Union[int, List[int], None] = None, all=False) -> dict:
     """Input is a list of entry_id. Gw is the gameweek number.
     'all' toggles between extracting all gameweeks or not"""
 
-    try:
-        valid, gw = check_gw(gw) #excludes invalid gameweeks here
-    except TypeError:
-        valid, gw = False, None
-    row = {}
-    if valid:
-        for entry_id in alist:
-            r = s.get(TRANSFER_URL.format(entry_id))
-            if r.status_code == 200:
-                obj = r.json()
-                # updates by gameweek
-                for item in obj:
-                    if all:
-                        row[item["event"]] = parse_transfers(item)
-                    else:
-                        if type(gw) == int and int(item["event"]) == gw:
-                            # updates each id
-                            row.update(parse_transfers(item, row))
-                        elif type(gw) == list:
-                            if int(item["event"]) in gw:
-                                row[item["event"]] = parse_transfers(item)
-            else:
-                print(
-                    "{} does not exist or Transfer URL endpoint unavailable".format(
-                        entry_id
-                    )
+    row: dict = {}
+    gw = None if all else gw
+    valid = False
+
+    if gw:
+        try:
+            valid, gw = check_gw(gw)  # excludes invalid gameweeks here
+        except TypeError:
+            valid, gw = False, None
+
+    if not (valid | all):
+        return row
+
+    for entry_id in alist:
+        r = s.get(TRANSFER_URL.format(entry_id))
+        if r.status_code == 200:
+            obj = r.json()  # provides all transfers
+            # updates by gameweek
+            for item in obj:
+                if all:
+                    row[item["event"]] = parse_transfers(item, {})
+                elif valid:
+                    if isinstance(gw, int) and int(item["event"]) == gw:
+                        row.update(parse_transfers(item, row))
+                    elif isinstance(gw, list) and int(item["event"]) in gw:
+                        row[item["event"]] = parse_transfers(item, {})
+        else:
+            LOGGER.info(
+                "{} does not exist or Transfer URL endpoint unavailable".format(
+                    entry_id
                 )
+            )
+
     return row
+
 
 def bucket_client(bucket_name="wrapped_participants_entry"):
     client = storage.Client()
@@ -130,7 +139,7 @@ def bucket_client(bucket_name="wrapped_participants_entry"):
 def get_participant_entry(entry_id: int, gw: int) -> dict:
     """Calls an Endpoint to retrieve a participants entry"""
     valid, gw = check_gw(gw)
-    team_list = {
+    team_list: dict[str, Any] = {
         "auto_sub_in": "",
         "auto_sub_out": "",
         "gw": None,
@@ -153,9 +162,9 @@ def get_participant_entry(entry_id: int, gw: int) -> dict:
 
 
         if r.status_code == 200:
-            
             obj = r.json()
-
+            team_list["entry_id"] = int(entry_id)
+            team_list["gw"] = int(gw)
             team_list["active_chip"] = obj["active_chip"]
             team_list["points_on_bench"] = obj["entry_history"]["points_on_bench"]
             team_list["total_points"] = obj["entry_history"]["points"]
@@ -163,46 +172,48 @@ def get_participant_entry(entry_id: int, gw: int) -> dict:
                 "event_transfers_cost"
             ]
 
-    if obj["automatic_subs"]:
-        # optimization 1
-        # team_list["auto_subs"] = [(item['element_in'],item['element_out'],) for item in obj['automatic_subs']]
+            if obj["automatic_subs"]:
+                # optimization 1
+                # team_list["auto_subs"] = [(item['element_in'],item['element_out'],) for item in obj['automatic_subs']]
 
-        for item in obj["automatic_subs"]:
-            if len(team_list["auto_sub_in"]) < 1:
-                team_list["auto_sub_in"] = str(item["element_in"])
-            else:
-                team_list["auto_sub_in"] = (
-                    team_list["auto_sub_in"] + "," + str(item["element_in"])
-                )
-            if len(team_list["auto_sub_out"]) < 1:
-                team_list["auto_sub_out"] = str(item["element_out"])
-            else:
-                team_list["auto_sub_out"] = (
-                    team_list["auto_sub_out"] + "," + str(item["element_out"])
-                )
+                for item in obj["automatic_subs"]:
+                    if len(team_list["auto_sub_in"]) < 1:
+                        team_list["auto_sub_in"] = str(item["element_in"])
+                    else:
+                        team_list["auto_sub_in"] = (
+                            team_list["auto_sub_in"] + "," + str(item["element_in"])
+                        )
+                    if len(team_list["auto_sub_out"]) < 1:
+                        team_list["auto_sub_out"] = str(item["element_out"])
+                    else:
+                        team_list["auto_sub_out"] = (
+                            team_list["auto_sub_out"] + "," + str(item["element_out"])
+                        )
 
-    for item in obj["picks"]:
-        if item["multiplier"] != 0:
-            if len(team_list["players"]) < 1:
-                team_list["players"] = str(item["element"])
-            else:
-                team_list["players"] = (
-                    team_list["players"] + "," + str(item["element"])
-                )
-        else:
-            if len(team_list["bench"]) < 1:
-                team_list["bench"] = str(item["element"])
-            else:
-                team_list["bench"] = (
-                    team_list["bench"] + "," + str(item["element"])
-                )
-        if item["is_captain"]:
-            team_list["captain"] = int(item["element"])
-        if item["is_vice_captain"]:
-            team_list["vice_captain"] = int(item["element"])
+            for item in obj["picks"]:
+                if item["multiplier"] != 0:
+                    if len(team_list["players"]) < 1:
+                        team_list["players"] = str(item["element"])
+                    else:
+                        team_list["players"] = (
+                            team_list["players"] + "," + str(item["element"])
+                        )
+                else:
+                    if len(team_list["bench"]) < 1:
+                        team_list["bench"] = str(item["element"])
+                    else:
+                        team_list["bench"] = (
+                            team_list["bench"] + "," + str(item["element"])
+                        )
+                if item["is_captain"]:
+                    team_list["captain"] = int(item["element"])
+                if item["is_vice_captain"]:
+                    team_list["vice_captain"] = int(item["element"])     
 
-        return team_list
-    
+
+    return team_list
+
+
 def get_curr_event() -> list:
     r = requests.get(FPL_URL)
     LOGGER.info(r.status_code)
@@ -214,316 +225,6 @@ def get_curr_event() -> list:
             curr_event.append(event["id"])
             curr_event.append((event["finished"], event["data_checked"]))
     return curr_event
-
-def get_gw_transfers_scrap(alist: List[int], gw: Union[int, List[int]], all=False) -> dict:
-    """Input is a list of entry_id. Gw is the gameweek number.
-    'all' toggles between extracting all gameweeks or not"""
-
-    try:
-        valid, gw = check_gw(gw)
-    except TypeError:
-        valid, gw = False, None
-    row = {}
-    if valid:
-        for entry_id in alist:
-            obj_row = {}
-            r = s.get(TRANSFER_URL.format(entry_id))
-            if r.status_code == 200:
-                obj = r.json()
-                # updates by gameweek
-                for item in obj:
-                    if all:
-                        obj_row[item["event"]] = parse_transfers(item, {})
-                    else:
-                        if type(gw) == int and int(item["event"]) == gw:
-                            # updates each id
-                            obj_row.update(parse_transfers(item, {}))
-                        elif type(gw) == list:
-                            if int(item["event"]) in gw:
-                                obj_row[item["event"]] = parse_transfers(item, {})
-            else:
-                print(
-                    "{} does not exist or Transfer URL endpoint unavailable".format(
-                        entry_id
-                    )
-                )
-            row[entry_id] = obj
-        # yield row
-
-    return row
-class Gameweek:
-    def __init__(self, gw=1):
-        self.gw = gw
-
-    def get_payload(self):
-        temp = s.get(GW_URL.format(self.gw))
-        temp_2 = s.get(FPL_URL)
-
-        self.json = temp.json()
-        self.gw_json = temp_2.json()
-
-    def parse_payload(self):
-        out = []
-
-        for item in self.json["elements"]:
-            obj = item["stats"]
-            obj["id"] = item["id"]
-            obj["value"] = item["explain"][0]["stats"][0]["value"]
-            obj["fixture"] = item["explain"][0]["fixture"]
-            out.append(obj)
-
-        self.week_df = pd.DataFrame(out)
-        print(self.week_df)
-
-        for item in self.gw_json["events"]:
-            if int(item["id"]) == int(self.gw):
-                self.status = item
-
-    def highest_scoring_player(self):
-        highest = self.week_df.sort_values(by="total_points", ascending=False).iloc[
-            0, :
-        ]
-        del highest
-
-    def dream_team(self):
-        dream_team = self.week_df[self.week_df["in_dreamteam"] == True]
-        for i in dream_team.itertuples():
-            print(i[-3], get_player(i[-3]).player_name)
-        return dream_team
-
-    def highest_xg(self):
-        highest_xg = self.week_df.sort_values(
-            by="expected_goals", ascending=False
-        ).iloc[0, :]
-        return highest_xg
-
-    def highest_xgc(self):
-        highest_xgc = self.week_df.sort_values(
-            by="expected_goals_conceded", ascending=False
-        ).iloc[0, :]
-        return highest_xgc
-
-    def highest_xa(self):
-        highest_xa = self.week_df.sort_values(
-            by="expected_assists", ascending=False
-        ).iloc[0, :]
-        return highest_xa
-
-    def gameweek_status(self):
-        return self.status["is_current"] if self.status["is_current"] else self.status["Finished"]
-
-    def chip_usage(self):
-        return self.status["chip_plays"]
-
-    def highest_score(self):
-        return self.status["highest_scoring_entry"]
-
-    def gameweek_average(self):
-        return self.status["average_entry_score"]
-
-
-class Participant:
-    def __init__(self, entry_id, gw):
-        self.participant = entry_id
-        self.gw = gw
-
-    def get_gw_transfers(self, gw: Union[int, List[int]], all=False) -> dict:
-        """Input is a list of entry_id. Gw is the gameweek number.
-        'all' toggles between extracting all gameweeks or not"""
-
-        row = {}
-        try:
-            valid, gw = check_gw(gw)
-        except TypeError:
-            valid, gw = False, None
-
-        if all or valid:
-            r = s.get(TRANSFER_URL.format(self.participant))
-            LOGGER.info(r.status_code)
-            if r.status_code == 200:
-                obj = r.json()
-                for item in obj:
-                    if all:
-                        row[item["event"]] = row.get(item["event"], {})
-                        row[item["event"]]["element_in"] = row[item["event"]].get(
-                            "element_in", []
-                        )
-                        row[item["event"]]["element_out"] = row[item["event"]].get(
-                            "element_out", []
-                        )
-                        row[item["event"]]["element_in"].append(item["element_in"])
-                        row[item["event"]]["element_out"].append(item["element_out"])
-                    else:
-                        if type(gw) == list and int(item["event"]) in gw:
-                            row[item["event"]] = row.get(item["event"], {})
-                            row[item["event"]]["element_in"] = row[item["event"]].get(
-                                "element_in", []
-                            )
-                            row[item["event"]]["element_out"] = row[item["event"]].get(
-                                "element_out", []
-                            )
-                            row[item["event"]]["element_in"].append(item["element_in"])
-                            row[item["event"]]["element_out"].append(
-                                item["element_out"]
-                            )
-                        elif type(gw) == int and int(item["event"]) == gw:
-                            row[item["event"]] = row.get(item["event"], {})
-                            row[item["event"]]["element_in"] = row[item["event"]].get(
-                                "element_in", []
-                            )
-                            row[item["event"]]["element_out"] = row[item["event"]].get(
-                                "element_out", []
-                            )
-                            row[item["event"]]["element_in"].append(item["element_in"])
-                            row[item["event"]]["element_out"].append(
-                                item["element_out"]
-                            )
-            else:
-                print(
-                    "{} does not exist or Transfer URL endpoint unavailable".format(
-                        self.participant
-                    )
-                )
-        return row
-
-    def get_span_week_transfers(self, span: List[int]) -> dict:
-        return self.get_gw_transfers(span)
-
-    def get_all_week_transfers(self) -> dict:
-        curr_gw = get_curr_event()[0]
-        print("getting all entries up to {}".format(curr_gw))
-        return self.get_gw_transfers(curr_gw, all=True)
-
-    def get_all_week_entries(self, gw: Union[int, List[int]], all=False) -> list:
-        if all:
-            curr_gw = get_curr_event()[0]
-            gw = curr_gw
-
-        try:
-            valid, gw = check_gw(gw)
-        except TypeError:
-            valid, gw = False, None
-
-        if valid:
-            if type(gw) == list:
-                self.all_gw_entries = [
-                    get_participant_entry(self.participant, gameweek) for gameweek in gw
-                ]
-            elif type(gw) == int:
-                self.all_gw_entries = [
-                    get_participant_entry(self.participant, gameweek)
-                    for gameweek in range(1, gw + 1)
-                ]
-            return self.all_gw_entries
-        else:
-            raise GameweekError
-
-
-class League:
-    def __init__(self, league_id):
-        self.league_id = league_id
-        self.participants = []
-        self.res = None
-        self.league_name = ""
-        self.PAGE_COUNT = 1
-
-    def obtain_league_participants(self, refresh=False):
-        """This function uses the league url as an endpoint to query for participants of a league at a certain date.
-        Should be used to update participants table in DB"""
-
-        if refresh or len(self.participants) == 0:
-            self.has_next = True
-            while self.has_next:
-                r = s.get(LEAGUE_URL.format(self.league_id, self.PAGE_COUNT))
-                if r.status_code == 200:
-                    # assert r.status_code == 200, "error connecting to the endpoint"
-                    obj = r.json()
-                    LOGGER.info(r.status_code)
-                    LOGGER.info(r.headers)
-                    del r
-
-                    self.league_name = obj["league"]["name"]
-
-                    self.participants.extend(obj["standings"]["results"])
-                    self.has_next = obj["standings"]["has_next"]
-                    self.PAGE_COUNT += 1
-            
-                    LOGGER.info(
-                        "All participants on page {} have been extracted".format(
-                            self.PAGE_COUNT
-                        )
-                    )
-                else:
-                    LOGGER.error(r.text)
-                    # raise EnvironmentError(msg=r.status_code)
-                self.league_name = obj["league"]["name"]
-        self.entry_ids = [participant["entry"] for participant in self.participants]
-        return self.participants
-
-    def get_league_count(self):
-        if len(self.participants > 1):
-            return len(self.participants)
-        else:
-            LOGGER.info("Obtain league participants first before getting league count")
-
-    def get_participant_name(self, refresh=False) -> dict:
-        """Creates participant id to name hash table"""
-        if refresh or len(self.participants) == 0:
-            self.obtain_league_participants()
-        self.participant_name = {
-            str(participant["entry"]): participant["entry_name"]
-            for participant in self.participants
-        }
-        self.id_participant = (
-            [
-                participant["entry"],
-                participant["entry_name"],
-                participant["player_name"],
-            ]
-            for participant in self.participants
-        )
-        return self.participant_name
-
-    def get_league_participant_mp(self, PAGE_COUNT):
-        """MultiProcessing version of get league participants"""
-        out = []
-
-        r = s.get(LEAGUE_URL.format(self.league_id, PAGE_COUNT))
-        obj = r.json()
-        if r.status_code == 200:
-            out.extend(obj["standings"]["results"])
-
-            LOGGER.info("page {} done".format(PAGE_COUNT))
-            return (
-                [
-                    participant["entry"],
-                    participant["entry_name"],
-                    participant["player_name"],
-                ]
-                for participant in out
-            )
-
-    def batch_participant_entry(self, batch):
-        for participant in batch:
-            yield get_participant_entry(participant["entry"], self.gw)
-
-    def get_all_participant_entries(self, gw, refresh=False, thread=None):
-        self.gw = gw
-
-        if refresh or len(self.participants) == 0:
-            self.obtain_league_participants()
-            
-        # optimization 2
-        for participant in self.participants:
-            yield get_participant_entry(participant["entry"], gw)
-
-    def get_gw_transfers(self, gw, refresh=False, thread=None):
-        self.transfers = []
-        if refresh or len(self.participants) == 0:
-            self.obtain_league_participants()
-
-        self.transfers = get_gw_transfers(self.entry_ids, gw)
-        return self.transfers
 
 
 if __name__ == "__main__":
@@ -545,4 +246,3 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--thread", type=int)
 
     args = parser.parse_args()
-    print(get_participant_entry(entry_id=98120, gw=1))
