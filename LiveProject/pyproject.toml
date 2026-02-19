@@ -7,7 +7,6 @@ authors = [
 ]
 requires-python = ">=3.12"
 dependencies = [
-    "pytest-cov (>=7.0.0,<8.0.0)",
     "django (>=6.0.2,<7.0.0)",
     "ariadne-django (>=0.3.0,<0.4.0)",
     "gunicorn (>=25.0.3,<26.0.0)",
@@ -19,7 +18,7 @@ dependencies = [
     "gevent (>=25.9.1,<26.0.0)",
     "sqlalchemy (>=2.0.46,<3.0.0)",
     "google-cloud-storage (>=3.9.0,<4.0.0)",
-    "psycopg2-binary (>=2.9.11,<3.0.0)"
+    "psycopg2-binary (>=2.9.11,<3.0.0)",
 ]
 
 
