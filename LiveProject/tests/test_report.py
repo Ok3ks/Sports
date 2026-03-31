@@ -1,27 +1,69 @@
-from src.report import LeagueWeeklyReport
-import pandas as pd
+from src.report import League
 
+class TestLeague:
 
-class TestLeagueWeeklyReport:
-    def test_init(self):
-        # TODO: test = LeagueWeeklyReport(gw_fixture, league_fixture)
-        pass
+    def test_init(self, classic_league):
+        test = League(classic_league)
+        assert test.league_id == 1491605
+        assert test.participants == []
+        assert test.PAGE_COUNT == 1
 
-    def test_weekly_score_transformation(self):
-        pass
+    def test_league_obtain_league_participants(
+        self, classic_league, league_fill_fixture
+    ):
+        test = League(classic_league)
+        test.participants = league_fill_fixture
 
-    def test_merge_league_weekly_transfer(self):
-        pass
+        obj = test.obtain_league_participants()
+        keys = set(
+            [
+                "entry",
+                "entry_name",
+                "id",
+                "event_total",
+                "player_name",
+                "rank",
+                "last_rank",
+                "rank_sort",
+                "total",
+            ]
+        )
 
-    def test_add_auto_sub(self):
-        pass
+        diff = keys.difference(test.participants[0].keys())
+        assert (
+            keys.intersection(test.participants[0].keys()) == keys
+        ), f"Vital keys missing, Add keys -  {diff}"
 
-    def test_create_report(self):
-        pass
+        assert len(test.participants) == len(obj)
+        assert type(test.participants) is list
 
-    def test_rise_and_fall(self):
-        pass
+        assert test.entry_ids is not None
+        assert type(test.entry_ids) is list
 
+    def test_get_league_count(
+        self, classic_league, league_fill_fixture
+    ):
+        test = League(classic_league)
+        test.participants = league_fill_fixture
 
-if __name__ == "__main__":
-    print("use pytest to run tests")
+        assert test.get_league_count() == len(league_fill_fixture)
+
+    def test_league_get_participant_name(self, classic_league, league_fill_fixture):
+        test = League(classic_league)
+        test.participants = league_fill_fixture
+        test.get_participant_name()
+
+        assert "entry" in test.participants[0].keys()
+        assert "entry_name" in test.participants[0].keys()
+
+        assert type(list(test.participant_name.values())[0]) is str
+
+    def test_league_get_gw_transfers(self, classic_league, league_weekly_transfer, gw_fixture, mocker):
+        test = League(classic_league)
+        assert test.transfers is None
+
+        spy = mocker.spy(test, "get_gw_transfers")
+        test.transfers = league_weekly_transfer
+        test.get_gw_transfers(gw_fixture)
+        assert spy.call_count == 1
+        assert spy.spy_return == league_weekly_transfer

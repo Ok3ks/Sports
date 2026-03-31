@@ -1,10 +1,9 @@
 import json
-import os
 from typing import List, Any
 import pandas as pd
 import pathlib
-
-from src.utils import bucket_client
+from src.utils import bucket_client, s
+from src.urls import GW_URL, FPL_URL
 from src.db.db import (
     get_player_name_map,
     get_player_position_map,
@@ -14,7 +13,68 @@ from src.db.db import (
 )
 
 
-def parse_fixture( to_dict=True, upload=False):
+class Gameweek:
+    def __init__(self, gw=1):
+        self.gw = gw
+
+    def get_payload(self):
+        temp = s.get(GW_URL.format(self.gw))
+        temp_2 = s.get(FPL_URL)
+        out = []
+
+        for item in temp["elements"]:
+            obj = item["stats"]
+            obj["id"] = item["id"]
+            obj["value"] = item["explain"][0]["stats"][0]["value"]
+            obj["fixture"] = item["explain"][0]["fixture"]
+            out.append(obj)
+
+        self.week_df = pd.DataFrame(out)
+        for item in temp_2.json()["events"]:
+            if int(item["id"]) == int(self.gw):
+                self.status = item
+
+    def highest_scoring_player(self):
+        highest = self.week_df.sort_values(by="total_points", ascending=False).iloc[
+            0, :]
+        return highest
+
+    def dream_team(self):
+        dream_team = self.week_df[self.week_df["in_dreamteam"] == True]
+        return dream_team
+
+    def highest_xg(self):
+        highest_xg = self.week_df.sort_values(
+            by="expected_goals", ascending=False
+        ).iloc[0, :]
+        return highest_xg
+
+    def highest_xgc(self):
+        highest_xgc = self.week_df.sort_values(
+            by="expected_goals_conceded", ascending=False
+        ).iloc[0, :]
+        return highest_xgc
+
+    def highest_xa(self):
+        highest_xa = self.week_df.sort_values(
+            by="expected_assists", ascending=False
+        ).iloc[0, :]
+        return highest_xa
+
+    def gameweek_status(self):
+        return self.status["is_current"] if self.status["is_current"] else self.status["Finished"]
+
+    def chip_usage(self):
+        return self.status["chip_plays"]
+
+    def highest_score(self):
+        return self.status["highest_scoring_entry"]
+
+    def gameweek_average(self):
+        return self.status["average_entry_score"]
+
+
+def parse_fixture(to_dict=True, upload=False):
     """Parse Fixtures from DB."""
     fixture = get_fixtures()
 
@@ -85,7 +145,6 @@ def parse_fixture( to_dict=True, upload=False):
 
 
 def parse_stats(filter: dict | None = {"gameweek": 38}, to_dict=True, path: str = "" , upload=False) -> dict[str, Any] | pd.DataFrame:
-def parse_stats(filter: dict | None = {"gameweek": 38}, to_dict=True, path: str = "" , upload=False) -> dict[str, Any] | pd.DataFrame:
     """Combine Season stats from DB, and map appropriately."""
 
     stats = get_season_stats()
@@ -96,8 +155,7 @@ def parse_stats(filter: dict | None = {"gameweek": 38}, to_dict=True, path: str 
     full_df: pd.DataFrame = pd.DataFrame(stats)
 
     if filter:
-        for gameweek in range(1,filter['gameweek']):
-            breakpoint()    
+        for gameweek in range(1,filter['gameweek']):  
             full_df = full_df[full_df['gameweek'] == gameweek]
             full_df["player_name"] = full_df["player_id"].map(lambda x: player_name_mapping[x])
             full_df["team"] = full_df["player_id"].map(lambda x: player_team_mapping[x])
@@ -159,7 +217,6 @@ if __name__ == "__main__":
 
     if args.fixture:
         parse_fixture(to_dict=True, upload=args.upload)
-    if args.gameweek_id:
     if args.gameweek_id:
         parse_stats(
             filter={

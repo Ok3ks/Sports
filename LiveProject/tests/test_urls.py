@@ -671,7 +671,9 @@ def test_fpl_url_endpoint():
         'tackles',
         'recoveries',
         'defensive_contribution',
-        'clearances_blocks_interceptions'
+        'clearances_blocks_interceptions',
+        'scout_risks',
+        'known_name'
     ]
 
     diff = set(elements_keys).difference(set(elements_keys_prev))

@@ -1,13 +1,50 @@
 """Multiprocessing script to write weekly entries to database"""
 
-from src.utils import get_gw_transfers, get_gw_transfers_scrap, get_participant_entry
-from sqlalchemy.orm import sessionmaker
+from LiveProject.src.urls import TRANSFER_URL
+from src.utils import check_gw
 import logging
 import gevent
 import pandas as pd
-
+from requests import Session
 
 LOGGER = logging.getLogger(__name__)
+
+
+def get_gw_transfers_scrap(alist: List[int], gw: Union[int, List[int]], s: Session, all=False) -> dict:
+    """Input is a list of entry_id. Gw is the gameweek number.
+    'all' toggles between extracting all gameweeks or not"""
+
+    try:
+        valid, gw = check_gw(gw)
+    except TypeError:
+        valid, gw = False, None
+    row = {}
+    if valid:
+        for entry_id in alist:
+            obj_row = {}
+            r = s.get(TRANSFER_URL.format(entry_id))
+            if r.status_code == 200:
+                obj = r.json()
+                # updates by gameweek
+                for item in obj:
+                    if all:
+                        obj_row[item["event"]] = parse_transfers(item, {})
+                    else:
+                        if isinstance(gw, int) and int(item["event"]) == gw:
+                            # updates each id
+                            obj_row.update(parse_transfers(item, {}))
+                        elif isinstance(gw, list):
+                            if int(item["event"]) in gw:
+                                obj_row[item["event"]] = parse_transfers(item, {})
+            else:
+                print(
+                    "{} does not exist or Transfer URL endpoint unavailable".format(
+                        entry_id
+                    )
+                )
+            row[entry_id] = obj_row
+    return row
+
 
 def participant_transfers(entry_id: list[int] | int, gw: int, to_json=False) ->  pd.DataFrame:
     """Downloads weekly entry for a list of entry Id"""

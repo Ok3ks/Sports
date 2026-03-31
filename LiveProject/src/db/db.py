@@ -385,16 +385,17 @@ def get_fixtures(session=session):
 
 def check_minutes(id, gw, session=session):
     """Checks DB for captain's minutes"""
-
-    if not math.isnan(id):
-        stmt = text(
-            f'SELECT minutes FROM Player_gameweek_score WHERE player_id={id} and gameweek = {gw}'
-        )
-        with session() as session:
-            c = session.execute(stmt)
-        return c.fetchone()
-    else:
+    
+    try:
+        math.isnan(id)
+    except TypeError:
         return [0]
+    stmt = text(
+        f'SELECT minutes FROM Player_gameweek_score WHERE player_id={id} and gameweek = {gw}'
+    )
+    with session() as session:
+        c = session.execute(stmt)
+    return c.fetchone()
 
 
 ## Gameweek

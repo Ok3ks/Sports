@@ -1,15 +1,113 @@
-import json
 import pandas as pd
-from src.utils import Participant
+from src.utils import GameweekError, Participant
 from functools import lru_cache
 import numpy as np
+from typing import Union
 
-from src.utils import get_curr_event
+from src.utils import get_curr_event, get_participant_entry, check_gw, s, LOGGER
+from src.urls import TRANSFER_URL
 from src.db.db import (
     get_player_gql,
     session,
     get_ind_player_stats_from_db,
 )
+
+
+class Participant:
+    def __init__(self, entry_id, gw):
+        self.participant = entry_id
+        self.gw = gw
+
+    def get_gw_transfers(self, gw: Union[int, list[int]], all=False) -> dict:
+        """Input is a list of entry_id. Gw is the gameweek number.
+        'all' toggles between extracting all gameweeks or not"""
+
+        row = {}
+        try:
+            valid, gw = check_gw(gw)
+        except TypeError:
+            valid, gw = False, None
+
+        if all or valid:
+            r = s.get(TRANSFER_URL.format(self.participant))
+            LOGGER.info(r.status_code)
+            if r.status_code == 200:
+                obj = r.json()
+                for item in obj:
+                    if all:
+                        row[item["event"]] = row.get(item["event"], {})
+                        row[item["event"]]["element_in"] = row[item["event"]].get(
+                            "element_in", []
+                        )
+                        row[item["event"]]["element_out"] = row[item["event"]].get(
+                            "element_out", []
+                        )
+                        row[item["event"]]["element_in"].append(item["element_in"])
+                        row[item["event"]]["element_out"].append(item["element_out"])
+                    else:
+                        if isinstance(gw, list) and int(item["event"]) in gw:
+                            row[item["event"]] = row.get(item["event"], {})
+                            row[item["event"]]["element_in"] = row[item["event"]].get(
+                                "element_in", []
+                            )
+                            row[item["event"]]["element_out"] = row[item["event"]].get(
+                                "element_out", []
+                            )
+                            row[item["event"]]["element_in"].append(item["element_in"])
+                            row[item["event"]]["element_out"].append(
+                                item["element_out"]
+                            )
+                        elif isinstance(gw, int) and int(item["event"]) == gw:
+                            row[item["event"]] = row.get(item["event"], {})
+                            row[item["event"]]["element_in"] = row[item["event"]].get(
+                                "element_in", []
+                            )
+                            row[item["event"]]["element_out"] = row[item["event"]].get(
+                                "element_out", []
+                            )
+                            row[item["event"]]["element_in"].append(item["element_in"])
+                            row[item["event"]]["element_out"].append(
+                                item["element_out"]
+                            )
+            else:
+                print(
+                    "{} does not exist or Transfer URL endpoint unavailable".format(
+                        self.participant
+                    )
+                )
+        return row
+
+    def get_span_week_transfers(self, span: list[int]) -> dict:
+        return self.get_gw_transfers(span)
+
+    def get_all_week_transfers(self) -> dict:
+        curr_gw = get_curr_event()[0]
+        print("getting all entries up to {}".format(curr_gw))
+        return self.get_gw_transfers(curr_gw, all=True)
+
+    def get_all_week_entries(self, gw: Union[int, list[int]], all=False) -> list:
+        if all:
+            curr_gw = get_curr_event()[0]
+            gw = curr_gw
+
+        try:
+            valid, gw = check_gw(gw)
+        except TypeError:
+            valid, gw = False, None
+
+        if valid:
+            if isinstance(gw, list):
+                self.all_gw_entries = [
+                    get_participant_entry(self.participant, gameweek) for gameweek in gw
+                ]
+            elif isinstance(gw, int):
+                self.all_gw_entries = [
+                    get_participant_entry(self.participant, gameweek)
+                    for gameweek in range(1, gw + 1)
+                ]
+            return self.all_gw_entries
+        else:
+            raise GameweekError
 
 
 class ParticipantReport(Participant):
