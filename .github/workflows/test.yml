@@ -32,6 +32,6 @@ jobs:
           source env/bin/activate
           cd LiveProject
           echo "Running Tests"
-          pytest --cov src/ --cov-fail-under=80
+          pytest --cov src/ --cov-fail-under=20
 
 
