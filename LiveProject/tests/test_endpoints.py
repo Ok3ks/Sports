@@ -435,6 +435,8 @@ def test_fpl_url_endpoint():
         "transfers_made",
         "most_captained",
         "most_vice_captained",
+        "price_change_percent",
+        "scount_news_link"
     ]
 
     assert len(set(event_keys_prev).difference(set(event_keys))) == 0, (
