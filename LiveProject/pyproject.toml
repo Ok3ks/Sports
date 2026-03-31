@@ -15,19 +15,18 @@ ariadne-django = "^0.3.0"
 gunicorn = "^23.0.0"
 pandas = "^2.2.3"
 numpy = "^2.1.2"
-pymysql = "^1.1.1"
 requests = "^2.32.3"
 argparse = "^1.4.0"
 gevent = "^24.11.1"
 pytest = "^8.3.4"
 sqlalchemy = "^2.0.38"
 google-cloud-storage = "^3.1.0"
-psycopg2 = "^2.9.10"
 
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.9.6"
 pytest = "^8.3.4"
+marimo = "^0.21.1"
 
 [build-system]
 requires = ["poetry-core"]
