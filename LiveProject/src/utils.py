@@ -11,9 +11,12 @@ from .urls import GW_URL, TRANSFER_URL, FPL_URL, FPL_PLAYER
 from .urls import LEAGUE_URL, FPL_PLAYER
 
 from .db.db import get_player, get_player_team_code
-from typing import List, Union
+from typing import Any, List, Union
 import logging
 import ssl
+
+LOGGER = logging.getLogger(__name__)
+
 
 class TLSAdapter(HTTPAdapter):
     def init_poolmanager(self, *args, **kwargs):
@@ -21,9 +24,6 @@ class TLSAdapter(HTTPAdapter):
         context.minimum_version = ssl.TLSVersion.TLSv1_2  # Enforcing TLSv1.2 or higher
         kwargs['ssl_context'] = context
         return super().init_poolmanager(*args, **kwargs)
-
-
-LOGGER = logging.getLogger(__name__)
 
 s = requests.Session()
 retries = Retry(
@@ -35,24 +35,29 @@ retries = Retry(
 s.mount("https://", TLSAdapter(max_retries=3))
 
 
-def to_json(x: dict, fp):
+def to_json(x: dict, fp):  ## use Path instead
     with open(fp, "w") as outs:
         json.dump(x, outs)
-    print(f"{x.keys()} stored in Json successfully. Find here {fp}")
+    LOGGER.info(f"{x.keys()} stored in Json successfully. Find here {fp}")
 
 
-def get_basic_stats(total_points: List[Union[int, float]]):
+def get_basic_stats(total_points: List[Union[int, float]]) -> tuple | None:
     """Measures of Central Tendency for Total points"""
-    average = np.mean(total_points)
-    Q3 = np.percentile(total_points, 75)
-    Q1 = np.percentile(total_points, 25)
+    Q1, average, Q3 = None, None, None
+    if len(total_points) >= 1:
+        average = np.mean(total_points)
+        Q3 = np.percentile(total_points, 75)
+        Q1 = np.percentile(total_points, 25)
     return Q1, average, Q3
 
 
 def parse_transfers(item: dict, row: dict) -> dict:
 
     """
-        Update Parsed transfer, Row contains a parsed transfer, and is being updated in get_gw_transfers()
+        Extracts transfers in and out and nests into an obj with key equivalent to item["entry"].
+        - Row is modified in place, with values from item. can be empty or not
+
+        Returns a dictionary with item["entry"] as a key
     """
 
     row[item["entry"]] = row.get(item["entry"], {})
@@ -67,7 +72,7 @@ def parse_transfers(item: dict, row: dict) -> dict:
 
 def check_gw(gw: Union[int, List[int]]) -> tuple:
     out = []
-    if gw is list:
+    if isinstance(gw, list):
         for i in gw:
             if check_gw(i)[0]:
                 out.append(i)
@@ -75,10 +80,10 @@ def check_gw(gw: Union[int, List[int]]) -> tuple:
                 pass
         return (True, out)
     else:
-        if (1 <= gw < 38 ):
+        if (1 <= gw < 38):
             return (True, gw)
         else:
-            logging.info(f"{gw} is out of range")
+            LOGGER.error(f"{gw} is out of range")
             return (False, None)
 
 
@@ -89,38 +94,44 @@ class GameweekError(Exception):
         super().__init__(message)
 
 
-def get_gw_transfers(alist: List[int], gw: Union[int, List[int]], all=False) -> dict:
+def get_gw_transfers(alist: List[int], gw: Union[int, List[int], None] = None, all=False) -> dict:
     """Input is a list of entry_id. Gw is the gameweek number.
     'all' toggles between extracting all gameweeks or not"""
 
-    try:
-        valid, gw = check_gw(gw)
-    except TypeError:
-        valid, gw = False, None
-    row = {}
-    if valid:
-        for entry_id in alist:
-            r = s.get(TRANSFER_URL.format(entry_id))
-            if r.status_code == 200:
-                obj = r.json()
-                # updates by gameweek
-                for item in obj:
-                    if all:
-                        row[item["event"]] = parse_transfers(item)
-                    else:
-                        if type(gw) == int and int(item["event"]) == gw:
-                            # updates each id
-                            row.update(parse_transfers(item, row))
-                        elif type(gw) == list:
-                            if int(item["event"]) in gw:
-                                row[item["event"]] = parse_transfers(item)
-            else:
-                print(
-                    "{} does not exist or Transfer URL endpoint unavailable".format(
-                        entry_id
-                    )
+    row: dict = {}
+    gw = None if all else gw
+    valid = False
+
+    if gw:
+        try:
+            valid, gw = check_gw(gw)  # excludes invalid gameweeks here
+        except TypeError:
+            valid, gw = False, None
+
+    if not (valid | all):
+        return row
+
+    for entry_id in alist:
+        r = s.get(TRANSFER_URL.format(entry_id))
+        if r.status_code == 200:
+            obj = r.json()  # provides all transfers
+            # updates by gameweek
+            for item in obj:
+                if all:
+                    row[item["event"]] = parse_transfers(item, {})
+                elif valid:
+                    if isinstance(gw, int) and int(item["event"]) == gw:
+                        row.update(parse_transfers(item, row))
+                    elif isinstance(gw, list) and int(item["event"]) in gw:
+                        row[item["event"]] = parse_transfers(item, {})
+        else:
+            LOGGER.info(
+                "{} does not exist or Transfer URL endpoint unavailable".format(
+                    entry_id
                 )
+            )
     return row
+
 
 def bucket_client(bucket_name="wrapped_participants_entry"):
     client = storage.Client()
@@ -130,39 +141,33 @@ def bucket_client(bucket_name="wrapped_participants_entry"):
 
 def get_participant_entry(entry_id: int, gw: int) -> dict:
     """Calls an Endpoint to retrieve a participants entry"""
-    try:
-        valid, gw = check_gw(gw)
-    except TypeError:
-        valid, gw = False, None
+    valid, gw = check_gw(gw)
+    team_list: dict[str, Any] = {
+        "auto_sub_in": "",
+        "auto_sub_out": "",
+        "gw": None,
+        "entry_id": None ,
+        "active_chip": None,
+        "points_on_bench": None,
+        "total_points": None,
+        "event_transfers_cost": None,
+        "players": "",
+        "bench": "",
+        "vice_captain": None,
+        "captain": None,
+    }
 
     if valid:
         # optimization, imported get directly from requests
         r = s.get(FPL_PLAYER.format(entry_id, gw))
 
         # optimization - assigning size of dictionary before hand to prevent resizing of dictionaries
-        team_list = {
-            "auto_sub_in": "",
-            "auto_sub_out": "",
-            "gw": gw,
-            "entry_id": entry_id,
-            "active_chip": None,
-            "points_on_bench": None,
-            "total_points": None,
-            "event_transfers_cost": None,
-            "players": "",
-            "bench": "",
-            "vice_captain": None,
-            "captain": None,
-        }
 
-    if valid:
-        # optimization, imported get directly from requests, but changed name to s.get for easy reference
-        r = s.get(FPL_PLAYER.format(entry_id, gw))
-        # optimization - assigning size of dictionary before hand to prevent resizing of dictionaries
+
         if r.status_code == 200:
-            
             obj = r.json()
-
+            team_list["entry_id"] = int(entry_id)
+            team_list["gw"] = int(gw)
             team_list["active_chip"] = obj["active_chip"]
             team_list["points_on_bench"] = obj["entry_history"]["points_on_bench"]
             team_list["total_points"] = obj["entry_history"]["points"]
@@ -206,17 +211,15 @@ def get_participant_entry(entry_id: int, gw: int) -> dict:
                 if item["is_captain"]:
                     team_list["captain"] = int(item["element"])
                 if item["is_vice_captain"]:
-                    team_list["vice_captain"] = int(item["element"])
-        else:
-            print(f"{r.status_code}")
-            print("{} does not exist".format(entry_id))
+                    team_list["vice_captain"] = int(item["element"])     
+
 
     return team_list
 
 
-def get_curr_event():
+def get_curr_event() -> list:
     r = requests.get(FPL_URL)
-    logging.info(r.status_code)
+    LOGGER.info(r.status_code)
 
     curr_event = []
     r = r.json()
@@ -552,6 +555,14 @@ class League:
 
         self.transfers = get_gw_transfers(self.entry_ids, gw)
         return self.transfers
+    
+    def get_all_gw_transfers(self, gw, refresh=False, thread=None):
+        self.transfers = []
+        if refresh or len(self.participants) == 0:
+            self.obtain_league_participants()
+
+        self.transfers = get_gw_transfers(self.entry_ids, gw, all=True)
+        return self.transfers
 
 
 if __name__ == "__main__":
@@ -573,4 +584,3 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--thread", type=int)
 
     args = parser.parse_args()
-    print(get_participant_entry(entry_id=98120, gw=1))
