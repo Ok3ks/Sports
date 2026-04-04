@@ -23,7 +23,8 @@ import math
 
 
 class Base(DeclarativeBase):
-    pass
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 
 class PlayerInfo(Base):
@@ -380,6 +381,14 @@ def get_fixtures(session=session):
     stmt = text(f'SELECT  * FROM "2025_2026_FIXTURES"')
     with session() as session:
         c = session.execute(stmt).all()
+    return c
+
+
+def get_fixture_gameweek(team:str, gw, session=session):
+    """Return fixture for a gameweek"""
+    stmt = text(f'SELECT * from "2025_2026_FIXTURES" where gameweek={gw} and (home="{team}" OR away="{team}")')
+    with session() as session:
+        c = session.execute(stmt).all()  # using .all() because a fixture can contain more than one gameweek
     return c
 
 
