@@ -132,6 +132,24 @@ def get_gw_transfers(alist: List[int], gw: Union[int, List[int], None] = None, a
             )
     return row
 
+def get_all_gw_transfers(alist: List[int]):
+    """Obtains all event transfers for a list of entry Ids"""
+
+    row: list = []
+
+    for entry_id in alist:
+        r = s.get(TRANSFER_URL.format(entry_id))
+        if r.status_code == 200:
+            obj = r.json()  # provides all transfers
+            row.extend(obj)
+        else:
+            LOGGER.info(
+                "{} does not exist or Transfer URL endpoint unavailable".format(
+                    entry_id
+                )
+            )
+    return row
+## versioning API -- API v2
 
 def bucket_client(bucket_name="wrapped_participants_entry"):
     client = storage.Client()
@@ -556,12 +574,12 @@ class League:
         self.transfers = get_gw_transfers(self.entry_ids, gw)
         return self.transfers
     
-    def get_all_gw_transfers(self, gw, refresh=False, thread=None):
+    def get_all_gw_transfers(self, refresh=False, thread=None):
         self.transfers = []
         if refresh or len(self.participants) == 0:
             self.obtain_league_participants()
 
-        self.transfers = get_gw_transfers(self.entry_ids, gw, all=True)
+        self.transfers = get_all_gw_transfers(self.entry_ids)
         return self.transfers
 
 

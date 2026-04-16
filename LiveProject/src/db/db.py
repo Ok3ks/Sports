@@ -1,4 +1,5 @@
 # from utils import Gameweek, Player, League
+from functools import lru_cache
 import sqlite3
 from types import NoneType
 from sqlite3 import Error  # type: ignore
@@ -331,6 +332,7 @@ def get_player_stats_from_db_gql(id, gw, session=session):
             (GameweekScore.player_id == id) & (GameweekScore.gameweek == gw)
         )
         c = session.scalars(stmt).one()
+
         return c
 
 
@@ -383,12 +385,12 @@ def get_fixtures(session=session):
         c = session.execute(stmt).all()
     return c
 
-
+@lru_cache(maxsize=128)
 def get_fixture_gameweek(team:str, gw, session=session):
     """Return fixture for a gameweek"""
     stmt = text(f'SELECT * from "2025_2026_FIXTURES" where gameweek={gw} and (home="{team}" OR away="{team}")')
     with session() as session:
-        c = session.execute(stmt).all()  # using .all() because a fixture can contain more than one gameweek
+        c = session.execute(stmt).all()  # using .all() because a gameweek can contain more than one fixture
     return c
 
 
