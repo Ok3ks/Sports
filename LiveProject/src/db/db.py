@@ -335,6 +335,19 @@ def get_player_stats_from_db_gql(id, gw, session=session):
 
         return c
 
+def get_player_season_points(id, session=session):
+    """ Player Season Points """
+      
+    #preferring raw statement to bypass sqlalchemy identity mapper
+    stmt = text(
+        f'SELECT total_points FROM Player_gameweek_score WHERE player_id = {id}'
+    )
+
+    with session() as session:
+        c = session.execute(stmt).all()
+        c = [i.total_points for i in c]
+        return c
+
 
 def get_player_stats_from_db(gw, session=session):
     stmt = text(
@@ -462,14 +475,23 @@ def get_teams(session=sessionmaker(create_connection_engine())):
         return obj
 
 
-def get_player_info(player_id, half, session=sessionmaker(create_connection_engine())):
+def get_player_info(player_id, half:int|None =None, session=sessionmaker(create_connection_engine())):
+    
     with session() as session:
+        if half:
+            statement = (
+                select(PlayerInfo)
+                .where(PlayerInfo.player_id == player_id)
+                .where(PlayerInfo.half == half)
+            )
+            obj = session.execute(statement).one()
+            return obj
+        
         statement = (
             select(PlayerInfo)
             .where(PlayerInfo.player_id == player_id)
-            .where(PlayerInfo.half == half)
         )
-        obj = session.execute(statement).one()
+        obj = session.execute(statement).all()
         return obj
 
 
