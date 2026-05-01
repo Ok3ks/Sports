@@ -48,6 +48,7 @@ if __name__ == "__main__":
         "-g",
         "--gameweek_id",
         type=int,
+        required=True,
         help="Gameweek you are trying to get a report of",
     )
     args = parser.parse_args()

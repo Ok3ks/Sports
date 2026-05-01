@@ -156,13 +156,13 @@ def parse_stats(filter: dict | None = {"gameweek": 38}, to_dict=True, path: str 
 
     if filter:
         for gameweek in range(1,filter['gameweek']):  
-            full_df = full_df[full_df['gameweek'] == gameweek]
-            full_df["player_name"] = full_df["player_id"].map(lambda x: player_name_mapping[x])
-            full_df["team"] = full_df["player_id"].map(lambda x: player_team_mapping[x])
-            full_df["position"] = full_df["player_id"].map(lambda x: player_position_mapping[x])
+            df = full_df[full_df['gameweek'] == gameweek]
+            df["player_name"] = df["player_id"].map(lambda x: player_name_mapping[x])
+            df["team"] = df["player_id"].map(lambda x: player_team_mapping[x])
+            df["position"] = df["player_id"].map(lambda x: player_position_mapping[x])
         
             if to_dict:
-                obj = full_df.to_dict("records") 
+                obj = df.to_dict("records") 
             output_path = pathlib.Path(args.path) if args.path else pathlib.Path(f"data/gameview/")
             output_path.mkdir(parents=True, exist_ok=True)
             filename = f"{gameweek}.json"
