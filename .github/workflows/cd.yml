@@ -44,15 +44,6 @@ jobs:
           pip install -r LiveProject/requirements.txt
           which python
 
-      - id: 'auth'
-        name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v2'
-        with:
-          create_credentials_file: true
-          workload_identity_provider: '${{secrets.WORKLOAD_IDENTITY_PROVIDERS }}'
-          service_account: '${{ secrets.AUTH_SERVICE_ACCOUNT }}'
-          process_gcloudignore: false
-      
       - name: Create cors.json
         run: |
           cat > cors.json <<'EOF'
@@ -70,8 +61,14 @@ jobs:
           ]
           EOF
 
-      - name: Apply CORS config
-        run: gsutil cors set cors.json gs://2024_2025 gs://2025_2026
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          create_credentials_file: true
+          workload_identity_provider: '${{secrets.WORKLOAD_IDENTITY_PROVIDERS }}'
+          service_account: '${{ secrets.AUTH_SERVICE_ACCOUNT }}'
+          run: gsutil cors set cors.json gs://2024_2025 gs://2025_2026
 
       - name: 'Docker auth'
         run: |
