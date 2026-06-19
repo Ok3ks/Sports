@@ -1,3 +1,4 @@
+from dataclasses import asdict, dataclass
 import requests
 from urllib3.util import Retry
 from requests.adapters import HTTPAdapter
@@ -5,15 +6,19 @@ import pandas as pd
 import json
 import numpy as np
 from google.cloud import storage
+from src.db import update_season_fixture
+from functools import lru_cache
 
 
-from .urls import GW_URL, TRANSFER_URL, FPL_URL, FPL_PLAYER
+
+from .urls import GW_URL, TRANSFER_URL, FPL_URL, FPL_PLAYER, HISTORY_URL
 from .urls import LEAGUE_URL, FPL_PLAYER
 
-from .db.db import get_player, get_player_team_code
+from .db.db import get_fixture_gameweek, get_player, get_player_info, get_player_season_points, get_player_stats_from_db_gql, get_player_team_code
 from typing import Any, List, Union
 import logging
 import ssl
+import polars as pl
 
 LOGGER = logging.getLogger(__name__)
 
@@ -80,7 +85,7 @@ def check_gw(gw: Union[int, List[int]]) -> tuple:
                 pass
         return (True, out)
     else:
-        if (1 <= gw < 38):
+        if (1 <= gw <= 38):
             return (True, gw)
         else:
             LOGGER.error(f"{gw} is out of range")
@@ -374,6 +379,16 @@ class Participant:
     def __init__(self, entry_id, gw):
         self.participant = entry_id
         self.gw = gw
+        self.history = None
+
+    def get_history(self) -> dict:
+        if not self.history: 
+            r = s.get(HISTORY_URL.format(self.participant))
+            LOGGER.info(r.status_code)
+            if r.status_code == 200:
+                obj = r.json()
+                self.history = obj
+        return self.history
 
     def get_gw_transfers(self, gw: Union[int, List[int]], all=False) -> dict:
         """Input is a list of entry_id. Gw is the gameweek number.
@@ -436,11 +451,10 @@ class Participant:
 
     def get_span_week_transfers(self, span: List[int]) -> dict:
         return self.get_gw_transfers(span)
+    
 
     def get_all_week_transfers(self) -> dict:
-        curr_gw = get_curr_event()[0]
-        print("getting all entries up to {}".format(curr_gw))
-        return self.get_gw_transfers(curr_gw, all=True)
+        return get_all_gw_transfers([self.participant])
 
     def get_all_week_entries(self, gw: Union[int, List[int]], all=False) -> list:
         if all:
@@ -583,6 +597,327 @@ class League:
         return self.transfers
 
 
+
+@dataclass(frozen=True, order=True)
+class Fixture:
+    home_difficulty: int | None
+    away_difficulty: int | None
+    home: str | None
+    away: str | None
+    home_goals: float | None
+    away_goals: float | None
+    code: int | None
+    gameweek: int | None
+    finished: bool | None
+    date: str | None
+
+
+
+class Player:
+    """This class represents a premier league player"""
+
+    def __init__(self, player_id, gw):
+        self.gw = gw
+        self.player_id: str = player_id
+        self._team = None
+        self._position = None
+        self._player_name = None
+
+    def _gameweek_score(self):
+        if isinstance(self.gw, list):
+            # obj = get_player_stats_from_db_gql(self.player_id, self.gw)
+            obj = [get_player_stats_from_db_gql(self.player_id, f) for f in self.gw]
+        else:
+            obj = get_player_stats_from_db_gql(self.player_id, self.gw)
+        
+        return obj
+
+    def _fixture(self):
+
+        if not self.team:
+            self._player_info()
+        
+        def _select_team(gw:int):
+            return  self._team[0] if gw < 18 else self._team[1]
+            
+        if isinstance(self.gw, list):
+            return [get_fixture_gameweek(_select_team(gw), gw) for gw in self.gw]
+        
+        return get_fixture_gameweek(_select_team(self.gw), self.gw)  # can return Fixture dataclass
+
+
+    def _player_info(self):
+        """Player Info"""
+        
+        obj = get_player_info(self.player_id) # can return Team dataclass
+        
+        self._team = [r[0].team for r in obj]
+        self._position = obj[0][0].position
+        self._player_name = obj[0][0].player_name    
+        return obj
+    
+
+    def _season_score(self):
+        obj = get_player_season_points(self.player_id)
+        return obj
+
+
+    @property
+    def gameweek_score(self):
+        return self._gameweek_score()
+    
+    @property
+    def total_points(self):
+        if isinstance(self.gw, list):
+            return [obj.total_points for obj in self._gameweek_score()]
+        else:
+            return self._gameweek_score().total_points
+    
+    @property
+    def fixture(self):
+        fixtures = self._fixture()
+        return [Fixture(*fixture) for fixture in fixtures] if fixtures else None
+    
+    @property
+    def team(self):
+        if not self._team: 
+            self._player_info()        
+        return self._team
+    
+    @property
+    def position(self):
+        if not self._position: 
+            self._player_info()
+        return self._position
+    
+    @property
+    def player_name(self):
+        if not self._player_name: 
+            self._player_info()
+        return self._player_name
+    
+    @property
+    def season_score(self):
+        return self._season_score()
+
+
+@lru_cache(maxsize=10)
+def get_league_data(league_id: int):
+    try:
+        f_df = pl.read_csv("test_data.csv")
+    except :
+        gw = get_curr_event()[0]
+        df = []
+
+        league = League(league_id=league_id)
+
+        for gameweek in range(1, gw, 1):
+            f = league.get_all_participant_entries(gameweek)
+            temp_df = pl.DataFrame(f)
+            df.append(temp_df)
+
+        f_df = pl.concat(df, how = "vertical")
+        f_df.write_csv("test_data.csv")
+    return f_df
+
+def get_fixture_data():
+    """ Get fixture data """
+    try:
+        f_df = pl.read_csv("test_fixture_data.csv")
+    except :
+        f_df = update_season_fixture()
+        f_df.to_csv("test_fixture_data.csv")
+
+    return f_df
+
+def get_transfer_data(league_id: int):
+    """ Transfer data """
+
+    gw = get_curr_event()[0]
+    df = []
+
+    league = League(league_id=league_id)
+    league.obtain_league_participants()
+    f = league.get_all_gw_transfers() ## TODO: update to use all_
+    
+    df = pl.DataFrame(f, infer_schema_length=True)
+    df = df.rename({
+        "entry": "entry_id",
+        "event": "gw",
+        "time": "transfer_time"
+    })
+    df = expand_date(df, date_col="transfer_time")
+    return df
+
+def expand_date(df: pl.DataFrame, date_col: str):
+        """
+        
+        Takes in a polars Dataframe with a str col - date
+        and expands into month,day,weekday,time,year.
+        
+        """
+        df = df.with_columns(
+            pl.col(date_col).cast(pl.Datetime).dt.month().alias("month"),
+            pl.col(date_col).cast(pl.Datetime).dt.day().alias("day"),
+            pl.col(date_col).cast(pl.Datetime).dt.weekday().alias("weekday"),
+            pl.col(date_col).cast(pl.Datetime).dt.time().alias("time"),
+            pl.col(date_col).cast(pl.Datetime).dt.year().alias("year")
+        )
+        return df
+
+def fixture_mapping(player, gw):
+    fixtures = Player(player, gw).fixture
+    return [asdict(f) for f in fixtures] if fixtures else []
+
+
+def player_transform(df: pl.DataFrame, vertical=False):
+    """
+
+    """
+
+    player_cols = [f"player_{i}" for i in range(1, 11)]
+
+    if vertical:
+        df =  df.with_columns(
+        pl.col("players").str.split(",")
+        ).explode("players")
+    else: 
+        df = df.with_columns(
+            pl.col("players").str.split(",").
+            list.to_struct(fields=player_cols)
+        ).unnest("players")
+
+    return df
+
+def bench_transform(df: pl.DataFrame):
+
+    bench_cols = [f"player_{i}" for i in range(1, 4)]
+
+    df = df.with_columns(
+        pl.col("bench").str.split(",")
+        .list.to_struct(fields=bench_cols)  # modularize
+        ).unnest("bench")
+
+    b_df = df.filter(pl.col("active_chip") != "bboost")
+
+    # b_df = enrich_player_cols(b_df, bench_cols)
+
+
+    return b_df
+
+def enrich_player_cols(df: pl.DataFrame, interested_cols: list[str], attributes:list| None=None):
+    """
+
+        Function to enrich player columns with information from the Player 
+        object. Including player_name, team, fixture, gameweek_score
+
+        df: Original dataframe,
+        interested_cols: A list of column names to transfer
+
+        First filters null objects then transforms the column.
+        Returns filtered dataframe, and df contains nulls for selected columns
+    
+    """
+
+    if not attributes:
+        attributes = [ "team", "position", "player_name", "gameweek_score", "minutes", "fixture"]
+    if len(interested_cols) < 1:
+        raise ValueError("Add an interested column to get started")
+
+
+    if not all(col in df.columns for col in interested_cols):
+        missing = [col for col in interested_cols if col not in df.columns]
+        raise ValueError(f"Missing columns: {missing}")
+
+    # Replaces empty string with None
+
+    t_df =  df.with_columns(
+            pl.when(pl.col(pl.String) == "")
+            .then(pl.lit(None))
+            .otherwise(pl.col(pl.String))
+            .name.keep()
+        )
+
+    if "team" in attributes:
+        t_df = t_df.with_columns([
+            pl.struct(col, "gw")
+            .map_elements(
+                lambda row, c=col: Player(row[c], row["gw"]).team,
+                return_dtype=pl.List(pl.String)
+            )
+            .alias(f"{col}_team")
+            for col in interested_cols
+        ])
+        
+
+    if "position" in attributes:
+        t_df = t_df.with_columns([
+            pl.struct(col, "gw")
+            .map_elements(
+                lambda row, c=col: Player(row[c], row["gw"]).position,
+                return_dtype=pl.String
+            )
+            .alias(f"{col}_position")
+            for col in interested_cols
+        ])
+
+    if "player_name" in attributes:
+        t_df = t_df.with_columns([
+            pl.struct(col, "gw")
+            .map_elements(
+                lambda row, c=col: Player(row[c], row["gw"]).player_name,
+                return_dtype=pl.String
+            )
+            .alias(f"{col}_player_name")
+            for col in interested_cols
+        ])
+
+    if "gameweek_score" in attributes:
+        t_df = t_df.with_columns([
+            pl.struct(col, "gw")
+            .map_elements(
+                lambda row, c=col: Player(row[c], row["gw"]).gameweek_score.total_points,
+                return_dtype=pl.Int64,
+            )
+            .alias(f"{col}_gameweek_score")
+            for col in interested_cols
+        ])
+
+    if "minutes" in attributes:
+        t_df = t_df.with_columns([
+            pl.struct(col, "gw")
+            .map_elements(
+                lambda row, c=col: Player(row[c], row["gw"]).gameweek_score.minutes,
+                return_dtype=pl.Int64,
+            )
+            .alias(f"{col}_minutes")
+            for col in interested_cols
+        ])
+    
+    if "fixture" in attributes:
+        t_df = t_df.with_columns([
+            pl.struct(col, "gw").map_elements(
+                lambda row, c=col: fixture_mapping(row[c], row["gw"]),
+                return_dtype=pl.List(pl.Struct({
+                    "home_difficulty": pl.Int64,
+                    "away_difficulty": pl.Int64,
+                    "home": pl.String, 
+                    "away": pl.String,
+                    "home_goals": pl.Int64,
+                    "away_goals": pl.Int64,
+                    "code": pl.Int64,
+                    "gameweek": pl.Int64,
+                    "finished": pl.Boolean,
+                    "date": pl.Datetime
+                }))
+            ).alias(f"{col}_fixture")
+            for col in interested_cols])
+
+    
+    return t_df
+
+
+
 if __name__ == "__main__":
     import argparse
 
@@ -602,3 +937,4 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--thread", type=int)
 
     args = parser.parse_args()
+

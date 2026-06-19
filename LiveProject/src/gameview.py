@@ -4,7 +4,6 @@ from typing import List, Any
 import pandas as pd
 import pathlib
 
-from src.utils import bucket_client
 from src.db.db import (
     get_player_name_map,
     get_player_position_map,
@@ -64,6 +63,7 @@ def parse_fixture( to_dict=True, upload=False):
     fixture_df["awaywin"] = fixture_df["awaywin"].astype(int)
 
     season = "2025_2026"
+
     for gameweek in range(1,38):
         temp_df = fixture_df[fixture_df['gameweek'] == gameweek]
         temp_df.fillna(0, inplace=True)
@@ -78,6 +78,7 @@ def parse_fixture( to_dict=True, upload=False):
             json.dump(obj, outs)
 
         if upload:
+            from src.utils import bucket_client
             bucket=bucket_client(bucket_name=season) #parameter
             blob = bucket.blob(filename)
             blob.upload_from_filename(output_path/filename)
@@ -110,6 +111,7 @@ def parse_stats(filter={"gameweek": 38}, to_dict=True, path: str = "" , upload=F
         json.dump(obj, outs)
 
     if upload:
+        from src.utils import bucket_client
         bucket=bucket_client(bucket_name="2025_2026") #parameter
         blob = bucket.blob(filename)
         blob.upload_from_filename(output_path/filename)

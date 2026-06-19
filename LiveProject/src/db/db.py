@@ -332,8 +332,8 @@ def get_player_stats_from_db_gql(id, gw, session=session):
             (GameweekScore.player_id == id) & (GameweekScore.gameweek == gw)
         )
         c = session.scalars(stmt).one()
-
         return c
+
 
 def get_player_season_points(id, session=session):
     """ Player Season Points """
