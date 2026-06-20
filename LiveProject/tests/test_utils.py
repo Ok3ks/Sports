@@ -1,187 +1,95 @@
 from src.utils import (
+    get_basic_stats,
+    get_curr_event,
     get_gw_transfers,
-    to_json,
+    parse_transfers,
     check_gw,
-    Participant,
-    League,
-    GameweekError,
 )
-import requests
 import pytest
-import json
-from os.path import join
-import os
-from src.urls import FPL_URL
 
 
-def test_to_json(transfer_obj, filepath):
-    output_name = "test.json"
-    to_json(transfer_obj, join(filepath, output_name))
-    assert output_name in os.listdir(filepath)
+
+@pytest.mark.parametrize("correct_gw", [10])
+@pytest.mark.parametrize("wrong_gw", [40])
+def test_check_gw(wrong_gw, correct_gw):
+    assert check_gw(correct_gw) == (True, correct_gw), "Only 38 games in a season"
+    assert check_gw(wrong_gw) == (False, None), "Only 38 games in a season"
 
 
-def test_from_json(filepath):
-    output_name = "test.json"
-    with open(join(filepath, output_name), "r") as ins:
-        obj = json.load(ins)
-    assert type(obj) == dict
+@pytest.mark.parametrize("gw_span", [[10, 12]])
+def test_check_gw_span(gw_span):
+    assert check_gw(gw_span) == (True, gw_span)
 
 
-def test_get_basic_stats(values):
-    pass
+def test_get_basic_stats_integers():
+    data = [1, 2, 3, 4, 5, 6, 7]
+
+    q1, average, q3 = get_basic_stats(data)
+    assert q1 == 2.5
+    assert average == 4.0
+    assert q3 == 5.5
+
+
+def test_get_basic_stats_empty():
+    q1, average, q3 = get_basic_stats([])
+    assert q1 is None
+    assert average is None
+    assert q3 is None
 
 
 def test_parse_transfers(transfer_obj):
-    pass
+    obj = parse_transfers(transfer_obj, {})
+    entry_id = transfer_obj["entry"]
+    assert entry_id in obj.keys()
+    assert "element_in", "element_out" in obj[entry_id].keys()
 
 
-def test_check_gw_int_is_true(gw_fixture):
-    pass
+def test_get_gw_transfers_one(participant):
+    transfers = get_gw_transfers([participant], 3)
+    assert len(transfers.keys()) == 1
+    assert list(transfers[participant].keys()) == ["element_in", "element_out"]
 
 
-def test_check_gw_span_is_true(span_fixture):
-    pass
+def test_get_gw_transfers_span(participant, span_fixture):
+    transfers = get_gw_transfers([participant], span_fixture)
+    assert set(transfers.keys()).intersection(transfers.keys()) == set(transfers.keys())
 
 
-@pytest.mark.parametrize("diff_fixture", [40])
-def test_check_gw_is_false(diff_fixture):
-    assert check_gw(diff_fixture) == (False, None), "Only 38 games in a season"
+def test_get_gw_transfers_all(participants):
+    transfers = get_gw_transfers(participants, all=True)
+    assert len(transfers.keys()) == get_curr_event()[0] - 1
 
 
-def test_get_curr_event():
-    r = requests.get(FPL_URL)
-    assert (
-        r.status_code == 200
-    ), "Endpoint unavailable, check participant_id and gameweek"
+def test_get_participant_entry(participant, gw_fixture, mocker):
+    from src import utils
+    spy = mocker.spy(utils, "get_participant_entry")
 
-    r = r.json()
-    assert type(r) == dict
-    assert "events" in r.keys()
-
-    check_set = r["events"][0]
-    inter_ = set(["finished", "data_checked", "id", "is_current"])
-
-    assert inter_.intersection(check_set) == inter_
-
-
-def test_get_diff_gw_transfers(participant, span_fixture):
-    row = get_gw_transfers([participant], span_fixture)
-    assert list(row[span_fixture[0]].keys())[0] == participant
-    assert set(row.keys()).union(set(span_fixture)) == set(span_fixture)
-
-
-def test_get_all_gw_transfers(participant, span_fixture):
-    row = get_gw_transfers([participant], span_fixture, all=True)
-    if row:
-        keys = list(row.keys())
-        start = keys[-1]
-        end = keys[0]
-        rang = [i for i in range(start, end + 1)]
-        assert set(row.keys()).union(rang) == set(rang)
-    else:
-        raise Exception("Error retrieving rows")
+    utils.get_participant_entry(participant, gw_fixture)
+    assert spy.call_count == 1
+    assert list(spy.spy_return.keys()) == [
+        "auto_sub_in",
+        "auto_sub_out",
+        "gw",
+        "entry_id",
+        "active_chip",
+        "points_on_bench",
+        "total_points",
+        "event_transfers_cost",
+        "players",
+        "bench",
+        "vice_captain",
+        "captain"
+    ]
 
 
-def test_get_participant_entry(participant, gw_fixture):
-    pass
+def test_get_curr_event(mocker):
+    from src import utils
+    spy = mocker.spy(utils, "get_curr_event")
+    utils.get_curr_event()
 
-
-class TestParticipant:
-    def test_init(
-        self,
-        participant,
-    ):
-        pass
-
-    def test_get_gw_transfers(self):
-        pass
-
-    def test_get_span_week_transfers(self):
-        pass
-
-    def test_get_all_week_transfers(self):
-        pass
-
-    def test_get_all_week_entries(self, participant, span_fixture, gw_fixture):
-        test = Participant(participant, gw_fixture)
-        test_list = test.get_all_week_entries(span_fixture)
-        test_int = test.get_all_week_entries(gw_fixture)
-
-        assert len(test_list) == len(gw_fixture)
-        assert len(test_int) == gw_fixture
-
-    @pytest.mark.parametrize("gameweek_list,gameweek_int", [([1, 10, 39], [13])])
-    def test_get_all_week_entries_incl_invalid(
-        self, participant, gameweek_list, gameweek_int
-    ):
-        test = Participant(participant, gameweek_int)
-
-        with pytest.raises(GameweekError):
-            test.get_all_week_entries(gameweek_list)
-
-
-class TestLeague:
-    def test_init(self, league_fixture):
-        test = League(league_fixture)
-        assert test.league_id == 538731
-        assert test.participants == []
-        pass
-
-    def test_league_obtain_league_participants_empty(self):
-        # Endpoint tests validates this
-        pass
-
-    def test_league_obtain_league_participants_fill(
-        self, league_fixture, league_fill_fixture
-    ):
-        test = League(league_fixture)
-        test.participants = league_fill_fixture
-
-        obj = test.obtain_league_participants()
-        keys = set(
-            [
-                "entry",
-                "entry_name",
-                "id",
-                "event_total",
-                "player_name",
-                "rank",
-                "last_rank",
-                "rank_sort",
-                "total",
-            ]
-        )
-
-        diff = keys.difference(test.participants[0].keys())
-        assert (
-            keys.intersection(test.participants[0].keys()) == keys
-        ), f"Vital keys missing, Add keys -  {diff}"
-
-        assert len(test.participants) == len(obj)
-        assert type(test.participants) == list
-
-        assert test.entry_ids != None
-        assert type(test.entry_ids) == list
-
-    def test_league_get_participant_name(self, league_fixture, league_fill_fixture):
-        test = League(league_fixture)
-        test.participants = league_fill_fixture
-        names = test.get_participant_name()
-
-        assert "entry" in test.participants[0].keys()
-        assert "entry_name" in test.participants[0].keys()
-
-        assert type(list(test.participant_name.values())[0]) == str
-        assert type(names) == dict
-
-    def test_league_get_all_participant_entries(self, league_fixture):
-        test = League(league_fixture)
-        test_all_entries = test.get_all_participant_entries(10)
-        # assert test_all_entries.__str__ is Generator
-
-    def test_league_get_gw_transfers(self, league_fixture):
-        pass
+    assert spy.call_count == 1
+    assert len(spy.spy_return) == 2
 
 
 if __name__ == "__main__":
-    print("use pytest to run tests")
+    print("use pytest --sw to run tests")

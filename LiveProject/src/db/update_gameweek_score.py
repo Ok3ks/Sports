@@ -20,7 +20,6 @@ def update_db_gameweek_score(conn, gw):
     r = requests.get(GW_URL.format(gw))
     r = r.json()
     temp = {item["id"]: item["stats"] for item in r["elements"]}
-
     df = pd.DataFrame(temp)
     df = df.T
     df["gameweek"] = gw

@@ -1,5 +1,5 @@
-[tool.poetry]
-name = "sports"
+[project]
+name = "liveproject"
 version = "0.1.0"
 description = ""
 authors = ["Your Name <you@example.com>"]
@@ -29,5 +29,11 @@ pytest = "^8.3.4"
 marimo = "^0.21.1"
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "pytest-cov (>=7.0.0,<8.0.0)",
+    "pytest-mock (>=3.15.1,<4.0.0)"
+]

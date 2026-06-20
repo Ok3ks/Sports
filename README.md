@@ -2,7 +2,7 @@
 
 Tools/Frameworks Used: 
 - Python,
-- PostgreSQl for database,
+- Sqlite for database,
 - SQAlchemy as ORM, 
 - Pandas for Data Wrangling as Analysis,
 - Django + GraphQL to create APIs,
@@ -10,4 +10,12 @@ Tools/Frameworks Used:
 - Poetry for Environment Management, 
 - [WIP] Github Actions for Continuous Integration and Continuous Deployment
 - Docker for Infrastructure Management
-- Redis as KV store
+
+### Repo Overview
+
+#### Monolith
+![Monolith](./monolith.png)
+
+#### Decoupled
+![Decoupled](./decoupled.png)
+

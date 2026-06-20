@@ -1,3 +1,6 @@
 [submodule "frontend"]
 	path = frontend
 	url = https://github.com/Ok3ks/fpl-frontend
+[submodule "fpl-frontend"]
+	path = fpl-frontend
+	url = https://github.com/Ok3ks/fpl-frontend.git

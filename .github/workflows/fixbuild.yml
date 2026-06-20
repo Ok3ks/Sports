@@ -1,4 +1,4 @@
-name: Fixtures/Results
+name: Fixtures
 on:
   push:
     paths:
@@ -48,11 +48,11 @@ jobs:
           service_account: '${{ secrets.AUTH_SERVICE_ACCOUNT }}'
           process_gcloudignore: false
     
-      - name: 'Create Gameweek Report'
+      - name: 'Upload Fixtures'
         run: |
             source venv/bin/activate
             source init_env.sh
             cd LiveProject
-            echo updating fixtures/results
+            echo updating fixtures
             python src/db/update_season_fixture.py
             python src/gameview.py -f True -u True

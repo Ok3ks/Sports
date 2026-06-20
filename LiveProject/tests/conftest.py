@@ -863,6 +863,11 @@ def participant():
 
 
 @pytest.fixture(scope="module")
+def participants():
+    return [int(145257), int(98320), int(4321)]
+
+
+@pytest.fixture(scope="module")
 def h2h_league():
     return int(2049961)
 
@@ -879,7 +884,7 @@ def gw_fixture():
 
 @pytest.fixture(scope="module")
 def span_fixture():
-    return [1, 1, 1]
+    return [1, 3, 5]
 
 
 @pytest.fixture(scope="module")
