@@ -96,7 +96,7 @@ class GameweekError(Exception):
     """Custom exception for invalid gameweek"""
 
     def __init__(self, message="Gameweek is not valid (Should be in range 1,38)"):
-        super().__init__(message)
+        return super().__init__(message)
 
 
 def get_gw_transfers(alist: List[int], gw: Union[int, List[int], None] = None, all=False) -> dict:
@@ -489,6 +489,7 @@ class League:
         self.league_name = ""
         self.has_next = True
         self.PAGE_COUNT = 1
+        self.transfers = None
 
     def obtain_league_participants(self, refresh=False):
         """This function uses the league url as an endpoint to query for participants of a league at a certain date.
@@ -524,7 +525,7 @@ class League:
         return self.participants
 
     def get_league_count(self):
-        if len(self.participants > 1):
+        if len(self.participants) > 1:
             return len(self.participants)
         else:
             LOGGER.info("Obtain league participants first before getting league count")
@@ -589,7 +590,6 @@ class League:
         return self.transfers
     
     def get_all_gw_transfers(self, refresh=False, thread=None):
-        self.transfers = []
         if refresh or len(self.participants) == 0:
             self.obtain_league_participants()
 
