@@ -8,7 +8,6 @@ authors = [
 requires-python = ">=3.12"
 dependencies = [
     "django (>=6.0.2,<7.0.0)",
-    "ariadne-django (>=0.3.0,<0.4.0)",
     "gunicorn (>=25.0.3,<26.0.0)",
     "numpy (>=2.4.2,<3.0.0)",
     "pandas (>=3.0.0,<4.0.0)",
@@ -20,6 +19,7 @@ dependencies = [
     "google-cloud-storage (>=3.9.0,<4.0.0)",
     "psycopg2-binary (>=2.9.11,<3.0.0)",
     "polars (>=1.41.2,<2.0.0)",
+    "ariadne-django (>=0.3.0,<0.4.0)",
 ]
 
 
