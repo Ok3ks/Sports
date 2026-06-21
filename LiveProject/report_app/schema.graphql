@@ -11,6 +11,8 @@ type Query {
 
   leagueWeeklyReport(leagueId: Int!, gameweek:Int!): LeagueWeeklyReport!
   participantReport(entryId:Int!, gameweek:Int): ParticipantReport!
+  seasonParticipantReport(season: String!, entryId: Int!): SeasonParticipantReport!
+
   gameViewReport(Gameweek:[Int!]): GameViewReport!
   Differential(gameweek:Int!): DifferentialPlayer
 }
@@ -91,6 +93,83 @@ type ParticipantReport{
   viceCaptainPoints: [Int]
   highestScoringPlayerPoints: [Int]
 
+}
+
+type SeasonParticipantReport{
+  rank: [GameweekHistory]
+  totalPointsGained: [TotalPointsGained]
+  nTransfers: Int
+  captainPoints: [CaptainPoints]
+  transferPointsGained: TransferPointsGained
+}
+
+type TotalPointsGained{
+  gw: Int!
+  totalPoints: Int!
+}
+type TransferPointDeltaRecord {
+    gw: Int
+    transferPointDelta: Int
+    finalCaptainGameweekScore: Int
+    captainGameweekScore:Int
+    captainFixture: [Fixture]
+    viceCaptainFixture: [Fixture]
+    captainPlayerName: String!
+    viceCaptainPlayerName: String!
+    captainMinutes: Int
+    viceCaptainMinutes: Int
+}
+
+type Fixture {
+    homeDifficulty: Int
+    awayDifficulty: Int
+    home: String
+    away: String
+    homeGoals: Int
+    awayGoals: Int
+    code: Int
+    gameweek: Int
+    finished: Boolean
+}
+
+type CaptainPoints {
+  gw: Int!,
+  finalCaptainGameweekScore: Int!
+  captainFixture: [Fixture]
+  viceCaptainFixture: [Fixture]
+  activeChip: String!
+  captainPlayerName: String!
+  viceCaptainPlayerName: String!
+  captainGameweekScore: Int!
+  viceCaptainGameweekScore: Int!
+  captainMinutes: Int!
+  viceCaptainMinutes: Int!
+}
+
+
+type TransferPointsGained {
+  freehit: [TransferPointDeltaRecord]
+  transfers: [TransferPointDeltaRecord]
+  wildcard: [TransferPointDeltaRecord]
+  bboost: [TransferPointDeltaRecord]
+  max: [TransferPointDeltaRecord]
+  min: [TransferPointDeltaRecord]
+  tripleCap: [TransferPointDeltaRecord]
+}
+
+type GameweekHistory {
+  event: Int!
+  points: Int!
+  totalPoints: Int!
+  rank: Int!
+  rankSort: Int!
+  overallRank: Int!
+  percentileRank: Int!
+  bank: Int!
+  value: Int!
+  eventTransfers: Int!
+  eventTransfersCost: Int!
+  pointsOnBench: Int!
 }
 
 type GameViewReport {

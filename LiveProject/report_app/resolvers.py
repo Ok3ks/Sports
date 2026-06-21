@@ -10,6 +10,7 @@ from ariadne import (
 
 
 # from .models import (Players, Gameweek_Scores)
+from src.season_league_analysis import story_2
 from src.db.db import get_gameweek_stats, get_player_gql
 from src.fpl_wrap import ParticipantReport
 from src.gameview import parse_stats
@@ -50,25 +51,20 @@ def resolve_players(*_, ids, gameweek):
 
 
 @functools.cache
-@query.field("participantReport")
-def resolve_participant(*_, entry_id, gameweek=None):
+@query.field("seasonParticipantReport")
+def resolve_participant(*_, season , entry_id):
     """Retrieve a participant's league analysis"""
 
-    if not gameweek:
-        gameweek = get_curr_event()[0]
+    gameweek = get_curr_event()[0]
 
     output = None
     if output:
         print("Obtained from cache")
         return json.loads(output)
     else:
-        participant = ParticipantReport(gw=gameweek, entry_id=entry_id)
-        participant.weekly_score_transformation()
-        participant.merge_league_weekly_transfer()
-        participant.add_auto_sub()
-        participant.prep_for_gql()
+        season_report  = ParticipantReport(gameweek, entry_id)
+        output = season_report.participant_stats()
 
-    output = participant.create_report(display=False)
     return output
 
 

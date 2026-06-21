@@ -7,8 +7,6 @@ from src.utils import (
 )
 import pytest
 
-
-
 @pytest.mark.parametrize("correct_gw", [10])
 @pytest.mark.parametrize("wrong_gw", [40])
 def test_check_gw(wrong_gw, correct_gw):

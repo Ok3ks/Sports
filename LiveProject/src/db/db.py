@@ -1,4 +1,5 @@
 # from utils import Gameweek, Player, League
+from functools import lru_cache
 import sqlite3
 from types import NoneType
 from sqlite3 import Error  # type: ignore
@@ -23,7 +24,8 @@ import math
 
 
 class Base(DeclarativeBase):
-    pass
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 
 class PlayerInfo(Base):
@@ -333,6 +335,20 @@ def get_player_stats_from_db_gql(id, gw, session=session):
         return c
 
 
+def get_player_season_points(id, session=session):
+    """ Player Season Points """
+      
+    #preferring raw statement to bypass sqlalchemy identity mapper
+    stmt = text(
+        f'SELECT total_points FROM Player_gameweek_score WHERE player_id = {id}'
+    )
+
+    with session() as session:
+        c = session.execute(stmt).all()
+        c = [i.total_points for i in c]
+        return c
+
+
 def get_player_stats_from_db(gw, session=session):
     stmt = text(
         f'SELECT player_id, total_points FROM Player_gameweek_score WHERE gameweek = {gw}'
@@ -382,20 +398,27 @@ def get_fixtures(session=session):
         c = session.execute(stmt).all()
     return c
 
+@lru_cache(maxsize=128)
+def get_fixture_gameweek(team:str, gw, session=session):
+    """Return fixture for a gameweek"""
+    stmt = text(f'SELECT * from "2025_2026_FIXTURES" where gameweek={gw} and (home="{team}" OR away="{team}")')
+    with session() as session:
+        c = session.execute(stmt).all()  # using .all() because a gameweek can contain more than one fixture
+    return c
+
 
 def check_minutes(id, gw, session=session):
     """Checks DB for captain's minutes"""
-    
-    try:
-        math.isnan(id)
-    except TypeError:
+
+    if not math.isnan(id):
+        stmt = text(
+            f'SELECT minutes FROM Player_gameweek_score WHERE player_id={id} and gameweek = {gw}'
+        )
+        with session() as session:
+            c = session.execute(stmt)
+        return c.fetchone()
+    else:
         return [0]
-    stmt = text(
-        f'SELECT minutes FROM Player_gameweek_score WHERE player_id={id} and gameweek = {gw}'
-    )
-    with session() as session:
-        c = session.execute(stmt)
-    return c.fetchone()
 
 
 ## Gameweek
@@ -452,14 +475,23 @@ def get_teams(session=sessionmaker(create_connection_engine())):
         return obj
 
 
-def get_player_info(player_id, half, session=sessionmaker(create_connection_engine())):
+def get_player_info(player_id, half:int|None =None, session=sessionmaker(create_connection_engine())):
+    
     with session() as session:
+        if half:
+            statement = (
+                select(PlayerInfo)
+                .where(PlayerInfo.player_id == player_id)
+                .where(PlayerInfo.half == half)
+            )
+            obj = session.execute(statement).one()
+            return obj
+        
         statement = (
             select(PlayerInfo)
             .where(PlayerInfo.player_id == player_id)
-            .where(PlayerInfo.half == half)
         )
-        obj = session.execute(statement).one()
+        obj = session.execute(statement).all()
         return obj
 
 

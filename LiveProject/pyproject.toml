@@ -8,7 +8,6 @@ authors = [
 requires-python = ">=3.12"
 dependencies = [
     "django (>=6.0.2,<7.0.0)",
-    "ariadne-django (>=0.3.0,<0.4.0)",
     "gunicorn (>=25.0.3,<26.0.0)",
     "numpy (>=2.4.2,<3.0.0)",
     "pandas (>=3.0.0,<4.0.0)",
@@ -19,11 +18,18 @@ dependencies = [
     "sqlalchemy (>=2.0.46,<3.0.0)",
     "google-cloud-storage (>=3.9.0,<4.0.0)",
     "psycopg2-binary (>=2.9.11,<3.0.0)",
+    "polars (>=1.41.2,<2.0.0)",
+    "ariadne-django (>=0.3.0,<0.4.0)",
 ]
 
 
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.9.6"
+pytest = "^8.3.4"
+marimo = "^0.21.1"
+
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
+requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [dependency-groups]
