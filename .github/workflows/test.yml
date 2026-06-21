@@ -1,6 +1,7 @@
 name : CI
 
 on :
+  workflow_dispatch : 
   push:
     paths:
       - 'LiveProject/**' 
@@ -29,7 +30,7 @@ jobs:
           pipx install poetry
           source env/bin/activate
           cd LiveProject
-          poetry install
+          poetry install --no-root
 
       - name : Run tests with pytest
         run: |
