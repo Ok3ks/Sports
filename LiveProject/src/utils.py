@@ -582,11 +582,12 @@ class League:
             yield get_participant_entry(participant["entry"], gw)
 
     def get_gw_transfers(self, gw, refresh=False, thread=None):
-        self.transfers = []
         if refresh or len(self.participants) == 0:
             self.obtain_league_participants()
+        
+        result = get_gw_transfers(self.entry_ids, gw)
+        self.transfers = result
 
-        self.transfers = get_gw_transfers(self.entry_ids, gw)
         return self.transfers
     
     def get_all_gw_transfers(self, refresh=False, thread=None):

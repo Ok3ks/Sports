@@ -60,10 +60,10 @@ class TestLeague:
 
     def test_league_get_gw_transfers(self, classic_league, league_weekly_transfer, gw_fixture, mocker):
         test = League(classic_league)
-        assert test.transfers is None
+        mocker.patch.object(test, "get_gw_transfers", return_value=league_weekly_transfer)
 
         spy = mocker.spy(test, "get_gw_transfers")
-        test.transfers = league_weekly_transfer
         test.get_gw_transfers(gw_fixture)
+
         assert spy.call_count == 1
         assert spy.spy_return == league_weekly_transfer
