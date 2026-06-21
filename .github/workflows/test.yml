@@ -24,7 +24,11 @@ jobs:
               
       - name : load dependencies
         id: init_env
-        run: python3 -m venv env | pipx install poetry | poetry install LiveProject/pyproject.toml
+        run: | 
+          python3 -m venv env 
+          pipx install poetry
+          source env/bin/activate
+          poetry install LiveProject/pyproject.toml
 
       - name : Run tests with pytest
         run: |
