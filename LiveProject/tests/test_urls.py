@@ -70,11 +70,12 @@ def test_gameweek_endpoint(gw_fixture):
         'defensive_contribution',
         'tackles',
         'recoveries',
-        'clearances_blocks_interceptions'
+        'clearances_blocks_interceptions',
+        "played"
     ]
 
     assert len(stats_keys.difference(set(stats_keys_prev))) == 0, (
-        f"Keys have changed {stats_keys.difference(set(stats_keys_prev))}"
+        f"Stats Keys have changed {stats_keys.difference(set(stats_keys_prev))}"
     )
 
     del stats_keys
@@ -445,7 +446,7 @@ def test_fpl_url_endpoint():
     ]
 
     assert len(set(event_keys_prev).difference(set(event_keys))) == 0, (
-        f"Keys have changed {set(event_keys_prev).difference(set(event_keys))}"
+        f"Event Keys have changed {set(event_keys_prev).difference(set(event_keys))}"
     )
 
     assert type(r["game_settings"]) is dict
@@ -525,6 +526,7 @@ def test_fpl_url_endpoint():
         "strength_defence_home",
         "strength_defence_away",
         "pulse_id",
+        "link_url"
     }
 
     diff = set(team_keys).difference(team_keys_prev)
@@ -557,7 +559,7 @@ def test_fpl_url_endpoint():
         "element_count",
     ]
     diff = set(element_types_keys).difference(element_types_keys_prev)
-    assert len(diff) == 0, f"Keys have changed{diff}"
+    assert len(diff) == 0, f"Element Types Keys have changed{diff}"
 
     elements_keys = r["elements"][0].keys()
     elements_keys_prev = [
@@ -673,11 +675,13 @@ def test_fpl_url_endpoint():
         'defensive_contribution',
         'clearances_blocks_interceptions',
         'scout_risks',
+        "scout_news_link",
+        "price_change_percent",
         'known_name'
     ]
 
     diff = set(elements_keys).difference(set(elements_keys_prev))
-    assert len(diff) == 0, f"Keys have changed {diff}"
+    assert len(diff) == 0, f"Elements Keys have changed {diff}"
 
     to_json(r, f"{MOCK_DIR}/endpoints/fpl_url_endpoint.json")
 

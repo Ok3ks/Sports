@@ -28,7 +28,8 @@ jobs:
           python3 -m venv env 
           pipx install poetry
           source env/bin/activate
-          poetry install LiveProject/pyproject.toml
+          cd LiveProject
+          poetry install
 
       - name : Run tests with pytest
         run: |

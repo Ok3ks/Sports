@@ -1,8 +1,9 @@
 from functools import lru_cache
 import operator
+
 import pandas as pd
-from src.utils import get_basic_stats, LOGGER, s, get_participant_entry, get_gw_transfers
-from src.urls import LEAGUE_URL
+import json
+from src.utils import get_basic_stats, League
 from src.db.db import (
     get_player_stats_from_db,
     check_minutes,
@@ -14,111 +15,6 @@ if "line_profiler" not in dir() and "profile" not in dir():
 
     def profile(func):
         return func
-
-
-class League:
-    def __init__(self, league_id):
-        self.league_id = league_id
-        self.participants = []
-        self.res = None
-        self.league_name = ""
-        self.PAGE_COUNT = 1
-        self.transfers = None
-
-    def obtain_league_participants(self, refresh=False):
-        """This function uses the league url as an endpoint to query for participants of a league at a certain date.
-        Should be used to update participants table in DB"""
-
-        if refresh or len(self.participants) == 0:
-            self.has_next = True
-            while self.has_next:
-                r = s.get(LEAGUE_URL.format(self.league_id, self.PAGE_COUNT))
-                if r.status_code == 200:
-                    # assert r.status_code == 200, "error connecting to the endpoint"
-                    obj = r.json()
-                    LOGGER.info(r.status_code)
-                    LOGGER.info(r.headers)
-                    del r
-
-                    self.league_name = obj["league"]["name"]
-
-                    self.participants.extend(obj["standings"]["results"])
-                    self.has_next = obj["standings"]["has_next"]
-                    self.PAGE_COUNT += 1
-                    LOGGER.info(
-                        "All participants on page {} have been extracted".format(
-                            self.PAGE_COUNT
-                        )
-                    )
-                else:
-                    LOGGER.error(r.text)
-                    # raise EnvironmentError(msg=r.status_code)
-                self.league_name = obj["league"]["name"]
-        self.entry_ids = [participant["entry"] for participant in self.participants]
-        return self.participants
-
-    def get_league_count(self):
-        if len(self.participants) > 1:
-            return len(self.participants)
-        else:
-            LOGGER.info("Obtain league participants first before getting league count")
-
-    def get_participant_name(self, refresh=False) -> dict:
-        """Creates participant id to name hash table"""
-        if refresh or len(self.participants) == 0:
-            self.obtain_league_participants()
-        self.participant_name = {
-            str(participant["entry"]): participant["entry_name"]
-            for participant in self.participants
-        }
-        self.id_participant = (
-            [
-                participant["entry"],
-                participant["entry_name"],
-                participant["player_name"],
-            ]
-            for participant in self.participants
-        )
-        return self.participant_name
-
-    def get_league_participant_mp(self, PAGE_COUNT):
-        """MultiProcessing version of get league participants"""
-        out = []
-
-        r = s.get(LEAGUE_URL.format(self.league_id, PAGE_COUNT))
-        obj = r.json()
-        if r.status_code == 200:
-            out.extend(obj["standings"]["results"])
-
-            LOGGER.info("page {} done".format(PAGE_COUNT))
-            return (
-                [
-                    participant["entry"],
-                    participant["entry_name"],
-                    participant["player_name"],
-                ]
-                for participant in out
-            )
-
-    def batch_participant_entry(self, batch):
-        for participant in batch:
-            yield get_participant_entry(participant["entry"], self.gw)
-
-    def get_all_participant_entries(self, gw, refresh=False, thread=None):
-        self.gw = gw
-
-        if refresh or len(self.participants) == 0:
-            self.obtain_league_participants()
-        # optimization 2
-        for participant in self.participants:
-            yield get_participant_entry(participant["entry"], gw)
-
-    def get_gw_transfers(self, gw, refresh=False, thread=None):
-        if not self.transfers:
-            if refresh or len(self.participants) == 0:
-                self.obtain_league_participants()
-                self.transfers = get_gw_transfers(self.entry_ids, gw)
-        return self.transfers
 
 
 class LeagueWeeklyReport(League):
@@ -141,10 +37,9 @@ class LeagueWeeklyReport(League):
     @profile
     def weekly_score_transformation(self):
         """Transforms weekly score into Dataframe, and returns weekly dataframe"""
-        columns = ["gw", "entry_id", "points_on_bench", "total_points", "event_transfers_cost", "vice_captain", "captain"]
-        self.one_df[columns] = self.one_df[columns].astype("Int64")
-        self.one_df = self.one_df.fillna(None)
+
         self.o_df = self.one_df[~self.one_df["players"].isna()]
+
 
         # optimization 4 - loaded all player rows into memory at once
         self.player_points = get_player_stats_from_db(self.gw)
@@ -248,7 +143,7 @@ class LeagueWeeklyReport(League):
             all_players = all_players.explode().value_counts()
 
             return {"differential": {"players": all_players.iloc[-3:].index.to_list()}}
-          
+        
         def get_league_name():
             return {"league_name": self.league_name}
 
@@ -324,6 +219,7 @@ class LeagueWeeklyReport(League):
                 "league_average": league_average,
             }
 
+        #
         @profile
         def out_transfer_stats():
             """ """
