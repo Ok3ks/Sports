@@ -10,7 +10,6 @@ type Query {
   gameviewReport: [PlayerGameweekScore!]!
 
   leagueWeeklyReport(leagueId: Int!, gameweek:Int!): LeagueWeeklyReport!
-  participantReport(entryId:Int!, gameweek:Int): ParticipantReport!
   seasonParticipantReport(season: String!, entryId: Int!): SeasonParticipantReport!
 
   gameViewReport(Gameweek:[Int!]): GameViewReport!
@@ -70,28 +69,6 @@ type gameviewReport {
     goals_scored: [Int!]
     total_points: [Int!]
     assists: [Int!]
-
-}
-type ParticipantReport{
-  autoSubIn: [String]
-  autoSubOut: [String]
-  gw: [Int]
-  entryId: [Int]
-  activeChip: [String] 
-  pointsOnBench: [Int]
-  totalPoints: [Int]
-  eventTransfersCost: [Int]
-  players: [String]
-  bench: [String]  
-
-  viceCaptain: [Player]
-  captain: [Player]
-  highestScoringPlayer: [Player]
-
-  pointsBreakdown: [[Int]]
-  captainPoints: [Int]
-  viceCaptainPoints: [Int]
-  highestScoringPlayerPoints: [Int]
 
 }
 
