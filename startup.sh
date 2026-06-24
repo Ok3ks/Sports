@@ -6,6 +6,7 @@ cd LiveProject
 
 python src/db/update_player_information.py -ha 1
 python src/db/update_player_information.py -ha 2
+python src/db/update_season_fixture.py
 
 for i in {1..38}
 do

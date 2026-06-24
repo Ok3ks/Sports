@@ -1,5 +1,6 @@
 python src/db/update_player_information.py -ha 1
 python src/db/update_player_information.py -ha 2
+python src/db/update_season_fixture.py
 
 python src/db/update_gameweek_score.py -g 1
 python src/db/update_gameweek_score.py -g 2
