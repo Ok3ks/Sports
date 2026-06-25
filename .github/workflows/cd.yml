@@ -12,7 +12,7 @@ env:
   PROJECT_NAME: fpl-analysis-tool
   ARTIFACT_REPO_NAME: fpl
   IMAGE_NAME: fpl-backend
-  REVISION: 25_Master
+  REVISION: 38_Master
   REGION: europe-west2
   SERVICE_NAME: redeployed-backend
 
@@ -54,7 +54,7 @@ jobs:
                 "https://wrappedfrontend.firebaseapp.com",
                 "https://fplwrapped.com"
               ],
-              "method": ["GET", "HEAD", "PUT", "POST", "DELETE"],
+              "method": ["GET", "HEAD", "POST"],
               "responseHeader": ["Content-Type", "Authorization"],
               "maxAgeSeconds": 3600
             }
