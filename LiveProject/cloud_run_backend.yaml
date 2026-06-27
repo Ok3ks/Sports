@@ -42,7 +42,7 @@ spec:
       containers:
       - name: fpl-backend-1
         image: >-
-          europe-west2-docker.pkg.dev/fpl-analysis-tool/fpl/fpl-backend:25_Master
+          europe-west2-docker.pkg.dev/fpl-analysis-tool/fpl/fpl-backend:38_Master
         command:
         - gunicorn
         args:
