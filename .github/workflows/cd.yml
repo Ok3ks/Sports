@@ -41,8 +41,9 @@ jobs:
           which python
           python -m venv venv
           source venv/bin/activate
-          pip install -r LiveProject/requirements.txt
-          which python
+          pipx install poetry
+          cd LiveProject
+          poetry install --no-root
 
       - name: Create cors.json
         run: |
