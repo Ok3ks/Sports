@@ -23,7 +23,7 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["*"] if os.getenv("DEVELOP", "True")  else ["fplwrapped.com", "app.fplwrapped.com"]
 
 # Application definition
 
@@ -61,10 +61,8 @@ CORS_ALLOW_HEADERS = [
     # ...any other headers you want to allow...
 ]
 CORS_ALLOW_METHODS = (
-    "DELETE",
     "GET",
     "OPTIONS",
-    "PATCH",
     "POST",
     "PUT",
 )
