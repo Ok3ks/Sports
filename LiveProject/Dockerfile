@@ -26,12 +26,13 @@ ARG REDISPORT
 FROM base
 
 WORKDIR /sports
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+COPY pyproject.toml .
+RUN pipx install poetry
 ENV PYTHONPATH=:$(pwd)
 
 # copy payload code only
 WORKDIR /sports/LiveProject
+RUN poetry install --no-root
 
 COPY src/ ./src/ 
 COPY LiveProject/ ./LiveProject/
