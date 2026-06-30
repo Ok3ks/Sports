@@ -28,11 +28,11 @@ FROM base
 WORKDIR /sports
 COPY pyproject.toml .
 RUN pip install poetry
+RUN poetry install --no-root
 ENV PYTHONPATH=:$(pwd)
 
 # copy payload code only
 WORKDIR /sports/LiveProject
-RUN poetry install --no-root
 
 COPY src/ ./src/ 
 COPY LiveProject/ ./LiveProject/
