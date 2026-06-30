@@ -7,6 +7,7 @@ WORKDIR /sports/app
 # upgrade pip to the latest version
 RUN apt-get update \
     && apt-get install -y build-essential libstdc++6 libgdal-dev gdal-bin \
+    && apt install pipx \
     && rm -rf /var/lib/apt/lists/*
 
 # Set environment variables for GDAL
