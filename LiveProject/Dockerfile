@@ -27,8 +27,7 @@ FROM base
 
 WORKDIR /sports
 COPY pyproject.toml .
-RUN apt install pipx
-RUN pipx install poetry
+RUN pip install poetry
 ENV PYTHONPATH=:$(pwd)
 
 # copy payload code only
