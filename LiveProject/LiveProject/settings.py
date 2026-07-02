@@ -46,6 +46,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "report_app.middleware.JWTAuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -56,6 +57,7 @@ CORS_ALLOW_HEADERS = [
     "authorization",
     "authorizationsource",
     "content-type",
+    "x-api-key",
     "Access-Control-Allow-Origin",
     "Access-Control-Allow-Methods",
     # ...any other headers you want to allow...
@@ -151,3 +153,7 @@ STATIC_ROOT = "./"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# JWT Configuration
+JWT_ALGORITHM = "HS256"
+JWT_EXPIRATION_MINUTES = 15
