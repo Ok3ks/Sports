@@ -18,13 +18,11 @@ Including another URLconf
 from ariadne_django.views import GraphQLView
 from django.urls import path
 
-# from report_app import views
 from report_app.resolvers import schema
+from report_app.views import token_view
 
 
-urlpatterns = [  # path('admin/', admin.site.urls),
-    # path("report/<int:id>", views.reportView.as_view(), name="report"),
-    # path("", views.display),
-    # "",
+urlpatterns = [
     path("graphql/", GraphQLView.as_view(schema=schema), name="graphql"),
+    path("api/token/", token_view, name="token"),
 ]
