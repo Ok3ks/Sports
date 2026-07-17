@@ -6,7 +6,7 @@ import pandas as pd
 import json
 import numpy as np
 from google.cloud import storage
-from src.db import update_season_fixture
+from src.db.db import get_fixtures
 from functools import lru_cache
 
 
@@ -704,31 +704,23 @@ class Player:
 
 @lru_cache(maxsize=10)
 def get_league_data(league_id: int):
-    try:
-        f_df = pl.read_csv("test_data.csv")
-    except :
-        gw = get_curr_event()[0]
-        df = []
+    gw = get_curr_event()[0]
+    df = []
 
-        league = League(league_id=league_id)
+    league = League(league_id=league_id)
 
-        for gameweek in range(1, gw, 1):
-            f = league.get_all_participant_entries(gameweek)
-            temp_df = pl.DataFrame(f)
-            df.append(temp_df)
+    for gameweek in range(1, gw, 1):
+        f = league.get_all_participant_entries(gameweek)
+        temp_df = pl.DataFrame(f)
+        df.append(temp_df)
 
-        f_df = pl.concat(df, how = "vertical")
-        f_df.write_csv("test_data.csv")
+    f_df = pl.concat(df, how = "vertical")
     return f_df
 
 def get_fixture_data():
-    """ Get fixture data """
-    try:
-        f_df = pl.read_csv("test_fixture_data.csv")
-    except :
-        f_df = update_season_fixture()
-        f_df.to_csv("test_fixture_data.csv")
-
+    """ Get fixture data from db """
+    data = get_fixtures()
+    f_df = pl.DataFrame(data)
     return f_df
 
 def get_transfer_data(league_id: int):
@@ -800,8 +792,6 @@ def bench_transform(df: pl.DataFrame):
         ).unnest("bench")
 
     b_df = df.filter(pl.col("active_chip") != "bboost")
-
-    # b_df = enrich_player_cols(b_df, bench_cols)
 
 
     return b_df

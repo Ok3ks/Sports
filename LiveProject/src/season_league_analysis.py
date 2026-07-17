@@ -1,7 +1,6 @@
 from dataclasses import dataclass, asdict
-import requests
 from src.urls import TRANSFER_URL
-from src.utils import League, Player, bench_transform, enrich_player_cols, expand_date, get_curr_event, get_fixture_data, get_league_data, get_transfer_data, player_transform
+from src.utils import bench_transform, enrich_player_cols, expand_date, get_curr_event, get_fixture_data, get_league_data, get_transfer_data, player_transform
 import polars as pl
 from functools import lru_cache
 import pprint

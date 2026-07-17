@@ -12,7 +12,7 @@ env:
   PROJECT_NAME: fpl-analysis-tool
   ARTIFACT_REPO_NAME: fpl
   IMAGE_NAME: fpl-backend
-  REVISION: new-test
+  REVISION: poetry-dep
   REGION: europe-west2
   SERVICE_NAME: redeployed-backend
 
