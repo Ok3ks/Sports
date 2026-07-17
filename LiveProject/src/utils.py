@@ -1,6 +1,7 @@
 from dataclasses import asdict, dataclass
 import requests
-from urllib3.util import Retry
+from httpx_retries import Retry, RetryTransport
+import httpx
 from requests.adapters import HTTPAdapter
 import pandas as pd
 import json
@@ -22,13 +23,8 @@ import polars as pl
 
 LOGGER = logging.getLogger(__name__)
 
-
-class TLSAdapter(HTTPAdapter):
-    def init_poolmanager(self, *args, **kwargs):
-        context = ssl.create_default_context()
-        context.minimum_version = ssl.TLSVersion.TLSv1_2  # Enforcing TLSv1.2 or higher
-        kwargs['ssl_context'] = context
-        return super().init_poolmanager(*args, **kwargs)
+context = ssl.create_default_context()
+context.minimum_version = ssl.TLSVersion.TLSv1_2
 
 s = requests.Session()
 retries = Retry(
@@ -37,7 +33,9 @@ retries = Retry(
     status_forcelist=[502, 503, 504],
     allowed_methods={"GET"},
 )
-s.mount("https://", TLSAdapter(max_retries=3))
+transport = RetryTransport(retry=retries)
+async_client = httpx.AsyncClient(verify=context, transport=transport)
+
 
 
 def to_json(x: dict, fp):  ## use Path instead
@@ -99,7 +97,7 @@ class GameweekError(Exception):
         return super().__init__(message)
 
 
-def get_gw_transfers(alist: List[int], gw: Union[int, List[int], None] = None, all=False) -> dict:
+async def get_gw_transfers(alist: List[int], gw: Union[int, List[int], None] = None, all=False) -> dict:
     """Input is a list of entry_id. Gw is the gameweek number.
     'all' toggles between extracting all gameweeks or not"""
 
@@ -117,7 +115,7 @@ def get_gw_transfers(alist: List[int], gw: Union[int, List[int], None] = None, a
         return row
 
     for entry_id in alist:
-        r = s.get(TRANSFER_URL.format(entry_id))
+        r = await async_client.get(TRANSFER_URL.format(entry_id))
         if r.status_code == 200:
             obj = r.json()  # provides all transfers
             # updates by gameweek
@@ -137,13 +135,13 @@ def get_gw_transfers(alist: List[int], gw: Union[int, List[int], None] = None, a
             )
     return row
 
-def get_all_gw_transfers(alist: List[int]):
+async def get_all_gw_transfers(alist: List[int]):
     """Obtains all event transfers for a list of entry Ids"""
 
     row: list = []
 
     for entry_id in alist:
-        r = s.get(TRANSFER_URL.format(entry_id))
+        r = await async_client.get(TRANSFER_URL.format(entry_id))
         if r.status_code == 200:
             obj = r.json()  # provides all transfers
             row.extend(obj)
@@ -162,7 +160,7 @@ def bucket_client(bucket_name="wrapped_participants_entry"):
     return bucket
 
 
-def get_participant_entry(entry_id: int, gw: int) -> dict:
+async def get_participant_entry(entry_id: int, gw: int) -> dict:
     """Calls an Endpoint to retrieve a participants entry"""
     valid, gw = check_gw(gw)
     team_list: dict[str, Any] = {
@@ -182,7 +180,7 @@ def get_participant_entry(entry_id: int, gw: int) -> dict:
 
     if valid:
         # optimization, imported get directly from requests
-        r = s.get(FPL_PLAYER.format(entry_id, gw))
+        r = await async_client.get(FPL_PLAYER.format(entry_id, gw))
 
         # optimization - assigning size of dictionary before hand to prevent resizing of dictionaries
 
@@ -252,7 +250,7 @@ def get_curr_event() -> list:
             curr_event.append((event["finished"], event["data_checked"]))
     return curr_event
 
-def get_gw_transfers_scrap(alist: List[int], gw: Union[int, List[int]], all=False) -> dict:
+async def get_gw_transfers_scrap(alist: List[int], gw: Union[int, List[int]], all=False) -> dict:
     """Input is a list of entry_id. Gw is the gameweek number.
     'all' toggles between extracting all gameweeks or not"""
 
@@ -264,7 +262,7 @@ def get_gw_transfers_scrap(alist: List[int], gw: Union[int, List[int]], all=Fals
     if valid:
         for entry_id in alist:
             obj_row = {}
-            r = s.get(TRANSFER_URL.format(entry_id))
+            r = await async_client.get(TRANSFER_URL.format(entry_id))
             if r.status_code == 200:
                 obj = r.json()
                 # updates by gameweek
@@ -292,9 +290,9 @@ class Gameweek:
     def __init__(self, gw=1):
         self.gw = gw
 
-    def get_payload(self):
-        temp = s.get(GW_URL.format(self.gw))
-        temp_2 = s.get(FPL_URL)
+    async def get_payload(self):
+        temp = await async_client.get(GW_URL.format(self.gw))
+        temp_2 = await async_client.get(FPL_URL)
 
         self.json = temp.json()
         self.gw_json = temp_2.json()
@@ -381,16 +379,16 @@ class Participant:
         self.gw = gw
         self.history = None
 
-    def get_history(self) -> dict:
+    async def get_history(self) -> dict:
         if not self.history: 
-            r = s.get(HISTORY_URL.format(self.participant))
+            r = await async_client.get(HISTORY_URL.format(self.participant))
             LOGGER.info(r.status_code)
             if r.status_code == 200:
                 obj = r.json()
                 self.history = obj
         return self.history
 
-    def get_gw_transfers(self, gw: Union[int, List[int]], all=False) -> dict:
+    async def get_gw_transfers(self, gw: Union[int, List[int]], all=False) -> dict:
         """Input is a list of entry_id. Gw is the gameweek number.
         'all' toggles between extracting all gameweeks or not"""
 
@@ -401,7 +399,7 @@ class Participant:
             valid, gw = False, None
 
         if all or valid:
-            r = s.get(TRANSFER_URL.format(self.participant))
+            r = await async_client.get(TRANSFER_URL.format(self.participant))
             LOGGER.info(r.status_code)
             if r.status_code == 200:
                 obj = r.json()
@@ -491,14 +489,14 @@ class League:
         self.PAGE_COUNT = 1
         self.transfers = None
 
-    def obtain_league_participants(self, refresh=False):
+    async def obtain_league_participants(self, refresh=False):
         """This function uses the league url as an endpoint to query for participants of a league at a certain date.
         Should be used to update participants table in DB"""
 
         if refresh or len(self.participants) == 0:
             self.has_next = True
             while self.has_next:
-                r = s.get(LEAGUE_URL.format(self.league_id, self.PAGE_COUNT))
+                r = await async_client.get(LEAGUE_URL.format(self.league_id, self.PAGE_COUNT))
                 if r.status_code == 200:
                     # assert r.status_code == 200, "error connecting to the endpoint"
                     obj = r.json()
@@ -548,11 +546,11 @@ class League:
         )
         return self.participant_name
 
-    def get_league_participant_mp(self, PAGE_COUNT):
+    async def get_league_participant_mp(self, PAGE_COUNT):
         """MultiProcessing version of get league participants"""
         out = []
 
-        r = s.get(LEAGUE_URL.format(self.league_id, PAGE_COUNT))
+        r = await async_client.get(LEAGUE_URL.format(self.league_id, PAGE_COUNT))
         obj = r.json()
         if r.status_code == 200:
             out.extend(obj["standings"]["results"])
