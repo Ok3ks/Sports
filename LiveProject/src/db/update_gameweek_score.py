@@ -13,6 +13,7 @@ import logging
 
 LOGGER = logging.getLogger(__name__)
 
+
 def update_db_gameweek_score(conn, gw):
     """This function retrieves current information of players
     from the API"""
@@ -36,6 +37,7 @@ def update_db_gameweek_score(conn, gw):
         # Combining all gameweeks into one database table,
         df.to_sql("Player_gameweek_score", conn, if_exists="append", method="multi")
         LOGGER.info("Data insert successful")
+
 
 if __name__ == "__main__":
     import argparse

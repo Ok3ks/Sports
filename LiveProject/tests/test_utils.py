@@ -7,6 +7,7 @@ from src.utils import (
 )
 import pytest
 
+
 @pytest.mark.parametrize("correct_gw", [10])
 @pytest.mark.parametrize("wrong_gw", [40])
 def test_check_gw(wrong_gw, correct_gw):
@@ -60,6 +61,7 @@ def test_get_gw_transfers_all(participants):
 
 def test_get_participant_entry(participant, gw_fixture, mocker):
     from src import utils
+
     spy = mocker.spy(utils, "get_participant_entry")
 
     utils.get_participant_entry(participant, gw_fixture)
@@ -76,12 +78,13 @@ def test_get_participant_entry(participant, gw_fixture, mocker):
         "players",
         "bench",
         "vice_captain",
-        "captain"
+        "captain",
     ]
 
 
 def test_get_curr_event(mocker):
     from src import utils
+
     spy = mocker.spy(utils, "get_curr_event")
     utils.get_curr_event()
 

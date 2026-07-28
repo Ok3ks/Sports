@@ -37,9 +37,8 @@ def create_gameweek_entries_table(conn="", table_name=""):
     return conn
 
 
+bucket = bucket_client(bucket_name="2025_2026_participants_entry")
 
-
-bucket=bucket_client(bucket_name="2025_2026_participants_entry")
 
 def participant_weekly_entry(entry_id: list[int] | int, to_json=False, upload=True):
     """Downloads weekly entry for a list of entry Id"""
@@ -50,12 +49,9 @@ def participant_weekly_entry(entry_id: list[int] | int, to_json=False, upload=Tr
         for n in range(0, len(entry_id), 100):
             # optimum number of spawned threads to 100
             req = [
-                gevent.spawn(
-                    get_participant_entry,
-                    gw=args.gameweek_id,
-                    entry_id=i) 
-                    for i in entry_id[START:START+100]
-                ]
+                gevent.spawn(get_participant_entry, gw=args.gameweek_id, entry_id=i)
+                for i in entry_id[START : START + 100]
+            ]
             res = [response.value for response in gevent.iwait(req)]
             filename = f"{entry_id[0] + n}.pqt"
             destination_path = os.path.join(new_directory, filename)
@@ -79,18 +75,18 @@ def participant_weekly_entry(entry_id: list[int] | int, to_json=False, upload=Tr
             # chaining tuples obtained from spawned processes
     else:
         import json
+
         res = get_participant_entry(gw=args.gameweek_id, entry_id=entry_id)
         filename = f"{entry_id}.pqt"
-        with open(filename, 'w') as outs:
+        with open(filename, "w") as outs:
             json.dump(res, outs)
         print(f"{filename} saved")
-    
-
 
 
 if __name__ == "__main__":
     import argparse
     import os
+
     parser = argparse.ArgumentParser("Writing participant entries into DB")
     parser.add_argument("-g", "--gameweek_id", type=int, help="Gameweek entry")
     parser.add_argument("-t", "--processes", type=int, help="Number of processes")
@@ -101,5 +97,3 @@ if __name__ == "__main__":
     import time
 
     participant_weekly_entry(args.start, to_json=True, upload=False)
-
-

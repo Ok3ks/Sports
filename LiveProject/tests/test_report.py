@@ -1,7 +1,7 @@
 from src.report import League
 
-class TestLeague:
 
+class TestLeague:
     def test_init(self, classic_league):
         test = League(classic_league)
         assert test.league_id == 1491605
@@ -30,9 +30,9 @@ class TestLeague:
         )
 
         diff = keys.difference(test.participants[0].keys())
-        assert (
-            keys.intersection(test.participants[0].keys()) == keys
-        ), f"Vital keys missing, Add keys -  {diff}"
+        assert keys.intersection(test.participants[0].keys()) == keys, (
+            f"Vital keys missing, Add keys -  {diff}"
+        )
 
         assert len(test.participants) == len(obj)
         assert type(test.participants) is list
@@ -40,9 +40,7 @@ class TestLeague:
         assert test.entry_ids is not None
         assert type(test.entry_ids) is list
 
-    def test_get_league_count(
-        self, classic_league, league_fill_fixture
-    ):
+    def test_get_league_count(self, classic_league, league_fill_fixture):
         test = League(classic_league)
         test.participants = league_fill_fixture
 
@@ -58,9 +56,13 @@ class TestLeague:
 
         assert type(list(test.participant_name.values())[0]) is str
 
-    def test_league_get_gw_transfers(self, classic_league, league_weekly_transfer, gw_fixture, mocker):
+    def test_league_get_gw_transfers(
+        self, classic_league, league_weekly_transfer, gw_fixture, mocker
+    ):
         test = League(classic_league)
-        mocker.patch.object(test, "get_gw_transfers", return_value=league_weekly_transfer)
+        mocker.patch.object(
+            test, "get_gw_transfers", return_value=league_weekly_transfer
+        )
 
         spy = mocker.spy(test, "get_gw_transfers")
         test.get_gw_transfers(gw_fixture)

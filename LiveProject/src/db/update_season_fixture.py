@@ -75,9 +75,7 @@ def update_season_fixture(engine=None, table_name="2025_2026_FIXTURES"):
     team_id_to_name = {item["id"]: item["name"] for item in home["teams"]}
 
     fixture_df["home"] = fixture_df["home"].map(lambda x: team_id_to_name[x])
-    fixture_df["away"] = fixture_df["away"].map(
-        lambda x: team_id_to_name[x]
-    )
+    fixture_df["away"] = fixture_df["away"].map(lambda x: team_id_to_name[x])
     if engine:
         fixture_df.to_sql(
             table_name, con=engine, if_exists="replace", chunksize=100, index=False

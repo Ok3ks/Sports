@@ -67,11 +67,11 @@ def test_gameweek_endpoint(gw_fixture):
         "total_points",
         "in_dreamteam",
         # 25-26
-        'defensive_contribution',
-        'tackles',
-        'recoveries',
-        'clearances_blocks_interceptions',
-        "played"
+        "defensive_contribution",
+        "tackles",
+        "recoveries",
+        "clearances_blocks_interceptions",
+        "played",
     ]
 
     assert len(stats_keys.difference(set(stats_keys_prev))) == 0, (
@@ -526,7 +526,7 @@ def test_fpl_url_endpoint():
         "strength_defence_home",
         "strength_defence_away",
         "pulse_id",
-        "link_url"
+        "link_url",
     }
 
     diff = set(team_keys).difference(team_keys_prev)
@@ -667,17 +667,17 @@ def test_fpl_url_endpoint():
         "cost_change_event",
         "code",
         "region",
-        #25-26
-        'defensive_contribution_per_90',
-        'birth_date',
-        'tackles',
-        'recoveries',
-        'defensive_contribution',
-        'clearances_blocks_interceptions',
-        'scout_risks',
+        # 25-26
+        "defensive_contribution_per_90",
+        "birth_date",
+        "tackles",
+        "recoveries",
+        "defensive_contribution",
+        "clearances_blocks_interceptions",
+        "scout_risks",
         "scout_news_link",
         "price_change_percent",
-        'known_name'
+        "known_name",
     ]
 
     diff = set(elements_keys).difference(set(elements_keys_prev))

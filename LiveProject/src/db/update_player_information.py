@@ -41,9 +41,7 @@ def update_db_player_info(engine, table_name, half=1):
     ]
 
     print(f"{len(data)} is ready to be added to database table")
-    data.to_sql(
-        f"{table_name}", engine, if_exists="append", method="multi", index=True
-    )
+    data.to_sql(f"{table_name}", engine, if_exists="append", method="multi", index=True)
     print(f"success adding {len(data)}")
 
 
@@ -55,12 +53,14 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "-t", "--table_name", type=str, help="Table name",
-        default="EPL_2025_PLAYER_INFO"
+        "-t",
+        "--table_name",
+        type=str,
+        help="Table name",
+        default="EPL_2025_PLAYER_INFO",
     )
     parser.add_argument(
-        "-db", "--db_name", type=str, help="Database name",
-        default="fpl"
+        "-db", "--db_name", type=str, help="Database name", default="fpl"
     )
     parser.add_argument(
         "-ha",

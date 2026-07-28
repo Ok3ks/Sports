@@ -36,7 +36,6 @@ def resolve_season_stats(*_, gameweek):
     return parse_stats(filter={"gameweek": gameweek})
 
 
-
 @query.field("player")
 def resolve_player(*_, id, gameweek):
     """Retrieve a Player's information by ID or return None if not found."""
@@ -51,7 +50,7 @@ def resolve_players(*_, ids, gameweek):
 
 @functools.cache
 @query.field("seasonParticipantReport")
-def resolve_participant(*_, season , entry_id):
+def resolve_participant(*_, season, entry_id):
     """Retrieve a participant's league analysis"""
 
     gameweek = get_curr_event()[0]
@@ -61,7 +60,7 @@ def resolve_participant(*_, season , entry_id):
         print("Obtained from cache")
         return json.loads(output)
     else:
-        season_report  = ParticipantReport(gameweek, entry_id)
+        season_report = ParticipantReport(gameweek, entry_id)
         output = season_report.participant_stats()
 
     return output
@@ -77,7 +76,7 @@ def resolve_league_gameweek_report(*_, league_id, gameweek):
     report.merge_league_weekly_transfer()
     report.add_auto_sub()
     report.captain_minutes()
-    output = report.create_report(display=False)  # replace this with caching?     
+    output = report.create_report(display=False)  # replace this with caching?
 
     print(output)
     print("Recomputed")

@@ -8,7 +8,10 @@ import pandas as pd
 
 LOGGER = logging.getLogger(__name__)
 
-def league_participant_weekly_entry( league_id : int, gameweek: list[int] | int | None = None, to_json=False, upload=True):
+
+def league_participant_weekly_entry(
+    league_id: int, gameweek: list[int] | int | None = None, to_json=False, upload=True
+):
     """Downloads weekly entry for a list of entry Id"""
 
     new_directory = f"data/league/{args.league_id}"
@@ -21,8 +24,8 @@ def league_participant_weekly_entry( league_id : int, gameweek: list[int] | int 
         gameweek = [i for i in range(1, 39)]
 
     if type(gameweek) is list:
-        for gw in gameweek: 
-            res = league.get_all_participant_entries(gw),
+        for gw in gameweek:
+            res = (league.get_all_participant_entries(gw),)
             res = [*res]
             filename = f"{gw}_entries.pqt"
             destination_path = os.path.join(new_directory, filename)
@@ -32,10 +35,10 @@ def league_participant_weekly_entry( league_id : int, gameweek: list[int] | int 
                 df.to_parquet(destination_path, compression="brotli")
                 print(f"{filename} saved")
 
-            if gw % (len(gameweek)//4) == 0:
+            if gw % (len(gameweek) // 4) == 0:
                 time.sleep(5)
 
-    else :
+    else:
         res = league.get_all_participant_entries(gw=gameweek)
         if to_json:
             res = [*res]
@@ -58,8 +61,13 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.gameweek_id:
-        league_participant_weekly_entry(gameweek= args.gameweek_id, league_id= args.league_id, to_json=True, upload=False)
+        league_participant_weekly_entry(
+            gameweek=args.gameweek_id,
+            league_id=args.league_id,
+            to_json=True,
+            upload=False,
+        )
     else:
-        league_participant_weekly_entry(league_id= args.league_id, to_json=True, upload=False)
-
-
+        league_participant_weekly_entry(
+            league_id=args.league_id, to_json=True, upload=False
+        )

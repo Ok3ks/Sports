@@ -40,7 +40,6 @@ class LeagueWeeklyReport(League):
 
         self.o_df = self.one_df[~self.one_df["players"].isna()]
 
-
         # optimization 4 - loaded all player rows into memory at once
         self.player_points = get_player_stats_from_db(self.gw)
         # del player_set
@@ -53,8 +52,8 @@ class LeagueWeeklyReport(League):
 
         self.o_df["captain_points"] = self.o_df["captain"].map(
             lambda x: self.player_points[int(x)] * 2 if math.isnan(x) != True else 0
-            )
-        
+        )
+
         self.o_df["vice_captain_points"] = self.o_df["vice_captain"].map(
             lambda x: self.player_points[x] if math.isnan(x) != True else 0
         )
@@ -102,7 +101,6 @@ class LeagueWeeklyReport(League):
     @profile
     def add_auto_sub(self):
         if "auto_sub_in" in self.f.columns:
-
             # optimization 1 - switching dictionaries to tuples
             self.f["auto_sub_in_player"] = self.f["auto_sub_in"].map(
                 lambda x: [y for y in x.split(",") if len(x) > 3]
@@ -136,14 +134,13 @@ class LeagueWeeklyReport(League):
             """Find the league differential. Calculating league EO"""
 
             all_players = self.o_df["players"].map(
-                lambda x: [
-                    int(y) for y in x.split(",") if len(y.strip()) >= 1
-                ])
-            
+                lambda x: [int(y) for y in x.split(",") if len(y.strip()) >= 1]
+            )
+
             all_players = all_players.explode().value_counts()
 
             return {"differential": {"players": all_players.iloc[-3:].index.to_list()}}
-        
+
         def get_league_name():
             return {"league_name": self.league_name}
 
@@ -282,19 +279,22 @@ class LeagueWeeklyReport(League):
 
                 if "element_in" in self.f.keys() and "element_out" in self.f.keys():
                     self.no_chips = self.no_chips.sort_values(
-                        by="delta", ascending=False)
+                        by="delta", ascending=False
+                    )
                     for i in range(1, n):
                         player_in = self.no_chips.iloc[-i, :]["element_in"]
                         player_out = self.no_chips.iloc[-i, :]["element_out"]
                         points_delta = int(self.no_chips.iloc[-i, :]["delta"])
                         participant_id = str(self.no_chips.iloc[-i, :]["entry_id"])
-                        event_transfer_cost = self.no_chips.iloc[-i, :]['event_transfers_cost']
+                        event_transfer_cost = self.no_chips.iloc[-i, :][
+                            "event_transfers_cost"
+                        ]
 
                         if "N" in str(event_transfer_cost):
                             event_transfer_cost = 0
                         else:
                             event_transfer_cost = int(event_transfer_cost)
-    
+
                         worst_transfer_in.append(
                             {
                                 "entry_id": participant_id,
@@ -320,13 +320,15 @@ class LeagueWeeklyReport(League):
                         player_out = self.no_chips.iloc[i, :]["element_out"]
                         points_delta = int(self.no_chips.iloc[i, :]["delta"])
                         participant_id = str(self.no_chips.iloc[i, :]["entry_id"])
-                        event_transfer_cost = str(self.no_chips.iloc[-i, :]['event_transfers_cost'])
+                        event_transfer_cost = str(
+                            self.no_chips.iloc[-i, :]["event_transfers_cost"]
+                        )
 
                         if "N" in str(event_transfer_cost):
                             event_transfer_cost = 0
                         else:
                             event_transfer_cost = int(event_transfer_cost)
-    
+
                         best_transfer_in.append(
                             {
                                 "entry_id": participant_id,
