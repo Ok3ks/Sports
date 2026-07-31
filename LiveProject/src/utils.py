@@ -150,18 +150,23 @@ async def get_all_gw_transfers(alist: List[int], client=async_client):
     """Obtains all event transfers for a list of entry Ids"""
 
     row: list = []
-
-    for entry_id in alist:
-        r = await client.get(TRANSFER_URL.format(entry_id))
-        if r.status_code == 200:
-            obj = r.json()  # provides all transfers
-            row.extend(obj)
-        else:
-            LOGGER.info(
-                "{} does not exist or Transfer URL endpoint unavailable".format(
-                    entry_id
+    async def worker(entry_id:int, semaphore:int):
+        async with semaphore:
+            r = await client.get(TRANSFER_URL.format(entry_id))
+            if r.status_code == 200:
+                obj = r.json()  # provides all transfers
+                row.extend(obj)
+            else:
+                LOGGER.info(
+                    "{} does not exist or Transfer URL endpoint unavailable".format(
+                        entry_id
+                    )
                 )
-            )
+
+    async with anyio.create_task_group() as tg:
+        for entry_id in alist:
+            tg.start_soon(worker, entry_id, anyio.Semaphore(40))
+            
     return row
 
 
@@ -490,9 +495,13 @@ class Participant:
 
         if valid:
             if type(gw) == list:
-                self.all_gw_entries = [
-                    await get_participant_entry(self.participant, gameweek) for gameweek in gw
-                ]
+                send_stream, receive_stream = anyio.create_memory_object_stream()
+                async with send_stream, receive_stream: 
+                    async with anyio.create_task_group() as tg:
+                        for gameweek in gw:
+                            tg.start_soon(get_participant_entry, self.participant, gw)
+                    async for entry in receive_stream:
+                        self.all_gw_entries.append(entry)
             elif type(gw) == int:
                 self.all_gw_entries = [
                     await get_participant_entry(self.participant, gameweek)
@@ -604,8 +613,15 @@ class League:
             self.obtain_league_participants()
 
         # optimization 2
-        async for participant in self.participants:
-            yield await get_participant_entry(participant["entry"], gw)
+        send_stream, receive_stream = anyio.create_memory_object_stream()
+        async with send_stream, receive_stream:
+            async with anyio.create_task_group() as tg:
+                for participant in self.participants:
+                    tg.start_soon(get_participant_entry, participant["entry"], gw)
+
+            async for entry in receive_stream:        
+                yield entry
+
 
     async def get_gw_transfers(self, gw, refresh=False, thread=None):
         if refresh or len(self.participants) == 0:
@@ -782,12 +798,13 @@ def expand_date(df: pl.DataFrame, date_col: str):
 
 
 def fixture_mapping(player, gw):
+    """Maps player to fixture"""
     fixtures = Player(player, gw).fixture
     return [asdict(f) for f in fixtures] if fixtures else []
 
 
 def player_transform(df: pl.DataFrame, vertical=False):
-    """ """
+    """Transforms a player"""
 
     player_cols = [f"player_{i}" for i in range(1, 11)]
 
@@ -802,7 +819,7 @@ def player_transform(df: pl.DataFrame, vertical=False):
 
 
 def bench_transform(df: pl.DataFrame):
-
+    
     bench_cols = [f"player_{i}" for i in range(1, 4)]
 
     df = df.with_columns(
