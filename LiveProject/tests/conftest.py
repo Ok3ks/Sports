@@ -859,7 +859,7 @@ def filepath():
 
 @pytest.fixture(scope="module")
 def participant():
-    return int(145257)
+    return int(437742)
 
 
 @pytest.fixture(scope="module")
@@ -869,12 +869,12 @@ def participants():
 
 @pytest.fixture(scope="module")
 def h2h_league():
-    return int(2049961)
+    return int(386194)
 
 
 @pytest.fixture(scope="module")
 def classic_league():
-    return int(1491605)
+    return int(87552)
 
 
 @pytest.fixture(scope="module")

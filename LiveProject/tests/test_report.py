@@ -4,17 +4,17 @@ from src.report import League
 class TestLeague:
     def test_init(self, classic_league):
         test = League(classic_league)
-        assert test.league_id == 1491605
+        assert test.league_id == 87552
         assert test.participants == []
         assert test.PAGE_COUNT == 1
 
-    def test_league_obtain_league_participants(
+    async def test_obtain_league_participants(
         self, classic_league, league_fill_fixture
     ):
         test = League(classic_league)
         test.participants = league_fill_fixture
 
-        obj = test.obtain_league_participants()
+        obj = await test.obtain_league_participants()
         keys = set(
             [
                 "entry",

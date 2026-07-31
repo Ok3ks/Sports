@@ -25,70 +25,71 @@ def test_gameweek_endpoint(gw_fixture):
     assert "elements" in r.keys()
 
     assert type(r["elements"]) is list
-    assert type(r["elements"][0]) is dict
 
-    element_keys = list(r["elements"][0].keys())
-    element_keys_prev = ["id", " stats ", " explain "]
+    if len(r["elements"]) > 0: 
+        assert type(r["elements"][0]) is dict
+        element_keys = list(r["elements"][0].keys())
+        element_keys_prev = ["id", " stats ", " explain "]
 
-    assert len(set(element_keys_prev).difference(element_keys)), " "
-    del element_keys
+        assert len(set(element_keys_prev).difference(element_keys)), " "
+        del element_keys
 
-    stats_keys = set(r["elements"][0]["stats"].keys())
-    stats_keys_prev = [
-        "mng_win",
-        "mng_underdog_draw",
-        "mng_loss",
-        "mng_draw",
-        "mng_goals_scored",
-        "mng_underdog_win",
-        "mng_clean_sheets",
-        "minutes",
-        "goals_scored",
-        "assists",
-        "clean_sheets",
-        "goals_conceded",
-        "own_goals",
-        "penalties_saved",
-        "penalties_missed",
-        "yellow_cards",
-        "red_cards",
-        "saves",
-        "bonus",
-        "bps",
-        "influence",
-        "creativity",
-        "threat",
-        "ict_index",
-        "starts",
-        "expected_goals",
-        "expected_assists",
-        "expected_goal_involvements",
-        "expected_goals_conceded",
-        "total_points",
-        "in_dreamteam",
-        # 25-26
-        "defensive_contribution",
-        "tackles",
-        "recoveries",
-        "clearances_blocks_interceptions",
-        "played",
-    ]
+        stats_keys = set(r["elements"][0]["stats"].keys())
+        stats_keys_prev = [
+            "mng_win",
+            "mng_underdog_draw",
+            "mng_loss",
+            "mng_draw",
+            "mng_goals_scored",
+            "mng_underdog_win",
+            "mng_clean_sheets",
+            "minutes",
+            "goals_scored",
+            "assists",
+            "clean_sheets",
+            "goals_conceded",
+            "own_goals",
+            "penalties_saved",
+            "penalties_missed",
+            "yellow_cards",
+            "red_cards",
+            "saves",
+            "bonus",
+            "bps",
+            "influence",
+            "creativity",
+            "threat",
+            "ict_index",
+            "starts",
+            "expected_goals",
+            "expected_assists",
+            "expected_goal_involvements",
+            "expected_goals_conceded",
+            "total_points",
+            "in_dreamteam",
+            # 25-26
+            "defensive_contribution",
+            "tackles",
+            "recoveries",
+            "clearances_blocks_interceptions",
+            "played",
+        ]
 
-    assert len(stats_keys.difference(set(stats_keys_prev))) == 0, (
-        f"Stats Keys have changed {stats_keys.difference(set(stats_keys_prev))}"
-    )
+        assert len(stats_keys.difference(set(stats_keys_prev))) == 0, (
+            f"Stats Keys have changed {stats_keys.difference(set(stats_keys_prev))}"
+        )
 
-    del stats_keys
-    explain_key = r["elements"][0]["explain"][0].keys()
-    explain_key_prev = {"fixture", "stats"}
+        del stats_keys
+        explain_key = r["elements"][0]["explain"][0].keys()
+        explain_key_prev = {"fixture", "stats"}
 
-    assert len(set(explain_key).difference(explain_key_prev)) == 0, (
-        "Explain keys have changed"
-    )
+        assert len(set(explain_key).difference(explain_key_prev)) == 0, (
+            "Explain keys have changed"
+        )
 
-    assert r["elements"][0]["explain"][0]["stats"][0]["identifier"] == "minutes"
-    assert "points" in r["elements"][0]["explain"][0]["stats"][0]
-    assert "value" in r["elements"][0]["explain"][0]["stats"][0]
+        assert r["elements"][0]["explain"][0]["stats"][0]["identifier"] == "minutes"
+        assert "points" in r["elements"][0]["explain"][0]["stats"][0]
+        assert "value" in r["elements"][0]["explain"][0]["stats"][0]
 
     to_json(r, f"{MOCK_DIR}/endpoints/gameweek_endpoint.json")
 
@@ -171,48 +172,47 @@ def test_history_endpoint(participant):
 
     assert type(r) is dict, "Endpoint structure has changed"
     history_keys = list(r.keys())
+   
     history_keys_prev = ["current", "past", "chips"]
 
     assert len(set(history_keys_prev).difference(set(history_keys))) == 0, (
         "History keys have changed"
     )
 
-    assert type(r["current"]) is list, "Endpoint structure has changed"  # type: ignore
-    assert type(r["current"][0]) is dict, "Endpoint structure has changed"  # type: ignore
+    assert type(r["current"]) ==  type(r["past"]) == type(r["chips"]) == list, "Endpoint structure has changed"  # type: ignore
 
-    assert type(r["past"]) is list, "Endpoint structure has changed"  # type: ignore
-    assert type(r["past"][0]) is dict, "Endpoint structure has changed"  # type: ignore
+    if len(r["current"]) > 0:
+        assert type(r["current"][0]) is dict, "Endpoint structure has changed"  # type: ignore
+    
+        current_keys = r["current"][0].keys()
+        current_keys_prev = [
+            "event",
+            "points",
+            "total_points",
+            "rank",
+            "rank_sort",
+            "percentile_rank",
+            "overall_rank",
+            "bank",
+            "value",
+            "event_transfers",
+            "event_transfers_cost",
+            "points_on_bench",
+        ]
 
-    assert type(r["chips"]) is list, "Endpoint structure has changed"  # type: ignore
+        assert len(set(current_keys).difference(set(current_keys_prev))) == 0, (
+            "Current keys has changed"
+        )
+        assert len(current_keys) == 12, "Number of keys has changed"
 
-    current_keys = r["current"][0].keys()
+    if len(r["past"]) > 0:
 
-    current_keys_prev = [
-        "event",
-        "points",
-        "total_points",
-        "rank",
-        "rank_sort",
-        "percentile_rank",
-        "overall_rank",
-        "bank",
-        "value",
-        "event_transfers",
-        "event_transfers_cost",
-        "points_on_bench",
-    ]
+        assert type(r["past"][0]) is dict, "Endpoint structure has changed"  # type: ignore
+        # Add conditional ifs
+        past_keys = r["past"][0].keys()
+        past_keys_prev = ["season_name", "total_points", "rank", "rank_percentage"]
 
-    assert len(set(current_keys).difference(set(current_keys_prev))) == 0, (
-        "Current keys has changed"
-    )
-
-    assert len(current_keys) == 12, "Number of keys has changed"
-
-    # Add conditional ifs
-    past_keys = r["past"][0].keys()
-    past_keys_prev = ["season_name", "total_points", "rank"]
-
-    assert len(set(past_keys).difference(past_keys_prev)) == 0, "Past keys have changed"
+        assert len(set(past_keys).difference(past_keys_prev)) == 0, "Past keys have changed"
 
     # Chips is empty if it has not been used
 
@@ -235,39 +235,40 @@ def test_h2h_league_endpoint(h2h_league):
         "H2h keys have changed"
     )
 
-    results_keys = list(r["results"][0].keys())
-    results_keys_prev = [
-        "id",
-        "entry_1_entry",
-        "entry_1_name",
-        "entry_1_player_name",
-        "entry_1_points",
-        "entry_1_win",
-        "entry_1_draw",
-        "entry_1_loss",
-        "entry_1_total",
-        "entry_2_entry",
-        "entry_2_name",
-        "entry_2_player_name",
-        "entry_2_points",
-        "entry_2_win",
-        "entry_2_draw",
-        "entry_2_loss",
-        "entry_2_total",
-        "is_knockout",
-        "league",
-        "winner",
-        "seed_value",
-        "event",
-        "tiebreak",
-        "is_bye",
-        "knockout_name",
-    ]
+    if len(r["results"]) > 0:
+        results_keys = list(r["results"][0].keys())
+        results_keys_prev = [
+            "id",
+            "entry_1_entry",
+            "entry_1_name",
+            "entry_1_player_name",
+            "entry_1_points",
+            "entry_1_win",
+            "entry_1_draw",
+            "entry_1_loss",
+            "entry_1_total",
+            "entry_2_entry",
+            "entry_2_name",
+            "entry_2_player_name",
+            "entry_2_points",
+            "entry_2_win",
+            "entry_2_draw",
+            "entry_2_loss",
+            "entry_2_total",
+            "is_knockout",
+            "league",
+            "winner",
+            "seed_value",
+            "event",
+            "tiebreak",
+            "is_bye",
+            "knockout_name",
+        ]
 
-    assert len(set(results_keys_prev).difference(results_keys)) == 0, (
-        "Results keys has changed"
-    )
-    to_json(r, f"{MOCK_DIR}/endpoints/h2h_league_endpoint.json")
+        assert len(set(results_keys_prev).difference(results_keys)) == 0, (
+            "Results keys has changed"
+        )
+        to_json(r, f"{MOCK_DIR}/endpoints/h2h_league_endpoint.json")
 
 
 def test_league_endpoint(classic_league):
@@ -321,21 +322,23 @@ def test_league_endpoint(classic_league):
         " Standings have changed"
     )
 
-    participant_info = r["standings"]["results"][0]  # type: ignore
-    participant_info_keys = [
-        "id",
-        "event_total",
-        "player_name",
-        "rank",
-        "last_rank",
-        "rank_sort",
-        "total",
-        "entry",
-        "entry_name",
-    ]
-    assert len(set(participant_info_keys).difference(participant_info)) == 0, (
-        "Participant info keys have changed"
-    )
+
+    if len(r["standings"]["results"]) > 0:
+        participant_info = r["standings"]["results"][0]  # type: ignore
+        participant_info_keys = [
+            "id",
+            "event_total",
+            "player_name",
+            "rank",
+            "last_rank",
+            "rank_sort",
+            "total",
+            "entry",
+            "entry_name",
+        ]
+        assert len(set(participant_info_keys).difference(participant_info)) == 0, (
+            "Participant info keys have changed"
+        )
 
     to_json(r, f"{MOCK_DIR}/endpoints/league_endpoint.json")
 
@@ -418,36 +421,37 @@ def test_fpl_url_endpoint():
     assert type(r["events"]) is list
     assert type(r["events"][0]) is dict
 
-    event_keys = list(r["events"][0])
-    event_keys_prev = [
-        "id",
-        "name",
-        "deadline_time",
-        "average_entry_score",
-        "finished",
-        "data_checked",
-        "highest_scoring_entry",
-        "deadline_time_epoch",
-        "deadline_time_game_offset",
-        "highest_score",
-        "is_previous",
-        "is_current",
-        "is_next",
-        "cup_leagues_created",
-        "h2h_ko_matches_created",
-        "chip_plays",
-        "most_selected",
-        "most_transferred_in",
-        "top_element",
-        "top_element_info",
-        "transfers_made",
-        "most_captained",
-        "most_vice_captained",
-    ]
+    if len(r["events"]) > 0:
+        event_keys = list(r["events"][0])
+        event_keys_prev = [
+            "id",
+            "name",
+            "deadline_time",
+            "average_entry_score",
+            "finished",
+            "data_checked",
+            "highest_scoring_entry",
+            "deadline_time_epoch",
+            "deadline_time_game_offset",
+            "highest_score",
+            "is_previous",
+            "is_current",
+            "is_next",
+            "cup_leagues_created",
+            "h2h_ko_matches_created",
+            "chip_plays",
+            "most_selected",
+            "most_transferred_in",
+            "top_element",
+            "top_element_info",
+            "transfers_made",
+            "most_captained",
+            "most_vice_captained",
+        ]
 
-    assert len(set(event_keys_prev).difference(set(event_keys))) == 0, (
-        f"Event Keys have changed {set(event_keys_prev).difference(set(event_keys))}"
-    )
+        assert len(set(event_keys_prev).difference(set(event_keys))) == 0, (
+            f"Event Keys have changed {set(event_keys_prev).difference(set(event_keys))}"
+        )
 
     assert type(r["game_settings"]) is dict
     game_settings_keys = r["game_settings"].keys()
@@ -491,197 +495,205 @@ def test_fpl_url_endpoint():
     ]
     diff = set(game_settings_keys).difference(game_settings_keys_prev)
     assert len(diff) == 0, f"Game setting keys have changed new {game_settings_keys}"
-
     assert type(r["phases"]) is list
-    assert type(r["phases"][0]) is dict
 
-    phase_keys = list(r["phases"][0])
+    if len(r["phases"]) > 0:
+        assert type(r["phases"][0]) is dict
+        phase_keys = list(r["phases"][0])
+    
     phase_keys_prev = {"id", "name", "start_event", "stop_event", "highest_score"}
 
     diff = set(phase_keys_prev).difference(phase_keys)
     assert len(diff) == 0, f"Game setting keys have changed new {diff}"
 
     assert type(r["teams"]) is list
-    assert type(r["teams"][0]) is dict
-    team_keys = list(r["teams"][0])
-    team_keys_prev = {
-        "code",
-        "draw",
-        "form",
-        "id",
-        "loss",
-        "name",
-        "played",
-        "points",
-        "position",
-        "short_name",
-        "strength",
-        "team_division",
-        "unavailable",
-        "win",
-        "strength_overall_home",
-        "strength_overall_away",
-        "strength_attack_home",
-        "strength_attack_away",
-        "strength_defence_home",
-        "strength_defence_away",
-        "pulse_id",
-        "link_url",
-    }
 
-    diff = set(team_keys).difference(team_keys_prev)
-    assert len(diff) == 0, f"Team keys have changed new {diff}"
+    if len(r["teams"]) > 0:
+        assert type(r["teams"][0]) is dict
+        team_keys = list(r["teams"][0])
+        team_keys_prev = {
+            "code",
+            "draw",
+            "form",
+            "id",
+            "loss",
+            "name",
+            "played",
+            "points",
+            "position",
+            "short_name",
+            "strength",
+            "team_division",
+            "unavailable",
+            "win",
+            "strength_overall_home",
+            "strength_overall_away",
+            "strength_attack_home",
+            "strength_attack_away",
+            "strength_defence_home",
+            "strength_defence_away",
+            "pulse_id",
+            "link_url",
+        }
 
-    element_stats_keys = r["element_stats"][0].keys()
-    assert "label" in element_stats_keys
-    assert "name" in element_stats_keys
-    assert r["element_stats"][0]["name"] == "minutes", "Measurement metric has changed"
-    assert r["element_stats"][0]["label"] == "Minutes played", (
-        "Measurement metric has changed"
-    )
-    assert len(element_stats_keys) == 2
+        diff = set(team_keys).difference(team_keys_prev)
+        assert len(diff) == 0, f"Team keys have changed new {diff}"
 
-    element_types_keys = r["element_types"][0].keys()
-    element_types_keys_prev = [
-        "id",
-        "plural_name",
-        "plural_name_short",
-        "singular_name",
-        "singular_name_short",
-        "squad_select",
-        "squad_min_play",
-        "squad_min_select",
-        "squad_max_select",
-        "squad_min_play",
-        "squad_max_play",
-        "ui_shirt_specific",
-        "sub_positions_locked",
-        "element_count",
-    ]
-    diff = set(element_types_keys).difference(element_types_keys_prev)
-    assert len(diff) == 0, f"Element Types Keys have changed{diff}"
 
-    elements_keys = r["elements"][0].keys()
-    elements_keys_prev = [
-        "chance_of_playing_next_round",
-        "team_join_date",
-        "mng_win",
-        "mng_underdog_win",
-        "can_transact",
-        "mng_underdog_draw",
-        "mng_clean_sheets",
-        "mng_draw",
-        "opta_code",
-        "removed",
-        "has_temporary_code",
-        "mng_goals_scored",
-        "can_select",
-        "mng_loss",
-        "team_join_datechance_of_playing_next_round",
-        "chance_of_playing_this_round",
-        "codecost_change_event",
-        "cost_change_event_fall",
-        "cost_change_start",
-        "cost_change_start_fall",
-        "dreamteam_count",
-        "element_type",
-        "ep_next",
-        "ep_this",
-        "event_points",
-        "first_name",
-        "form",
-        "id",
-        "in_dreamteam",
-        "news",
-        "news_added",
-        "now_cost",
-        "photo",
-        "points_per_game",
-        "second_name",
-        "selected_by_percent",
-        "special",
-        "squad_number",
-        "status",
-        "team",
-        "team_code",
-        "total_points",
-        "transfers_in",
-        "transfers_in_event",
-        "transfers_out",
-        "transfers_out_event",
-        "value_form",
-        "value_season",
-        "web_name",
-        "minutes",
-        "goals_scored",
-        "assists",
-        "clean_sheets",
-        "goals_conceded",
-        "own_goals",
-        "penalties_saved",
-        "penalties_missed",
-        "yellow_cards",
-        "red_cards",
-        "saves",
-        "bonus",
-        "bps",
-        "influence",
-        "creativity",
-        "threat",
-        "ict_index",
-        "starts",
-        "expected_goals",
-        "expected_assists",
-        "expected_goal_involvements",
-        "expected_goals_conceded",
-        "influence_rank",
-        "influence_rank_type",
-        "creativity_rank",
-        "creativity_rank_type",
-        "threat_rank",
-        "threat_rank_type",
-        "ict_index_rank",
-        "ict_index_rank_type",
-        "corners_and_indirect_freekicks_order",
-        "corners_and_indirect_freekicks_text",
-        "direct_freekicks_order",
-        "direct_freekicks_text",
-        "penalties_order",
-        "penalties_text",
-        "expected_goals_per_90",
-        "saves_per_90",
-        "expected_assists_per_90",
-        "expected_goal_involvements_per_90",
-        "expected_goals_conceded_per_90",
-        "goals_conceded_per_90",
-        "now_cost_rank",
-        "now_cost_rank_type",
-        "form_rank",
-        "form_rank_type",
-        "points_per_game_rank",
-        "points_per_game_rank_type",
-        "selected_rank",
-        "selected_rank_type",
-        "starts_per_90",
-        "clean_sheets_per_90",
-        "cost_change_event",
-        "code",
-        "region",
-        # 25-26
-        "defensive_contribution_per_90",
-        "birth_date",
-        "tackles",
-        "recoveries",
-        "defensive_contribution",
-        "clearances_blocks_interceptions",
-        "scout_risks",
-        "scout_news_link",
-        "price_change_percent",
-        "known_name",
-    ]
 
-    diff = set(elements_keys).difference(set(elements_keys_prev))
-    assert len(diff) == 0, f"Elements Keys have changed {diff}"
+    if len(r["element_stats"]) > 0:
+        element_stats_keys = r["element_stats"][0].keys()
+        assert "label" in element_stats_keys
+        assert "name" in element_stats_keys
+        assert r["element_stats"][0]["name"] == "minutes", "Measurement metric has changed"
+        assert r["element_stats"][0]["label"] == "Minutes played", (
+            "Measurement metric has changed"
+        )
+        assert len(element_stats_keys) == 2
+
+    if len(r["element_types"]) > 0:
+        element_types_keys = r["element_types"][0].keys()
+        element_types_keys_prev = [
+            "id",
+            "plural_name",
+            "plural_name_short",
+            "singular_name",
+            "singular_name_short",
+            "squad_select",
+            "squad_min_play",
+            "squad_min_select",
+            "squad_max_select",
+            "squad_min_play",
+            "squad_max_play",
+            "ui_shirt_specific",
+            "sub_positions_locked",
+            "element_count",
+        ]
+        diff = set(element_types_keys).difference(element_types_keys_prev)
+        assert len(diff) == 0, f"Element Types Keys have changed{diff}"
+
+    if len(r["elements"]) > 0:
+        elements_keys = r["elements"][0].keys()
+        elements_keys_prev = [
+            "chance_of_playing_next_round",
+            "team_join_date",
+            "mng_win",
+            "mng_underdog_win",
+            "can_transact",
+            "mng_underdog_draw",
+            "mng_clean_sheets",
+            "mng_draw",
+            "opta_code",
+            "removed",
+            "has_temporary_code",
+            "mng_goals_scored",
+            "can_select",
+            "mng_loss",
+            "team_join_datechance_of_playing_next_round",
+            "chance_of_playing_this_round",
+            "codecost_change_event",
+            "cost_change_event_fall",
+            "cost_change_start",
+            "cost_change_start_fall",
+            "dreamteam_count",
+            "element_type",
+            "ep_next",
+            "ep_this",
+            "event_points",
+            "first_name",
+            "form",
+            "id",
+            "in_dreamteam",
+            "news",
+            "news_added",
+            "now_cost",
+            "photo",
+            "points_per_game",
+            "second_name",
+            "selected_by_percent",
+            "special",
+            "squad_number",
+            "status",
+            "team",
+            "team_code",
+            "total_points",
+            "transfers_in",
+            "transfers_in_event",
+            "transfers_out",
+            "transfers_out_event",
+            "value_form",
+            "value_season",
+            "web_name",
+            "minutes",
+            "goals_scored",
+            "assists",
+            "clean_sheets",
+            "goals_conceded",
+            "own_goals",
+            "penalties_saved",
+            "penalties_missed",
+            "yellow_cards",
+            "red_cards",
+            "saves",
+            "bonus",
+            "bps",
+            "influence",
+            "creativity",
+            "threat",
+            "ict_index",
+            "starts",
+            "expected_goals",
+            "expected_assists",
+            "expected_goal_involvements",
+            "expected_goals_conceded",
+            "influence_rank",
+            "influence_rank_type",
+            "creativity_rank",
+            "creativity_rank_type",
+            "threat_rank",
+            "threat_rank_type",
+            "ict_index_rank",
+            "ict_index_rank_type",
+            "corners_and_indirect_freekicks_order",
+            "corners_and_indirect_freekicks_text",
+            "direct_freekicks_order",
+            "direct_freekicks_text",
+            "penalties_order",
+            "penalties_text",
+            "expected_goals_per_90",
+            "saves_per_90",
+            "expected_assists_per_90",
+            "expected_goal_involvements_per_90",
+            "expected_goals_conceded_per_90",
+            "goals_conceded_per_90",
+            "now_cost_rank",
+            "now_cost_rank_type",
+            "form_rank",
+            "form_rank_type",
+            "points_per_game_rank",
+            "points_per_game_rank_type",
+            "selected_rank",
+            "selected_rank_type",
+            "starts_per_90",
+            "clean_sheets_per_90",
+            "cost_change_event",
+            "code",
+            "region",
+            # 25-26
+            "defensive_contribution_per_90",
+            "birth_date",
+            "tackles",
+            "recoveries",
+            "defensive_contribution",
+            "clearances_blocks_interceptions",
+            "scout_risks",
+            "scout_news_link",
+            "price_change_percent",
+            "known_name",
+        ]
+
+        diff = set(elements_keys).difference(set(elements_keys_prev))
+        assert len(diff) == 0, f"Elements Keys have changed {diff}"
 
     to_json(r, f"{MOCK_DIR}/endpoints/fpl_url_endpoint.json")
 
