@@ -12,16 +12,8 @@ import numpy as np
 import polars as pl
 from src.db.update_season_fixture import update_season_fixture
 from src.db.db import (
-    get_fixture_gameweek,
-    get_player_season_points,
-    get_player_stats_from_db_gql,
-    get_player,
+
     get_player_gql,
-    get_player_info,
-    get_player_team_map,
-    get_fixtures,
-    get_season_stats,
-    get_teams,
 )
 
 from src.utils import get_curr_event
@@ -41,12 +33,11 @@ class ParticipantReport(Participant):
         self.entry_id = entry_id
 
     @lru_cache
-    def weekly_score_transformation(self):
+    async def weekly_score_transformation(self):
         """Transforms weekly score into Dataframe, and returns weekly dataframe"""
 
-        one_df = pd.DataFrame(self.get_all_week_entries(gw=self.gw, all=True))
+        one_df = pd.DataFrame(await self.get_all_week_entries(gw=self.gw, all=True))
         self.o_df = one_df[~one_df["players"].isna()]
-
         self.o_df["points_breakdown"] = [
             [
                 get_ind_player_stats_from_db(y, event)
@@ -64,7 +55,7 @@ class ParticipantReport(Participant):
         ]
         self.o_df["highest_scoring_player_points"] = self.o_df[
             "points_breakdown"
-        ].apply(max)
+        ].apply(np.argmax)
 
         self.o_df["captain_points"] = [
             get_ind_player_stats_from_db(self.o_df["captain"][event - 1], event) * 2
@@ -79,7 +70,7 @@ class ParticipantReport(Participant):
         return self.o_df
 
     @lru_cache
-    def merge_league_weekly_transfer(self):
+    async def merge_league_weekly_transfer(self):
         """Merges Weekly score dataframe with transfers dataframe"""
         self.transfers = self.get_all_week_transfers()
         transfer_weeks = set(self.transfers.keys())
@@ -124,10 +115,6 @@ class ParticipantReport(Participant):
         return self.f
 
     def add_auto_sub(self):
-        # self.f["auto_sub_in_player"] = self.f["auto_sub_in"]  # .map(lambda x: x["in"])
-        # self.f["auto_sub_out_player"] = self.f[
-        #     "auto_sub_out"
-        # ]  # .map(lambda x: x["out"])
         self.f["auto_sub_in_points"] = [
             sum(
                 i
@@ -152,6 +139,7 @@ class ParticipantReport(Participant):
         ]
 
     def prep_for_gql(self):
+        """Utility function which modifies entry for GraphQL"""
         self.output = self.o_df.to_dict("list")
         for key, value in self.output.items():
             if key in ["captain", "vice_captain", "highest_scoring_player"]:
@@ -160,14 +148,14 @@ class ParticipantReport(Participant):
                     for gameweek, player_id in enumerate(value)
                 ]
 
-    def participant_stats(self):
+    async def participant_stats(self):
         """Season Statistics for a participant"""
 
         metrics = {}
         self.transfers = (
-            self.get_all_week_transfers() if self.transfers is None else self.transfers
+            await self.get_all_week_transfers() if self.transfers is None else self.transfers
         )
-        entries = self.get_all_week_entries(1, all=True)
+        entries = await self.get_all_week_entries(1, all=True)
 
         df = pl.DataFrame(entries)
         df = df.with_columns(pl.col("entry_id").cast(pl.Int32))
@@ -342,16 +330,16 @@ class ParticipantReport(Participant):
             return self.output
 
 
-if __name__ == "__main__":
+async def main():
     import argparse
 
-    parser = argparse.ArgumentParser(prog="FPLWRAP", description="Provider")
-
+    curr_gw = await get_curr_event()
+    parser = argparse.ArgumentParser(prog="FplWrap", description="Provider")
     parser.add_argument(
         "-g",
         "--gameweek",
         type=int,
-        default=get_curr_event()[0],
+        default= curr_gw[0] if curr_gw else 2,
         help="Gameweek you are trying to get a report of",
     )
     parser.add_argument(
@@ -359,12 +347,15 @@ if __name__ == "__main__":
         "--entry_id",
         type=int,
         required=True,
-        help="ID of pkayer you're interested in ",
+        help="ID of player you're interested in ",
     )
     args = parser.parse_args()
     if args:
         test = ParticipantReport(args.gameweek, args.entry_id)
-        test.weekly_score_transformation()
-        test.merge_league_weekly_transfer()
+        await test.weekly_score_transformation()
+        await test.merge_league_weekly_transfer()
         test.add_auto_sub()
-        test.participant_stats()
+        await test.participant_stats()
+if __name__ == "__main__":
+    import anyio
+    anyio.run(main)

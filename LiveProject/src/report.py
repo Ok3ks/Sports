@@ -1,8 +1,9 @@
 from functools import lru_cache
 import operator
 
+import anyio
 import pandas as pd
-import json
+import anyio
 from src.utils import get_basic_stats, League
 from src.db.db import (
     get_player_stats_from_db,
@@ -27,11 +28,13 @@ class LeagueWeeklyReport(League):
 
     @lru_cache()
     @profile
-    def get_data(self):
-        self.one_df = pd.DataFrame(self.get_all_participant_entries(self.gw))
-        self.f = pd.DataFrame(self.get_gw_transfers(self.gw))
+    async def get_data(self):
+        self.one_df = pd.DataFrame(await self.get_all_participant_entries(self.gw))
+        self.f = pd.DataFrame(await self.get_gw_transfers(self.gw))
         self.f = self.f.T
         self.f = self.f.fillna("0")
+        self.participants = await self.obtain_league_participants()
+        self.participants_name = await self.get_participant_name()
 
     @lru_cache(10)
     @profile
@@ -126,9 +129,6 @@ class LeagueWeeklyReport(League):
                 self.f["active_chip"].value_counts().to_dict()
             )  # More report based on this
             self.no_chips = self.f[self.f["active_chip"].isna()]
-
-        self.participants = self.obtain_league_participants()
-        self.participants_name = self.get_participant_name()
 
         def find_differential():
             """Find the league differential. Calculating league EO"""
@@ -444,14 +444,12 @@ class LeagueWeeklyReport(League):
         return output
 
 
-# Output of report page should be a json for a django template
-if __name__ == "__main__":
+async def main():
     import argparse
 
     parser = argparse.ArgumentParser(
         prog="weeklyreport", description="Provide Gameweek ID and League ID"
     )
-
     parser.add_argument(
         "-g",
         "--gameweek_id",
@@ -470,7 +468,6 @@ if __name__ == "__main__":
 
     if args.dry_run:
         test = LeagueWeeklyReport(args.gameweek_id, args.league_id)
-
         test.o_df = pd.DataFrame(test.o_df)
         test.f = pd.DataFrame(test.f)
         test.participants = test.participants["participants"]
@@ -478,9 +475,13 @@ if __name__ == "__main__":
 
     else:
         test = LeagueWeeklyReport(args.gameweek_id, args.league_id)
-        test.get_data()
+        await test.get_data()
         test.weekly_score_transformation()
         test.merge_league_weekly_transfer()
         test.add_auto_sub()
         test.captain_minutes()
         output = test.create_report(display=True)
+
+
+if __name__ == "__main__":
+    anyio.run(main())

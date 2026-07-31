@@ -1,4 +1,5 @@
 from dataclasses import asdict, dataclass
+import anyio
 import requests
 from httpx_retries import Retry, RetryTransport
 import httpx
@@ -9,6 +10,7 @@ import numpy as np
 from google.cloud import storage
 from src.db.db import get_fixtures
 from functools import lru_cache
+from anyio import create_task_group
 
 
 from .urls import GW_URL, TRANSFER_URL, FPL_URL, FPL_PLAYER, HISTORY_URL
@@ -42,6 +44,7 @@ retries = Retry(
 transport = RetryTransport(retry=retries)
 async_client = httpx.AsyncClient(verify=context, transport=transport)
 
+## Replace print with logging 
 
 def to_json(x: dict, fp):  ## use Path instead
     with open(fp, "w") as outs:
@@ -102,7 +105,8 @@ class GameweekError(Exception):
 
 
 async def get_gw_transfers(
-    alist: List[int], gw: Union[int, List[int], None] = None, all=False
+    alist: List[int], gw: Union[int, List[int], None] = None, all=False,
+    client=async_client
 ) -> dict:
     """Input is a list of entry_id. Gw is the gameweek number.
     'all' toggles between extracting all gameweeks or not"""
@@ -121,7 +125,7 @@ async def get_gw_transfers(
         return row
 
     for entry_id in alist:
-        r = await async_client.get(TRANSFER_URL.format(entry_id))
+        r = await client.get(TRANSFER_URL.format(entry_id))
         if r.status_code == 200:
             obj = r.json()  # provides all transfers
             # updates by gameweek
@@ -142,13 +146,13 @@ async def get_gw_transfers(
     return row
 
 
-async def get_all_gw_transfers(alist: List[int]):
+async def get_all_gw_transfers(alist: List[int], client=async_client):
     """Obtains all event transfers for a list of entry Ids"""
 
     row: list = []
 
     for entry_id in alist:
-        r = await async_client.get(TRANSFER_URL.format(entry_id))
+        r = await client.get(TRANSFER_URL.format(entry_id))
         if r.status_code == 200:
             obj = r.json()  # provides all transfers
             row.extend(obj)
@@ -170,7 +174,7 @@ def bucket_client(bucket_name="wrapped_participants_entry"):
     return bucket
 
 
-async def get_participant_entry(entry_id: int, gw: int) -> dict:
+async def get_participant_entry(entry_id: int, gw: int, client=async_client) -> dict:
     """Calls an Endpoint to retrieve a participants entry"""
     valid, gw = check_gw(gw)
     team_list: dict[str, Any] = {
@@ -190,7 +194,7 @@ async def get_participant_entry(entry_id: int, gw: int) -> dict:
 
     if valid:
         # optimization, imported get directly from requests
-        r = await async_client.get(FPL_PLAYER.format(entry_id, gw))
+        r = await client.get(FPL_PLAYER.format(entry_id, gw))
 
         # optimization - assigning size of dictionary before hand to prevent resizing of dictionaries
 
@@ -246,21 +250,22 @@ async def get_participant_entry(entry_id: int, gw: int) -> dict:
     return team_list
 
 
-def get_curr_event() -> list:
-    r = requests.get(FPL_URL)
+async def get_curr_event() -> list:
+    r = await async_client.get(FPL_URL)
     LOGGER.info(r.status_code)
 
     curr_event = []
     r = r.json()
     for event in r["events"]:
-        if event["is_current"]:
-            curr_event.append(event["id"])
-            curr_event.append((event["finished"], event["data_checked"]))
+        if not event["is_current"]:
+            return curr_event
+        curr_event.append(event["id"])
+        curr_event.append((event["finished"], event["data_checked"]))
     return curr_event
 
 
 async def get_gw_transfers_scrap(
-    alist: List[int], gw: Union[int, List[int]], all=False
+    alist: List[int], gw: Union[int, List[int]], all=False, client=async_client
 ) -> dict:
     """Input is a list of entry_id. Gw is the gameweek number.
     'all' toggles between extracting all gameweeks or not"""
@@ -273,7 +278,7 @@ async def get_gw_transfers_scrap(
     if valid:
         for entry_id in alist:
             obj_row = {}
-            r = await async_client.get(TRANSFER_URL.format(entry_id))
+            r = await client.get(TRANSFER_URL.format(entry_id))
             if r.status_code == 200:
                 obj = r.json()
                 # updates by gameweek
@@ -302,10 +307,11 @@ async def get_gw_transfers_scrap(
 class Gameweek:
     def __init__(self, gw=1):
         self.gw = gw
+        self.client = async_client
 
     async def get_payload(self):
-        temp = await async_client.get(GW_URL.format(self.gw))
-        temp_2 = await async_client.get(FPL_URL)
+        temp = await self.client.get(GW_URL.format(self.gw))
+        temp_2 = await self.client.get(FPL_URL)
 
         self.json = temp.json()
         self.gw_json = temp_2.json()
@@ -384,17 +390,23 @@ class Gameweek:
 
     def gameweek_average(self):
         return self.status["average_entry_score"]
+    
+    def get_curr_event(self): ## TODO
+        pass
 
+    def set_curr_event(self): ## TODO
+        pass
 
 class Participant:
     def __init__(self, entry_id, gw):
         self.participant = entry_id
         self.gw = gw
         self.history = None
+        self.client = async_client
 
     async def get_history(self) -> dict:
         if not self.history:
-            r = await async_client.get(HISTORY_URL.format(self.participant))
+            r = await self.client.get(HISTORY_URL.format(self.participant))
             LOGGER.info(r.status_code)
             if r.status_code == 200:
                 obj = r.json()
@@ -460,16 +472,16 @@ class Participant:
                 )
         return row
 
-    def get_span_week_transfers(self, span: List[int]) -> dict:
-        return self.get_gw_transfers(span)
+    async def get_span_week_transfers(self, span: List[int]) -> dict:
+        return await self.get_gw_transfers(span)
 
-    def get_all_week_transfers(self) -> dict:
-        return get_all_gw_transfers([self.participant])
+    async def get_all_week_transfers(self) -> dict:
+        return await get_all_gw_transfers([self.participant])
 
-    def get_all_week_entries(self, gw: Union[int, List[int]], all=False) -> list:
+    async def get_all_week_entries(self, gw: Union[int, List[int]], all=False) -> list:
         if all:
-            curr_gw = get_curr_event()[0]
-            gw = curr_gw
+            curr_gw = await get_curr_event()
+            gw = curr_gw[0]
 
         try:
             valid, gw = check_gw(gw)
@@ -479,11 +491,11 @@ class Participant:
         if valid:
             if type(gw) == list:
                 self.all_gw_entries = [
-                    get_participant_entry(self.participant, gameweek) for gameweek in gw
+                    await get_participant_entry(self.participant, gameweek) for gameweek in gw
                 ]
             elif type(gw) == int:
                 self.all_gw_entries = [
-                    get_participant_entry(self.participant, gameweek)
+                    await get_participant_entry(self.participant, gameweek)
                     for gameweek in range(1, gw + 1)
                 ]
             return self.all_gw_entries
@@ -500,6 +512,7 @@ class League:
         self.has_next = True
         self.PAGE_COUNT = 1
         self.transfers = None
+        self.client = async_client
 
     async def obtain_league_participants(self, refresh=False):
         """This function uses the league url as an endpoint to query for participants of a league at a certain date.
@@ -508,7 +521,7 @@ class League:
         if refresh or len(self.participants) == 0:
             self.has_next = True
             while self.has_next:
-                r = await async_client.get(
+                r = await self.client.get(
                     LEAGUE_URL.format(self.league_id, self.PAGE_COUNT)
                 )
                 if r.status_code == 200:
@@ -537,15 +550,15 @@ class League:
         return self.participants
 
     def get_league_count(self):
-        if len(self.participants) > 1:
+        if len(self.participants) >= 1:
             return len(self.participants)
         else:
             LOGGER.info("Obtain league participants first before getting league count")
 
-    def get_participant_name(self, refresh=False) -> dict:
+    async def get_participant_name(self, refresh=False) -> dict:
         """Creates participant id to name hash table"""
         if refresh or len(self.participants) == 0:
-            self.obtain_league_participants()
+            await self.obtain_league_participants()
         self.participant_name = {
             str(participant["entry"]): participant["entry_name"]
             for participant in self.participants
@@ -579,34 +592,35 @@ class League:
                 for participant in out
             )
 
-    def batch_participant_entry(self, batch):
+    async def batch_participant_entry(self, batch):
+        
         for participant in batch:
-            yield get_participant_entry(participant["entry"], self.gw)
+            yield await get_participant_entry(participant["entry"], self.gw)
 
-    def get_all_participant_entries(self, gw, refresh=False, thread=None):
+    async def get_all_participant_entries(self, gw, refresh=False, thread=None):
         self.gw = gw
 
         if refresh or len(self.participants) == 0:
             self.obtain_league_participants()
 
         # optimization 2
-        for participant in self.participants:
-            yield get_participant_entry(participant["entry"], gw)
+        async for participant in self.participants:
+            yield await get_participant_entry(participant["entry"], gw)
 
-    def get_gw_transfers(self, gw, refresh=False, thread=None):
+    async def get_gw_transfers(self, gw, refresh=False, thread=None):
         if refresh or len(self.participants) == 0:
             self.obtain_league_participants()
 
-        result = get_gw_transfers(self.entry_ids, gw)
+        result = await get_gw_transfers(self.entry_ids, gw)
         self.transfers = result
 
         return self.transfers
 
-    def get_all_gw_transfers(self, refresh=False, thread=None):
+    async def get_all_gw_transfers(self, refresh=False, thread=None):
         if refresh or len(self.participants) == 0:
             self.obtain_league_participants()
 
-        self.transfers = get_all_gw_transfers(self.entry_ids)
+        self.transfers = await get_all_gw_transfers(self.entry_ids)
         return self.transfers
 
 

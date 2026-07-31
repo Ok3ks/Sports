@@ -3,7 +3,7 @@ import os
 from typing import List, Any
 import pandas as pd
 import pathlib
-
+import anyio
 from src.db.db import (
     get_player_name_map,
     get_player_position_map,
@@ -14,7 +14,7 @@ from src.db.db import (
 )
 
 
-def parse_fixture(to_dict=True, upload=False):
+def parse_fixture(to_dict=True, upload=False, path:str =""):
     """Parse Fixtures from DB."""
     fixture = get_fixtures()
 
@@ -71,7 +71,7 @@ def parse_fixture(to_dict=True, upload=False):
             obj = temp_df.to_dict("records")
 
         output_path = (
-            pathlib.Path(args.path) if args.path else pathlib.Path(f"data/gameview/")
+            pathlib.Path(path) if path else pathlib.Path(f"data/gameview/")
         )
         output_path.mkdir(parents=True, exist_ok=True)
         filename = f"{gameweek}_fixture.json"
@@ -109,7 +109,7 @@ def parse_stats(
     if to_dict:
         obj = full_df.to_dict("records")
     output_path = (
-        pathlib.Path(args.path) if args.path else pathlib.Path(f"data/gameview/")
+        pathlib.Path(path) if path else pathlib.Path(f"data/gameview/")
     )
     output_path.mkdir(parents=True, exist_ok=True)
     filename = f"{filter['gameweek']}.json"
@@ -152,10 +152,8 @@ def groupby(groups: set[str] = {"gameweek", "position"}):
     out.update({last_key: [""]})
     return [out]
 
-
-if __name__ == "__main__":
+def main():
     import argparse
-
     parser = argparse.ArgumentParser()
 
     parser.add_argument("-g", "--gameweek_id", type=int, help="Gameweek entry")
@@ -176,3 +174,6 @@ if __name__ == "__main__":
             path=args.path,
             upload=args.upload,
         )
+
+if __name__ == "__main__":
+    anyio.run(main()) 
