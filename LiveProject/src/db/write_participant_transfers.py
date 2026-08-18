@@ -1,7 +1,8 @@
 """Multiprocessing script to write weekly entries to database"""
 
+from typing import List, Union
 from LiveProject.src.urls import TRANSFER_URL
-from src.utils import check_gw
+from src.utils import check_gw, parse_transfers
 import logging
 import gevent
 import pandas as pd

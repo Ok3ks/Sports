@@ -499,7 +499,7 @@ class Participant:
                 async with send_stream, receive_stream: 
                     async with anyio.create_task_group() as tg:
                         for gameweek in gw:
-                            tg.start_soon(get_participant_entry, self.participant, gw)
+                            tg.start_soon(get_participant_entry, self.participant, gameweek)
                     async for entry in receive_stream:
                         self.all_gw_entries.append(entry)
             elif type(gw) == int:

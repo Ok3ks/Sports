@@ -1,11 +1,15 @@
 """Multiprocessing script to write weekly entries to database"""
 
+from sqlite3 import Error
+
+from sqlalchemy import text
 from src.utils import get_participant_entry
 import logging
 import gevent
 from src.db.participant_info_table import league_participant_info
 import pandas as pd
 from src.utils import bucket_client
+from sqlalchemy.orm import sessionmaker
 
 LOGGER = logging.getLogger(__name__)
 
