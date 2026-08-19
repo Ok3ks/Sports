@@ -13,12 +13,12 @@ retries = Retry(
 transport = RetryTransport(retry=retries)
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def anyio_backend():
     return "trio"
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def test_async_client():
     async_client = httpx.AsyncClient(transport=transport)
     return async_client
