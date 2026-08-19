@@ -56,15 +56,16 @@ async def test_get_gw_transfers_span(participant, span_fixture):
 
 async def test_get_gw_transfers_all(participants):
     transfers = await get_gw_transfers(participants, all=True)
-    assert len(transfers.keys()) == get_curr_event()[0] - 1
+    curr_event = await get_curr_event()
+    assert len(transfers.keys()) == curr_event[0] - 1
 
 
-def test_get_participant_entry(participant, gw_fixture, mocker):
+async def test_get_participant_entry(participant, gw_fixture, mocker):
     from src import utils
 
     spy = mocker.spy(utils, "get_participant_entry")
 
-    utils.get_participant_entry(participant, gw_fixture)
+    await utils.get_participant_entry(participant, gw_fixture)
     assert spy.call_count == 1
     assert list(spy.spy_return.keys()) == [
         "auto_sub_in",
@@ -82,12 +83,12 @@ def test_get_participant_entry(participant, gw_fixture, mocker):
     ]
 
 
-def test_get_curr_event(mocker):
+async def test_get_curr_event(mocker):
     from src import utils
 
     spy = mocker.spy(utils, "get_curr_event")
 
-    utils.get_curr_event()
+    await utils.get_curr_event()
 
     assert spy.call_count == 1
     assert len(spy.spy_return) in [0, 2]
