@@ -1,13 +1,15 @@
+## Done
+
 - use async connection engine for database
 - parameterize async client
 - wrap async functions in task groups
     - async functions within report class
-
-- Test with locust
 - Test async client works 
 - write tests, use task groups where appropriate (league, )
-- profile before and after (with free-threaded python)
 
+
+- Test with locust
+- profile before and after (with free-threaded python)
 - deploy - move to uvicorn
 
 - rate limit participant report endpoint
@@ -18,8 +20,7 @@
 Limitations.
 - Unable to use Django user model because of embedded database which is replaced on redeploy
 
-- Try out pgembed as embedded database, and for concurrent async connections
+- Try out pgembed/aiosqlite as embedded database, and for concurrent async connections
 
 Features
-
 - Live Table which updates
