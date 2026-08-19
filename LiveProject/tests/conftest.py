@@ -1,6 +1,27 @@
 import pytest
 from ...paths import REPORT_DIR
 from os.path import realpath
+import httpx
+from httpx_retries import Retry, RetryTransport
+
+retries = Retry(
+    total=3,
+    backoff_factor=0.1,
+    status_forcelist=[502, 503, 504],
+    allowed_methods={"GET"},
+)
+transport = RetryTransport(retry=retries)
+
+
+@pytest.fixture(scope="function")
+def anyio_backend():
+    return "trio"
+
+
+@pytest.fixture(scope="function")
+def test_async_client():
+    async_client = httpx.AsyncClient(transport=transport)
+    return async_client
 
 
 @pytest.fixture(scope="module")
@@ -859,7 +880,7 @@ def filepath():
 
 @pytest.fixture(scope="module")
 def participant():
-    return int(145257)
+    return int(437742)
 
 
 @pytest.fixture(scope="module")
@@ -869,12 +890,12 @@ def participants():
 
 @pytest.fixture(scope="module")
 def h2h_league():
-    return int(2049961)
+    return int(386194)
 
 
 @pytest.fixture(scope="module")
 def classic_league():
-    return int(1491605)
+    return int(87552)
 
 
 @pytest.fixture(scope="module")

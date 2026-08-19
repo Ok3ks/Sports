@@ -16,3 +16,6 @@ reports/weekly_report
 **/temp_venv
 **/misc/data_scrap
 **/*.json
+.env
+*DS_Store
+*.csv

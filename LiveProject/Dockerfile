@@ -46,4 +46,4 @@ RUN chmod +x ./container.sh
 RUN ./container.sh
 
 EXPOSE 8000
-ENTRYPOINT ["poetry", "run", "gunicorn", "--config=python:LiveProject.gunicorn"]
+ENTRYPOINT ["poetry", "run", "uvicorn", "--config=python:LiveProject.uvicorn"]

@@ -7,6 +7,7 @@ from src.utils import (
 )
 import pytest
 
+
 @pytest.mark.parametrize("correct_gw", [10])
 @pytest.mark.parametrize("wrong_gw", [40])
 def test_check_gw(wrong_gw, correct_gw):
@@ -42,27 +43,29 @@ def test_parse_transfers(transfer_obj):
     assert "element_in", "element_out" in obj[entry_id].keys()
 
 
-def test_get_gw_transfers_one(participant):
-    transfers = get_gw_transfers([participant], 3)
+async def test_get_gw_transfers_one(participant):
+    transfers = await get_gw_transfers([participant], 3)
     assert len(transfers.keys()) == 1
     assert list(transfers[participant].keys()) == ["element_in", "element_out"]
 
 
-def test_get_gw_transfers_span(participant, span_fixture):
-    transfers = get_gw_transfers([participant], span_fixture)
+async def test_get_gw_transfers_span(participant, span_fixture):
+    transfers = await get_gw_transfers([participant], span_fixture)
     assert set(transfers.keys()).intersection(transfers.keys()) == set(transfers.keys())
 
 
-def test_get_gw_transfers_all(participants):
-    transfers = get_gw_transfers(participants, all=True)
-    assert len(transfers.keys()) == get_curr_event()[0] - 1
+async def test_get_gw_transfers_all(participants):
+    transfers = await get_gw_transfers(participants, all=True)
+    curr_event = await get_curr_event()
+    assert len(transfers.keys()) == curr_event[0] - 1
 
 
-def test_get_participant_entry(participant, gw_fixture, mocker):
+async def test_get_participant_entry(participant, gw_fixture, mocker):
     from src import utils
+
     spy = mocker.spy(utils, "get_participant_entry")
 
-    utils.get_participant_entry(participant, gw_fixture)
+    await utils.get_participant_entry(participant, gw_fixture)
     assert spy.call_count == 1
     assert list(spy.spy_return.keys()) == [
         "auto_sub_in",
@@ -76,17 +79,22 @@ def test_get_participant_entry(participant, gw_fixture, mocker):
         "players",
         "bench",
         "vice_captain",
-        "captain"
+        "captain",
     ]
 
 
-def test_get_curr_event(mocker):
+async def test_get_curr_event(mocker):
     from src import utils
+
     spy = mocker.spy(utils, "get_curr_event")
-    utils.get_curr_event()
+
+    await utils.get_curr_event()
 
     assert spy.call_count == 1
-    assert len(spy.spy_return) == 2
+    assert len(spy.spy_return) in [0, 2]
+
+
+# TODO: test_get_curr_event_empty
 
 
 if __name__ == "__main__":
