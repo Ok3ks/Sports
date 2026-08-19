@@ -92,6 +92,7 @@ def test_get_curr_event(mocker):
     assert spy.call_count == 1
     assert len(spy.spy_return) in [0, 2]
 
+
 # TODO: test_get_curr_event_empty
 
 

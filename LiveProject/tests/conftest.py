@@ -1,6 +1,27 @@
 import pytest
 from ...paths import REPORT_DIR
 from os.path import realpath
+import httpx
+from httpx_retries import Retry, RetryTransport
+
+retries = Retry(
+    total=3,
+    backoff_factor=0.1,
+    status_forcelist=[502, 503, 504],
+    allowed_methods={"GET"},
+)
+transport = RetryTransport(retry=retries)
+
+
+@pytest.fixture(scope="module")
+def anyio_backend():
+    return "trio"
+
+
+@pytest.fixture(scope="module")
+def test_async_client():
+    async_client = httpx.AsyncClient(transport=transport)
+    return async_client
 
 
 @pytest.fixture(scope="module")

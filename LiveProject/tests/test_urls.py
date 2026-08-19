@@ -9,24 +9,23 @@ from ..src.urls import (
     FPL_URL,
 )
 
-import requests
 from src.utils import to_json
 from ...paths import MOCK_DIR
 
 
-def test_gameweek_endpoint(gw_fixture):
+async def test_gameweek_endpoint(gw_fixture, test_async_client):
     # digit greater than 1 less than 38
     gameweek_url = GW_URL.format(gw_fixture)
     assert gameweek_url == "https://fantasy.premierleague.com/api/event/1/live/"
 
-    r = requests.get(gameweek_url)
+    r = await test_async_client.get(gameweek_url)
     assert r.status_code == 200, f"{r.status_code} - Url invalid, or unavailable"
     r = r.json()
     assert "elements" in r.keys()
 
     assert type(r["elements"]) is list
 
-    if len(r["elements"]) > 0: 
+    if len(r["elements"]) > 0:
         assert type(r["elements"][0]) is dict
         element_keys = list(r["elements"][0].keys())
         element_keys_prev = ["id", " stats ", " explain "]
@@ -94,8 +93,8 @@ def test_gameweek_endpoint(gw_fixture):
     to_json(r, f"{MOCK_DIR}/endpoints/gameweek_endpoint.json")
 
 
-def test_fixture_endpoint():
-    r = requests.get(FIXTURE_URL)
+async def test_fixture_endpoint(test_async_client):
+    r = await test_async_client.get(FIXTURE_URL)
     assert r.status_code == 200, "endpoint unavailable"
     r = r.json()
 
@@ -132,11 +131,11 @@ def test_fixture_endpoint():
     to_json(out_dict, f"{MOCK_DIR}/endpoints/fixture_endpoint.json")
 
 
-def test_transfer_endpoint(participant):
+async def test_transfer_endpoint(participant, test_async_client):
     """Tests transfer endpoint given a valid entry_id.
     Response is a list of transfers for previous gameweeks"""
-    r = requests.get(TRANSFER_URL.format(participant))
-    print(r.status_code)
+
+    r = await test_async_client.get(TRANSFER_URL.format(participant))
 
     assert r.status_code == 200, "Endpoint unavailable"
     r = r.json()
@@ -163,27 +162,29 @@ def test_transfer_endpoint(participant):
     to_json(out_dict, f"{MOCK_DIR}/endpoints/transfer_endpoint.json")
 
 
-def test_history_endpoint(participant):
+async def test_history_endpoint(participant, test_async_client):
     """Extracts a players history for prior seasons given an id"""
 
-    r = requests.get(HISTORY_URL.format(participant))
+    r = await test_async_client.get(HISTORY_URL.format(participant))
     assert r.status_code == 200, "Endpoint unavailable"
     r = r.json()
 
     assert type(r) is dict, "Endpoint structure has changed"
     history_keys = list(r.keys())
-   
+
     history_keys_prev = ["current", "past", "chips"]
 
     assert len(set(history_keys_prev).difference(set(history_keys))) == 0, (
         "History keys have changed"
     )
 
-    assert type(r["current"]) ==  type(r["past"]) == type(r["chips"]) == list, "Endpoint structure has changed"  # type: ignore
+    assert type(r["current"]) == type(r["past"]) == type(r["chips"]) == list, (
+        "Endpoint structure has changed"
+    )  # type: ignore
 
     if len(r["current"]) > 0:
         assert type(r["current"][0]) is dict, "Endpoint structure has changed"  # type: ignore
-    
+
         current_keys = r["current"][0].keys()
         current_keys_prev = [
             "event",
@@ -206,23 +207,24 @@ def test_history_endpoint(participant):
         assert len(current_keys) == 12, "Number of keys has changed"
 
     if len(r["past"]) > 0:
-
         assert type(r["past"][0]) is dict, "Endpoint structure has changed"  # type: ignore
         # Add conditional ifs
         past_keys = r["past"][0].keys()
         past_keys_prev = ["season_name", "total_points", "rank", "rank_percentage"]
 
-        assert len(set(past_keys).difference(past_keys_prev)) == 0, "Past keys have changed"
+        assert len(set(past_keys).difference(past_keys_prev)) == 0, (
+            "Past keys have changed"
+        )
 
     # Chips is empty if it has not been used
 
     to_json(r, f"{MOCK_DIR}/endpoints/history_endpoint.json")
 
 
-def test_h2h_league_endpoint(h2h_league):
+async def test_h2h_league_endpoint(h2h_league, test_async_client):
     """"""
 
-    r = requests.get(H2H_LEAGUE.format(h2h_league))
+    r = await test_async_client.get(H2H_LEAGUE.format(h2h_league))
     assert r.status_code == 200
 
     r = r.json()
@@ -271,9 +273,9 @@ def test_h2h_league_endpoint(h2h_league):
         to_json(r, f"{MOCK_DIR}/endpoints/h2h_league_endpoint.json")
 
 
-def test_league_endpoint(classic_league):
+async def test_league_endpoint(classic_league, test_async_client):
     page = 1
-    r = requests.get(LEAGUE_URL.format(classic_league, page))
+    r = await test_async_client.get(LEAGUE_URL.format(classic_league, page))
 
     assert r.status_code == 200
     r = dict(r.json())
@@ -322,7 +324,6 @@ def test_league_endpoint(classic_league):
         " Standings have changed"
     )
 
-
     if len(r["standings"]["results"]) > 0:
         participant_info = r["standings"]["results"][0]  # type: ignore
         participant_info_keys = [
@@ -343,8 +344,8 @@ def test_league_endpoint(classic_league):
     to_json(r, f"{MOCK_DIR}/endpoints/league_endpoint.json")
 
 
-def test_fpl_player_endpoint(participant, gw_fixture):
-    r = requests.get(FPL_PLAYER.format(participant, gw_fixture))
+async def test_fpl_player_endpoint(participant, gw_fixture, test_async_client):
+    r = await test_async_client.get(FPL_PLAYER.format(participant, gw_fixture))
     assert r.status_code == 200, "Endpoint unavailable, check player_id and gameweek"
 
     r = r.json()
@@ -397,8 +398,8 @@ def test_fpl_player_endpoint(participant, gw_fixture):
     to_json(r, f"{MOCK_DIR}/endpoints/player_endpoint.json")
 
 
-def test_fpl_url_endpoint():
-    r = requests.get(FPL_URL)
+async def test_fpl_url_endpoint(test_async_client):
+    r = await test_async_client.get(FPL_URL)
     assert r.status_code == 200, "Endpoint unavailable"
 
     r = r.json()
@@ -500,7 +501,7 @@ def test_fpl_url_endpoint():
     if len(r["phases"]) > 0:
         assert type(r["phases"][0]) is dict
         phase_keys = list(r["phases"][0])
-    
+
     phase_keys_prev = {"id", "name", "start_event", "stop_event", "highest_score"}
 
     diff = set(phase_keys_prev).difference(phase_keys)
@@ -539,13 +540,13 @@ def test_fpl_url_endpoint():
         diff = set(team_keys).difference(team_keys_prev)
         assert len(diff) == 0, f"Team keys have changed new {diff}"
 
-
-
     if len(r["element_stats"]) > 0:
         element_stats_keys = r["element_stats"][0].keys()
         assert "label" in element_stats_keys
         assert "name" in element_stats_keys
-        assert r["element_stats"][0]["name"] == "minutes", "Measurement metric has changed"
+        assert r["element_stats"][0]["name"] == "minutes", (
+            "Measurement metric has changed"
+        )
         assert r["element_stats"][0]["label"] == "Minutes played", (
             "Measurement metric has changed"
         )
@@ -690,6 +691,11 @@ def test_fpl_url_endpoint():
             "scout_news_link",
             "price_change_percent",
             "known_name",
+            ## 26-27
+            "price_change_calibrating",
+            "price_change_hourly_rate",
+            "price_change_projections",
+            "price_change_locked_until",
         ]
 
         diff = set(elements_keys).difference(set(elements_keys_prev))
