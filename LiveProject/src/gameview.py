@@ -14,7 +14,7 @@ from src.db.db import (
 )
 
 
-def parse_fixture(to_dict=True, upload=False, path:str =""):
+def parse_fixture(to_dict=True, upload=False, path: str = ""):
     """Parse Fixtures from DB."""
     fixture = get_fixtures()
 
@@ -70,9 +70,7 @@ def parse_fixture(to_dict=True, upload=False, path:str =""):
         if to_dict:
             obj = temp_df.to_dict("records")
 
-        output_path = (
-            pathlib.Path(path) if path else pathlib.Path(f"data/gameview/")
-        )
+        output_path = pathlib.Path(path) if path else pathlib.Path(f"data/gameview/")
         output_path.mkdir(parents=True, exist_ok=True)
         filename = f"{gameweek}_fixture.json"
 
@@ -108,9 +106,7 @@ def parse_stats(
 
     if to_dict:
         obj = full_df.to_dict("records")
-    output_path = (
-        pathlib.Path(path) if path else pathlib.Path(f"data/gameview/")
-    )
+    output_path = pathlib.Path(path) if path else pathlib.Path(f"data/gameview/")
     output_path.mkdir(parents=True, exist_ok=True)
     filename = f"{filter['gameweek']}.json"
 
@@ -152,8 +148,10 @@ def groupby(groups: set[str] = {"gameweek", "position"}):
     out.update({last_key: [""]})
     return [out]
 
+
 def main():
     import argparse
+
     parser = argparse.ArgumentParser()
 
     parser.add_argument("-g", "--gameweek_id", type=int, help="Gameweek entry")
@@ -175,5 +173,6 @@ def main():
             upload=args.upload,
         )
 
+
 if __name__ == "__main__":
-    anyio.run(main()) 
+    anyio.run(main())

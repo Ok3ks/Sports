@@ -35,6 +35,9 @@ ruff = "^0.9.6"
 pytest = "^8.3.4"
 marimo = "^0.21.1"
 
+[tool.pytest.ini_options]
+anyio_mode = "auto"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

@@ -47,8 +47,12 @@ async def update_db_player_info(engine, table_name, half=1):
     await to_thread.run_sync(_save, data, engine, table_name)
     print(f"success adding {len(data)}")
 
-def _save(df:pd.DataFrame, engine:sqlalchemy.Engine, table_name:str):
-    return df.to_sql(table_name, con=engine, if_exists="append",method="multi",  index=True)
+
+def _save(df: pd.DataFrame, engine: sqlalchemy.Engine, table_name: str):
+    return df.to_sql(
+        table_name, con=engine, if_exists="append", method="multi", index=True
+    )
+
 
 if __name__ == "__main__":
     import argparse
@@ -80,4 +84,4 @@ if __name__ == "__main__":
     engine = create_connection_engine()
 
     # update_db_player_info(engine, args.table_name, half=args.half)
-    anyio.run(update_db_player_info, engine, args.table_name, args.half)
+    anyio.run(update_db_player_info, engine, args.table_name, args.half, backend="trio")

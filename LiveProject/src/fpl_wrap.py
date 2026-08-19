@@ -12,7 +12,6 @@ import numpy as np
 import polars as pl
 from src.db.update_season_fixture import update_season_fixture
 from src.db.db import (
-
     get_player_gql,
 )
 
@@ -153,7 +152,9 @@ class ParticipantReport(Participant):
 
         metrics = {}
         self.transfers = (
-            await self.get_all_week_transfers() if self.transfers is None else self.transfers
+            await self.get_all_week_transfers()
+            if self.transfers is None
+            else self.transfers
         )
         entries = await self.get_all_week_entries(1, all=True)
 
@@ -339,7 +340,7 @@ async def main():
         "-g",
         "--gameweek",
         type=int,
-        default= curr_gw[0] if curr_gw else 2,
+        default=curr_gw[0] if curr_gw else 2,
         help="Gameweek you are trying to get a report of",
     )
     parser.add_argument(
@@ -356,6 +357,9 @@ async def main():
         await test.merge_league_weekly_transfer()
         test.add_auto_sub()
         await test.participant_stats()
+
+
 if __name__ == "__main__":
     import anyio
+
     anyio.run(main)

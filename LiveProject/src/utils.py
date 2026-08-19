@@ -44,7 +44,8 @@ retries = Retry(
 transport = RetryTransport(retry=retries)
 async_client = httpx.AsyncClient(verify=context, transport=transport)
 
-## Replace print with logging 
+## Replace print with logging
+
 
 def to_json(x: dict, fp):  ## use Path instead
     with open(fp, "w") as outs:
@@ -105,8 +106,10 @@ class GameweekError(Exception):
 
 
 async def get_gw_transfers(
-    alist: List[int], gw: Union[int, List[int], None] = None, all=False,
-    client=async_client
+    alist: List[int],
+    gw: Union[int, List[int], None] = None,
+    all=False,
+    client=async_client,
 ) -> dict:
     """Input is a list of entry_id. Gw is the gameweek number.
     'all' toggles between extracting all gameweeks or not"""
@@ -150,7 +153,8 @@ async def get_all_gw_transfers(alist: List[int], client=async_client):
     """Obtains all event transfers for a list of entry Ids"""
 
     row: list = []
-    async def worker(entry_id:int, semaphore:int):
+
+    async def worker(entry_id: int, semaphore: int):
         async with semaphore:
             r = await client.get(TRANSFER_URL.format(entry_id))
             if r.status_code == 200:
@@ -166,7 +170,7 @@ async def get_all_gw_transfers(alist: List[int], client=async_client):
     async with anyio.create_task_group() as tg:
         for entry_id in alist:
             tg.start_soon(worker, entry_id, anyio.Semaphore(40))
-            
+
     return row
 
 
@@ -395,12 +399,13 @@ class Gameweek:
 
     def gameweek_average(self):
         return self.status["average_entry_score"]
-    
-    def get_curr_event(self): ## TODO
+
+    def get_curr_event(self):  ## TODO
         pass
 
-    def set_curr_event(self): ## TODO
+    def set_curr_event(self):  ## TODO
         pass
+
 
 class Participant:
     def __init__(self, entry_id, gw):
@@ -496,10 +501,12 @@ class Participant:
         if valid:
             if type(gw) == list:
                 send_stream, receive_stream = anyio.create_memory_object_stream()
-                async with send_stream, receive_stream: 
+                async with send_stream, receive_stream:
                     async with anyio.create_task_group() as tg:
                         for gameweek in gw:
-                            tg.start_soon(get_participant_entry, self.participant, gameweek)
+                            tg.start_soon(
+                                get_participant_entry, self.participant, gameweek
+                            )
                     async for entry in receive_stream:
                         self.all_gw_entries.append(entry)
             elif type(gw) == int:
@@ -602,7 +609,7 @@ class League:
             )
 
     async def batch_participant_entry(self, batch):
-        
+
         for participant in batch:
             yield await get_participant_entry(participant["entry"], self.gw)
 
@@ -619,9 +626,8 @@ class League:
                 for participant in self.participants:
                     tg.start_soon(get_participant_entry, participant["entry"], gw)
 
-            async for entry in receive_stream:        
+            async for entry in receive_stream:
                 yield entry
-
 
     async def get_gw_transfers(self, gw, refresh=False, thread=None):
         if refresh or len(self.participants) == 0:
@@ -819,7 +825,7 @@ def player_transform(df: pl.DataFrame, vertical=False):
 
 
 def bench_transform(df: pl.DataFrame):
-    
+
     bench_cols = [f"player_{i}" for i in range(1, 4)]
 
     df = df.with_columns(

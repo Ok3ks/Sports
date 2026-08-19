@@ -80,14 +80,16 @@ async def update_season_fixture(engine=None, table_name="2025_2026_FIXTURES"):
     fixture_df["home"] = fixture_df["home"].map(lambda x: team_id_to_name[x])
     fixture_df["away"] = fixture_df["away"].map(lambda x: team_id_to_name[x])
     if engine:
-        await to_thread.run_sync(
-            _save, fixture_df, engine,  table_name
-        )
+        await to_thread.run_sync(_save, fixture_df, engine, table_name)
     else:
         return fixture_df
 
-def _save(df:pd.DataFrame, engine:sqlalchemy.Engine, table_name):
-    return df.to_sql(table_name, con=engine, if_exists="replace",  chunksize=100, index=False)
+
+def _save(df: pd.DataFrame, engine: sqlalchemy.Engine, table_name):
+    return df.to_sql(
+        table_name, con=engine, if_exists="replace", chunksize=100, index=False
+    )
+
 
 if __name__ == "__main__":
-    anyio.run(update_season_fixture, create_connection_engine())
+    anyio.run(update_season_fixture, create_connection_engine(), backend="trio")
