@@ -46,17 +46,17 @@ class TestLeague:
 
         assert test.get_league_count() == len(league_fill_fixture)
 
-    def test_league_get_participant_name(self, classic_league, league_fill_fixture):
+    async def test_league_get_participant_name(self, classic_league, league_fill_fixture):
         test = League(classic_league)
         test.participants = league_fill_fixture
-        test.get_participant_name()
+        await test.get_participant_name()
 
         assert "entry" in test.participants[0].keys()
         assert "entry_name" in test.participants[0].keys()
 
         assert type(list(test.participant_name.values())[0]) is str
 
-    def test_league_get_gw_transfers(
+    async def test_league_get_gw_transfers(
         self, classic_league, league_weekly_transfer, gw_fixture, mocker
     ):
         test = League(classic_league)
@@ -65,7 +65,7 @@ class TestLeague:
         )
 
         spy = mocker.spy(test, "get_gw_transfers")
-        test.get_gw_transfers(gw_fixture)
+        await test.get_gw_transfers(gw_fixture)
 
         assert spy.call_count == 1
         assert spy.spy_return == league_weekly_transfer

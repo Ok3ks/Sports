@@ -92,4 +92,4 @@ def _save(df: pd.DataFrame, engine: sqlalchemy.Engine, table_name):
 
 
 if __name__ == "__main__":
-    anyio.run(update_season_fixture, create_connection_engine(), backend="trio")
+    anyio.run(update_season_fixture, create_connection_engine())

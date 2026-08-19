@@ -83,4 +83,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     engine = create_connection_engine()
 
-    anyio.run(update_db_player_info, engine, args.table_name, args.half, backend="trio")
+    anyio.run(update_db_player_info, engine, args.table_name, args.half)

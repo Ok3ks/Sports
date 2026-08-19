@@ -43,19 +43,19 @@ def test_parse_transfers(transfer_obj):
     assert "element_in", "element_out" in obj[entry_id].keys()
 
 
-def test_get_gw_transfers_one(participant):
-    transfers = get_gw_transfers([participant], 3)
+async def test_get_gw_transfers_one(participant):
+    transfers = await get_gw_transfers([participant], 3)
     assert len(transfers.keys()) == 1
     assert list(transfers[participant].keys()) == ["element_in", "element_out"]
 
 
-def test_get_gw_transfers_span(participant, span_fixture):
-    transfers = get_gw_transfers([participant], span_fixture)
+async def test_get_gw_transfers_span(participant, span_fixture):
+    transfers = await get_gw_transfers([participant], span_fixture)
     assert set(transfers.keys()).intersection(transfers.keys()) == set(transfers.keys())
 
 
-def test_get_gw_transfers_all(participants):
-    transfers = get_gw_transfers(participants, all=True)
+async def test_get_gw_transfers_all(participants):
+    transfers = await get_gw_transfers(participants, all=True)
     assert len(transfers.keys()) == get_curr_event()[0] - 1
 
 
