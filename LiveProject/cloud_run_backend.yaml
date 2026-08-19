@@ -44,10 +44,10 @@ spec:
         image: >-
           europe-west2-docker.pkg.dev/fpl-analysis-tool/fpl/fpl-backend:38_Master
         command:
-        - gunicorn
+        - uvicorn
         args:
         - '--config'
-        - LiveProject/gunicorn.py
+        - LiveProject/uvicorn.py
         ports:
         - name: http1
           containerPort: 8000
