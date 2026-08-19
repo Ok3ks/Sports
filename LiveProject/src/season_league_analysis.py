@@ -4,11 +4,9 @@ from src.utils import (
     bench_transform,
     enrich_player_cols,
     expand_date,
-    get_curr_event,
     get_fixture_data,
     get_league_data,
     get_transfer_data,
-    player_transform,
 )
 import polars as pl
 from functools import lru_cache

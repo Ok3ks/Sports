@@ -400,17 +400,17 @@ class Gameweek:
     def gameweek_average(self):
         return self.status["average_entry_score"]
 
-    def get_curr_event(self):  ## TODO
-        pass
+    async def get_curr_event(self):  ## TODO
+        curr_event = await get_curr_event()
+        return curr_event
 
     def set_curr_event(self):  ## TODO
         pass
 
 
 class Participant:
-    def __init__(self, entry_id, gw):
+    def __init__(self, entry_id):
         self.participant = entry_id
-        self.gw = gw
         self.history = None
         self.client = async_client
 
