@@ -1,7 +1,9 @@
 "https://fantasy.premierleague.com/api/fixtures/"
 
+import anyio
+import sqlalchemy
 from src.db.db import create_connection_engine
-import requests
+from anyio import to_thread
 from src.urls import FIXTURE_URL, FPL_URL
 
 from sqlalchemy import Integer, Boolean, String
@@ -9,6 +11,7 @@ from sqlalchemy import Integer, Boolean, String
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import DeclarativeBase
 import pandas as pd
+from src.utils import async_client
 
 
 class Base(DeclarativeBase):
@@ -34,11 +37,11 @@ class Fixture(Base):
             {self.away}. Date {self.date}"""
 
 
-def update_season_fixture(engine=None, table_name="2025_2026_FIXTURES"):
+async def update_season_fixture(engine=None, table_name="2025_2026_FIXTURES"):
     """This function retrieves current information of players
     from the API"""
 
-    fix = requests.get(FIXTURE_URL)
+    fix = await async_client.get(FIXTURE_URL)
     fix = fix.json()
     fixture_df = pd.DataFrame(fix)
 
@@ -70,21 +73,23 @@ def update_season_fixture(engine=None, table_name="2025_2026_FIXTURES"):
             "date",
         ]
     ]
-    home = requests.get(FPL_URL)
+    home = await async_client.get(FPL_URL)
     home = home.json()
     team_id_to_name = {item["id"]: item["name"] for item in home["teams"]}
 
     fixture_df["home"] = fixture_df["home"].map(lambda x: team_id_to_name[x])
-    fixture_df["away"] = fixture_df["away"].map(
-        lambda x: team_id_to_name[x]
-    )
+    fixture_df["away"] = fixture_df["away"].map(lambda x: team_id_to_name[x])
     if engine:
-        fixture_df.to_sql(
-            table_name, con=engine, if_exists="replace", chunksize=100, index=False
-        )
+        await to_thread.run_sync(_save, fixture_df, engine, table_name)
     else:
         return fixture_df
 
 
+def _save(df: pd.DataFrame, engine: sqlalchemy.Engine, table_name):
+    return df.to_sql(
+        table_name, con=engine, if_exists="replace", chunksize=100, index=False
+    )
+
+
 if __name__ == "__main__":
-    update_season_fixture(engine=create_connection_engine())
+    anyio.run(update_season_fixture, create_connection_engine())

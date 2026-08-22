@@ -1,3 +1,4 @@
+import anyio
 import pandas as pd
 from src.db.db import (
     create_connection_engine,
@@ -6,18 +7,19 @@ from src.db.db import (
 )
 
 from src.db.db import GameweekScore
-
-import requests
+from src.utils import async_client
 from src.urls import GW_URL
 import logging
+from .db import SEASON
 
 LOGGER = logging.getLogger(__name__)
 
-def update_db_gameweek_score(conn, gw):
+
+async def update_db_gameweek_score(conn, gw):
     """This function retrieves current information of players
     from the API"""
 
-    r = requests.get(GW_URL.format(gw))
+    r = await async_client.get(GW_URL.format(gw))
     r = r.json()
     temp = {item["id"]: item["stats"] for item in r["elements"]}
     df = pd.DataFrame(temp)
@@ -26,16 +28,17 @@ def update_db_gameweek_score(conn, gw):
     df.reset_index(level=0, names="player_id", inplace=True)
 
     # Write first, so we're assured table is always created
-    df.to_sql("Player_gameweek_score", conn, if_exists="append", method="multi")
+    df.to_sql(f"{SEASON}_Player_gameweek_score", conn, if_exists="append", method="multi")
 
     if get_gameweek_scores(gw) > 0:
-        print(delete_gameweek_scores(gw, table_name=GameweekScore.__tablename__))
-        df.to_sql("Player_gameweek_score", conn, if_exists="append", method="multi")
+        # print(delete_gameweek_scores(gw, table_name=GameweekScore.__tablename__))
+        df.to_sql(f"{SEASON}_Player_gameweek_score", conn, if_exists="append", method="multi")
         LOGGER.info("Data insert successful")
     else:
         # Combining all gameweeks into one database table,
-        df.to_sql("Player_gameweek_score", conn, if_exists="append", method="multi")
+        df.to_sql(f"{SEASON}_Player_gameweek_score", conn, if_exists="append", method="multi")
         LOGGER.info("Data insert successful")
+
 
 if __name__ == "__main__":
     import argparse
@@ -54,6 +57,6 @@ if __name__ == "__main__":
     connection = create_connection_engine()  # Add database directory as constant
 
     try:
-        update_db_gameweek_score(connection, args.gameweek_id)
+        anyio.run(update_db_gameweek_score, connection, args.gameweek_id)
     except ValueError:
         LOGGER.info("Gameweek is unavailable")

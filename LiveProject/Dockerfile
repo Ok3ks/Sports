@@ -21,13 +21,14 @@ ARG DB_DRIVER_NAME
 ARG DJANGO_SECRET_KEY
 ARG REDISHOST
 ARG REDISPORT
-
+ARG DEVELOP
 # build a clean environment
 FROM base
 
 WORKDIR /sports
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+COPY pyproject.toml .
+RUN pip install poetry
+RUN poetry install --no-root
 ENV PYTHONPATH=:$(pwd)
 
 # copy payload code only
@@ -45,4 +46,4 @@ RUN chmod +x ./container.sh
 RUN ./container.sh
 
 EXPOSE 8000
-ENTRYPOINT ["gunicorn", "--config=python:LiveProject.gunicorn"]
+ENTRYPOINT ["poetry", "run", "uvicorn", "--config=python:LiveProject.uvicorn"]

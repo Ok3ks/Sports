@@ -1,14 +1,17 @@
-from src.db.db import create_connection_engine
-import requests
+from anyio import to_thread
+import anyio
+from src.db.db import SEASON, create_connection_engine
+from src.utils import async_client
 from src.urls import FPL_URL
 import pandas as pd
+import sqlalchemy
 
 
-def update_db_player_info(engine, table_name, half=1):
+async def update_db_player_info(engine, table_name, half=1):
     """This function retrieves current information of players
     from the API"""
 
-    home = requests.get(FPL_URL)
+    home = await async_client.get(FPL_URL)
     home = home.json()
 
     team_code_to_name = {item["code"]: item["name"] for item in home["teams"]}
@@ -41,10 +44,14 @@ def update_db_player_info(engine, table_name, half=1):
     ]
 
     print(f"{len(data)} is ready to be added to database table")
-    data.to_sql(
-        f"{table_name}", engine, if_exists="append", method="multi", index=True
-    )
+    await to_thread.run_sync(_save, data, engine)
     print(f"success adding {len(data)}")
+
+
+def _save(df: pd.DataFrame, engine: sqlalchemy.Engine):
+    return df.to_sql(
+        f"EPL_{SEASON}_PLAYER_INFO", con=engine, if_exists="append", method="multi", index=True
+    )
 
 
 if __name__ == "__main__":
@@ -53,14 +60,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         "Update Player information, this happens twice a year"
     )
-
     parser.add_argument(
-        "-t", "--table_name", type=str, help="Table name",
-        default="EPL_2025_PLAYER_INFO"
-    )
-    parser.add_argument(
-        "-db", "--db_name", type=str, help="Database name",
-        default="fpl"
+        "-db", "--db_name", type=str, help="Database name", default="fpl"
     )
     parser.add_argument(
         "-ha",
@@ -74,4 +75,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     engine = create_connection_engine()
 
-    update_db_player_info(engine, args.table_name, half=args.half)
+    anyio.run(update_db_player_info, engine, args.half)

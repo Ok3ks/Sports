@@ -1,8 +1,9 @@
 from functools import lru_cache
 import operator
 
+import anyio
 import pandas as pd
-import json
+import anyio
 from src.utils import get_basic_stats, League
 from src.db.db import (
     get_player_stats_from_db,
@@ -27,11 +28,13 @@ class LeagueWeeklyReport(League):
 
     @lru_cache()
     @profile
-    def get_data(self):
-        self.one_df = pd.DataFrame(self.get_all_participant_entries(self.gw))
-        self.f = pd.DataFrame(self.get_gw_transfers(self.gw))
+    async def get_data(self):
+        self.one_df = pd.DataFrame(await self.get_all_participant_entries(self.gw))
+        self.f = pd.DataFrame(await self.get_gw_transfers(self.gw))
         self.f = self.f.T
         self.f = self.f.fillna("0")
+        self.participants = await self.obtain_league_participants()
+        self.participants_name = await self.get_participant_name()
 
     @lru_cache(10)
     @profile
@@ -39,7 +42,6 @@ class LeagueWeeklyReport(League):
         """Transforms weekly score into Dataframe, and returns weekly dataframe"""
 
         self.o_df = self.one_df[~self.one_df["players"].isna()]
-
 
         # optimization 4 - loaded all player rows into memory at once
         self.player_points = get_player_stats_from_db(self.gw)
@@ -53,8 +55,8 @@ class LeagueWeeklyReport(League):
 
         self.o_df["captain_points"] = self.o_df["captain"].map(
             lambda x: self.player_points[int(x)] * 2 if math.isnan(x) != True else 0
-            )
-        
+        )
+
         self.o_df["vice_captain_points"] = self.o_df["vice_captain"].map(
             lambda x: self.player_points[x] if math.isnan(x) != True else 0
         )
@@ -102,7 +104,6 @@ class LeagueWeeklyReport(League):
     @profile
     def add_auto_sub(self):
         if "auto_sub_in" in self.f.columns:
-
             # optimization 1 - switching dictionaries to tuples
             self.f["auto_sub_in_player"] = self.f["auto_sub_in"].map(
                 lambda x: [y for y in x.split(",") if len(x) > 3]
@@ -129,21 +130,17 @@ class LeagueWeeklyReport(League):
             )  # More report based on this
             self.no_chips = self.f[self.f["active_chip"].isna()]
 
-        self.participants = self.obtain_league_participants()
-        self.participants_name = self.get_participant_name()
-
         def find_differential():
             """Find the league differential. Calculating league EO"""
 
             all_players = self.o_df["players"].map(
-                lambda x: [
-                    int(y) for y in x.split(",") if len(y.strip()) >= 1
-                ])
-            
+                lambda x: [int(y) for y in x.split(",") if len(y.strip()) >= 1]
+            )
+
             all_players = all_players.explode().value_counts()
 
             return {"differential": {"players": all_players.iloc[-3:].index.to_list()}}
-        
+
         def get_league_name():
             return {"league_name": self.league_name}
 
@@ -282,19 +279,22 @@ class LeagueWeeklyReport(League):
 
                 if "element_in" in self.f.keys() and "element_out" in self.f.keys():
                     self.no_chips = self.no_chips.sort_values(
-                        by="delta", ascending=False)
+                        by="delta", ascending=False
+                    )
                     for i in range(1, n):
                         player_in = self.no_chips.iloc[-i, :]["element_in"]
                         player_out = self.no_chips.iloc[-i, :]["element_out"]
                         points_delta = int(self.no_chips.iloc[-i, :]["delta"])
                         participant_id = str(self.no_chips.iloc[-i, :]["entry_id"])
-                        event_transfer_cost = self.no_chips.iloc[-i, :]['event_transfers_cost']
+                        event_transfer_cost = self.no_chips.iloc[-i, :][
+                            "event_transfers_cost"
+                        ]
 
                         if "N" in str(event_transfer_cost):
                             event_transfer_cost = 0
                         else:
                             event_transfer_cost = int(event_transfer_cost)
-    
+
                         worst_transfer_in.append(
                             {
                                 "entry_id": participant_id,
@@ -320,13 +320,15 @@ class LeagueWeeklyReport(League):
                         player_out = self.no_chips.iloc[i, :]["element_out"]
                         points_delta = int(self.no_chips.iloc[i, :]["delta"])
                         participant_id = str(self.no_chips.iloc[i, :]["entry_id"])
-                        event_transfer_cost = str(self.no_chips.iloc[-i, :]['event_transfers_cost'])
+                        event_transfer_cost = str(
+                            self.no_chips.iloc[-i, :]["event_transfers_cost"]
+                        )
 
                         if "N" in str(event_transfer_cost):
                             event_transfer_cost = 0
                         else:
                             event_transfer_cost = int(event_transfer_cost)
-    
+
                         best_transfer_in.append(
                             {
                                 "entry_id": participant_id,
@@ -442,14 +444,12 @@ class LeagueWeeklyReport(League):
         return output
 
 
-# Output of report page should be a json for a django template
-if __name__ == "__main__":
+async def main():
     import argparse
 
     parser = argparse.ArgumentParser(
         prog="weeklyreport", description="Provide Gameweek ID and League ID"
     )
-
     parser.add_argument(
         "-g",
         "--gameweek_id",
@@ -468,7 +468,6 @@ if __name__ == "__main__":
 
     if args.dry_run:
         test = LeagueWeeklyReport(args.gameweek_id, args.league_id)
-
         test.o_df = pd.DataFrame(test.o_df)
         test.f = pd.DataFrame(test.f)
         test.participants = test.participants["participants"]
@@ -476,9 +475,13 @@ if __name__ == "__main__":
 
     else:
         test = LeagueWeeklyReport(args.gameweek_id, args.league_id)
-        test.get_data()
+        await test.get_data()
         test.weekly_score_transformation()
         test.merge_league_weekly_transfer()
         test.add_auto_sub()
         test.captain_minutes()
         output = test.create_report(display=True)
+
+
+if __name__ == "__main__":
+    anyio.run(main())

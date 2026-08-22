@@ -23,7 +23,9 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = (
+    ["*"] if os.getenv("DEVELOP", "True") else ["fplwrapped.com", "app.fplwrapped.com"]
+)
 
 # Application definition
 
@@ -61,10 +63,8 @@ CORS_ALLOW_HEADERS = [
     # ...any other headers you want to allow...
 ]
 CORS_ALLOW_METHODS = (
-    "DELETE",
     "GET",
     "OPTIONS",
-    "PATCH",
     "POST",
     "PUT",
 )
@@ -93,22 +93,26 @@ WSGI_APPLICATION = "LiveProject.wsgi.application"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 PASSWORD = os.getenv("DB_PASSWORD")
 
-DATABASES = {
-    "default": {
+DATABASES = (
+    {
+        "default": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": BASE_DIR / "db.sqlite3",
         }
-} if os.getenv("IS_SQLITE") else {
-      "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DB_DATABASE"),
-        "USER": os.getenv("DB_USERNAME"),
-        "PASSWORD": os.getenv("DB_PASSWORD"),
-        "HOST": os.getenv("DB_HOST"),
-        "PORT": os.getenv("DB_PORT"),
-        # 'OPTIONS': {'sslmode': 'require'},
-    },
-}
+    }
+    if os.getenv("IS_SQLITE")
+    else {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("DB_DATABASE"),
+            "USER": os.getenv("DB_USERNAME"),
+            "PASSWORD": os.getenv("DB_PASSWORD"),
+            "HOST": os.getenv("DB_HOST"),
+            "PORT": os.getenv("DB_PORT"),
+            # 'OPTIONS': {'sslmode': 'require'},
+        },
+    }
+)
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
