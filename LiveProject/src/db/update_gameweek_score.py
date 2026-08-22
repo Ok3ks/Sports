@@ -10,6 +10,7 @@ from src.db.db import GameweekScore
 from src.utils import async_client
 from src.urls import GW_URL
 import logging
+from .db import SEASON
 
 LOGGER = logging.getLogger(__name__)
 
@@ -27,15 +28,15 @@ async def update_db_gameweek_score(conn, gw):
     df.reset_index(level=0, names="player_id", inplace=True)
 
     # Write first, so we're assured table is always created
-    df.to_sql("Player_gameweek_score", conn, if_exists="append", method="multi")
+    df.to_sql(f"{SEASON}_Player_gameweek_score", conn, if_exists="append", method="multi")
 
     if get_gameweek_scores(gw) > 0:
-        print(delete_gameweek_scores(gw, table_name=GameweekScore.__tablename__))
-        df.to_sql("Player_gameweek_score", conn, if_exists="append", method="multi")
+        # print(delete_gameweek_scores(gw, table_name=GameweekScore.__tablename__))
+        df.to_sql(f"{SEASON}_Player_gameweek_score", conn, if_exists="append", method="multi")
         LOGGER.info("Data insert successful")
     else:
         # Combining all gameweeks into one database table,
-        df.to_sql("Player_gameweek_score", conn, if_exists="append", method="multi")
+        df.to_sql(f"{SEASON}_Player_gameweek_score", conn, if_exists="append", method="multi")
         LOGGER.info("Data insert successful")
 
 
