@@ -22,6 +22,7 @@ import os
 import math
 # from update_gameweek_score import PlayerGameweekScores #decide which to remove on refactor
 
+SEASON = os.environ.get("CURRENT_SEASON")
 
 class Base(DeclarativeBase):
     def to_dict(self):
@@ -29,7 +30,7 @@ class Base(DeclarativeBase):
 
 
 class PlayerInfo(Base):
-    __tablename__ = "EPL_2025_PLAYER_INFO"
+    __tablename__ = f"EPL_{SEASON}_PLAYER_INFO"
 
     player_id: Mapped[int] = mapped_column(Integer, primary_key=True)
     team_code: Mapped[int] = mapped_column(Integer)
@@ -45,7 +46,7 @@ class PlayerInfo(Base):
 
 
 class GameweekScore(Base):
-    __tablename__ = "Player_gameweek_score"
+    __tablename__ = f"{SEASON}_Player_gameweek_score"
 
     index: Mapped[int] = mapped_column(Integer)
     player_id: Mapped[int] = mapped_column(
@@ -86,7 +87,7 @@ class GameweekScore(Base):
 
 
 class Fixtures(Base):
-    __tablename__ = "2025_2026_FIXTURES"
+    __tablename__ = f"{SEASON}_FIXTURES"
 
     homedifficulty: Mapped[int] = mapped_column(Integer)
     awaydifficulty: Mapped[int] = mapped_column(Integer)
@@ -270,45 +271,40 @@ def get_teams(session=session):
         return obj
 
 
-def get_teams_id(session=session) -> dict:
+def get_teams_id(session=session, season=SEASON) -> dict:
     """Return a mapping of team id to teams"""
     with session() as session:
-        statement_1 = text("SELECT team_id,team FROM EPL_2025_PLAYER_INFO")
+        statement_1 = text(f"SELECT team_id,team FROM EPL_{season}_PLAYER_INFO")
         obj = session.execute(statement_1).all()
         obj = {i[0]: i[1] for i in obj}
         return obj
 
 
-def get_player_team_map(session=session) -> dict:
+def get_player_team_map(session=session, season=SEASON) -> dict:
     """Return a mapping of Player id to teams"""
     with session() as session:
-        statement_1 = text("SELECT player_id, team FROM EPL_2025_PLAYER_INFO")
+        statement_1 = text(f"SELECT player_id, team FROM EPL_{season}_PLAYER_INFO")
         obj = session.execute(statement_1).all()
         obj = {i[0]: i[1] for i in obj}
         return obj
 
 
-def get_player_name_map(session=session) -> dict:
+def get_player_name_map(session=session, season=SEASON) -> dict:
     """Return a mapping of Player id to Name"""
     with session() as session:
-        statement_1 = text("SELECT player_id, player_name FROM EPL_2025_PLAYER_INFO")
+        statement_1 = text(f"SELECT player_id, player_name FROM EPL_{SEASON}_PLAYER_INFO")
         obj = session.execute(statement_1).all()
         obj = {i[0]: i[1] for i in obj}
         return obj
 
 
-def get_player_position_map(session=session) -> dict:
+def get_player_position_map(session=session, season=SEASON) -> dict:
     """Return a mapping of Player id to teams"""
     with session() as session:
-        statement_1 = text('SELECT player_id, position FROM "EPL_2025_PLAYER_INFO"')
+        statement_1 = text(f"SELECT player_id, position FROM EPL_{SEASON}_PLAYER_INFO")
         obj = session.execute(statement_1).all()
         obj = {i[0]: i[1] for i in obj}
         return obj
-
-
-# r
-# raw sql queries make it hard to switch databases
-# tests are good
 
 
 def get_entry_ids(session=sessionmaker(create_connection_engine()), table_name=""):
@@ -330,12 +326,12 @@ def get_player_stats_from_db_gql(id, gw, session=session):
         return c
 
 
-def get_player_season_points(id, session=session):
+def get_player_season_points(id, session=session, season=SEASON):
     """Player Season Points"""
 
     # preferring raw statement to bypass sqlalchemy identity mapper
     stmt = text(
-        f"SELECT total_points FROM Player_gameweek_score WHERE player_id = {id}"
+        f'SELECT total_points FROM "{season}_Player_gameweek_score" WHERE player_id = {id}'
     )
 
     with session() as session:
@@ -344,9 +340,9 @@ def get_player_season_points(id, session=session):
         return c
 
 
-def get_player_stats_from_db(gw, session=session):
+def get_player_stats_from_db(gw, session=session, season=SEASON):
     stmt = text(
-        f"SELECT player_id, total_points FROM Player_gameweek_score WHERE gameweek = {gw}"
+        f'SELECT player_id, total_points FROM "{season}_Player_gameweek_score" WHERE gameweek = {gw}'
     )
     # stmt = select(PlayerGameweekScores.total_points).where((PlayerGameweekScores.player_id == id)&(PlayerGameweekScores.gameweek == gw))
     with session() as session:
@@ -355,10 +351,10 @@ def get_player_stats_from_db(gw, session=session):
     return {i.player_id: i.total_points for i in c}
 
 
-def get_ind_player_stats_from_db(id, gw, session=session):
+def get_ind_player_stats_from_db(id, gw, session=session, season=SEASON):
     if id and gw:
         stmt = text(
-            f"SELECT total_points FROM Player_gameweek_score WHERE gameweek = {gw} and player_id = {id}"
+            f'SELECT total_points FROM "{season}_Player_gameweek_score" WHERE gameweek = {gw} and player_id = {id}'
         )
         with session() as session:
             c = session.execute(stmt).one()
@@ -368,35 +364,35 @@ def get_ind_player_stats_from_db(id, gw, session=session):
             pass
 
 
-def get_gameweek_stats(gw, session=session):
+def get_gameweek_stats(gw, session=session, season=SEASON):
     """Return all stats for a particular gameweek."""
-    stmt = text(f"SELECT * FROM Player_gameweek_score WHERE gameweek = {gw}")
+    stmt = text(f'SELECT * FROM "{season}_Player_gameweek_score" WHERE gameweek = {gw}')
     with session() as session:
         c = session.execute(stmt).all()
     return c
 
 
-def get_season_stats(session=session):
+def get_season_stats(session=session, season=SEASON):
     """Return all season stats"""
-    stmt = text(f"SELECT * FROM Player_gameweek_score ORDER BY GAMEWEEK DESC ")
+    stmt = text(f'SELECT * FROM "{season}_Player_gameweek_score" ORDER BY GAMEWEEK DESC')
     with session() as session:
         c = session.execute(stmt).all()
     return c
 
 
-def get_fixtures(session=session):
+def get_fixtures(session=session, season=SEASON):
     """Return all fixtures."""
-    stmt = text(f'SELECT  * FROM "2025_2026_FIXTURES"')
+    stmt = text(f'SELECT  * FROM {season}_FIXTURES ')
     with session() as session:
         c = session.execute(stmt).all()
     return c
 
 
 @lru_cache(maxsize=128)
-def get_fixture_gameweek(team: str, gw, session=session):
+def get_fixture_gameweek(team: str, gw, session=session, season=SEASON):
     """Return fixture for a gameweek"""
     stmt = text(
-        f'SELECT * from "2025_2026_FIXTURES" where gameweek={gw} and (home="{team}" OR away="{team}")'
+        f'SELECT * from {season}_FIXTURES where gameweek={gw} and (home="{team}" OR away="{team}")'
     )
     with session() as session:
         c = session.execute(
@@ -405,12 +401,12 @@ def get_fixture_gameweek(team: str, gw, session=session):
     return c
 
 
-def check_minutes(id, gw, session=session):
+def check_minutes(id, gw, session=session, season=SEASON):
     """Checks DB for captain's minutes"""
 
     if not math.isnan(id):
         stmt = text(
-            f"SELECT minutes FROM Player_gameweek_score WHERE player_id={id} and gameweek = {gw}"
+            f'SELECT minutes FROM "{season}_Player_gameweek_score" WHERE player_id={id} and gameweek = {gw}'
         )
         with session() as session:
             c = session.execute(stmt)
@@ -424,9 +420,10 @@ def check_minutes(id, gw, session=session):
 
 def get_available_gameweek_scores(
     session=sessionmaker(create_connection_engine()),
+    season=SEASON
 ):
     # can be refactored to get_distinct of any column
-    stmt = text("SELECT distinct(gameweek) FROM Player_gameweek_score")
+    stmt = text(f"SELECT distinct(gameweek) FROM {season}_Player_gameweek_score")
     with session() as session:
         c = session.execute(stmt)
     return c.fetchall()

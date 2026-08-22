@@ -194,6 +194,7 @@ async def test_history_endpoint(participant, test_async_client):
             "rank_sort",
             "percentile_rank",
             "overall_rank",
+            "overall_rank_percentage",
             "bank",
             "value",
             "event_transfers",
@@ -204,7 +205,7 @@ async def test_history_endpoint(participant, test_async_client):
         assert len(set(current_keys).difference(set(current_keys_prev))) == 0, (
             "Current keys has changed"
         )
-        assert len(current_keys) == 12, "Number of keys has changed"
+        assert len(current_keys) == 13, "Number of keys has changed"
 
     if len(r["past"]) > 0:
         assert type(r["past"][0]) is dict, "Endpoint structure has changed"  # type: ignore
@@ -285,7 +286,7 @@ async def test_league_endpoint(classic_league, test_async_client):
 
     keys_prev = ["new_entries", "last_updated_data", "league", "standings"]
 
-    assert len(set(keys_prev).difference(keys)) == 0, "League Keys have changed"
+    assert len(set(keys_prev).difference(keys)) == 0, "Base Keys have changed"
 
     assert type(r["league"]) is dict  # type: ignore
     assert type(r["new_entries"]) is dict  # type: ignore
@@ -327,7 +328,7 @@ async def test_league_endpoint(classic_league, test_async_client):
     if len(r["standings"]["results"]) > 0:
         participant_info = r["standings"]["results"][0]  # type: ignore
         participant_info_keys = [
-            "id",
+
             "event_total",
             "player_name",
             "rank",
@@ -363,6 +364,7 @@ async def test_fpl_player_endpoint(participant, gw_fixture, test_async_client):
     entry_history_keys = list(r["entry_history"].keys())
 
     curr_entry_history_keys = [
+        "id",
         "event",
         "points",
         "total_points",
@@ -370,6 +372,7 @@ async def test_fpl_player_endpoint(participant, gw_fixture, test_async_client):
         "rank_sort",
         "percentile_rank",
         "overall_rank",
+        "overall_rank_percentage",
         "bank",
         "value",
         "event_transfers",
