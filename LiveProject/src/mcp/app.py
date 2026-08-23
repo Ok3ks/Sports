@@ -4,13 +4,12 @@
 
 """
 
-import pathlib
-from fastmcp import FastMCP
-import anyio
 from typing import Any
 import polars as pl
 import os
 from .base import mcp
+from google.cloud import storage
+from fastmcp.resources import ResourceContent
 
 
 ####TOOLS
@@ -26,40 +25,36 @@ def load_visualization_tool():
     """Uses seaborn to aid visualization"""
     pass
 
+@mcp.tool
+def extract_fixture():
+    """Seperates stats and data """
 
 ####RESOURCES
-@mcp.resource("gs://{year}")
-def stats_data(year:str):
+@mcp.resource("data://{season}/")
+def season_data(season:str):
     """
-        Exposes statistics for available seasons.
+        Exposes all stats for an available seasons.
     """
+    client = storage.Client(use_auth_w_custom_endpoint=False)
+    bucket = client.get_bucket(season)
+    blobs = bucket.list_blobs()
+    blobs = [blob.download_as_text() for blob in blobs]
+    return blobs
 
-    resources_path = os.getenv("RESOURCES_PATH")
-    
-    if resources_path.startswith("gs") or pathlib.Path(resources_path).exists():
-        resources_url = resources_path # validate and think of how best to store this
-    else:
-        raise ValueError(
-            "Path is invalid, function accepts only a google network storage object or a local path"
-            )
-    
-    return resources_url
-
-@mcp.resource("gs://{year}_fixtures")
-def fixtures_data(year:str):
+@mcp.resource("data://{season}/{gameweek}.json")
+def gameweek_data(season:str, gameweek:str) -> tuple[dict[str, Any], dict[str,Any]]:
     """
-        Exposes fixtures for available seasons.
-    """
+        Exposes statistics for available specific gameweek, and specific fixture as a Tuple of text strings.
 
-    resources_path = os.getenv("RESOURCES_PATH")
-    
-    if resources_path.startswith("gs") or pathlib.Path(resources_path).exists():
-        fixtures_url = f"{resources_path}_fixtures"
-    else:
-        raise ValueError(
-            "Path is invalid, function accepts only a google network storage object or a local path"
-            )
-    return fixtures_url
+    """
+    client = storage.Client()
+    bucket = client.get_bucket(season)
+
+    stats = bucket.get_blob(f"{gameweek}.json").download_as_text()
+    fixture = bucket.get_blob(f"{gameweek}_fixture.json").download_as_text()
+
+    return stats, fixture
+
 
 ####PROMPTS
 @mcp.prompt
