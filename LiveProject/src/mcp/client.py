@@ -18,4 +18,4 @@ async def main() -> None:
         print(tools)
 
 if __name__ == "__main__":
-    anyio.run(main())
+    anyio.run(main)
