@@ -148,7 +148,7 @@ def groupby(groups: set[str] = {"gameweek", "position"}):
     return [out]
 
 
-def main():
+async def main():
     import argparse
 
     parser = argparse.ArgumentParser()
@@ -174,4 +174,4 @@ def main():
 
 
 if __name__ == "__main__":
-    anyio.run(main())
+    anyio.run(main)
