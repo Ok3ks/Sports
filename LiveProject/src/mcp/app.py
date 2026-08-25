@@ -4,45 +4,24 @@
 
 """
 
+import json
 from typing import Any
 import polars as pl
-import os
+from fastmcp.server import create_proxy
+
+from pydantic_ai import RunContext
 from .base import mcp
 from google.cloud import storage
-from fastmcp.resources import ResourceContent
+from typing import Annotated
+from pydantic import Field
 
-
-####TOOLS
-
-@mcp.tool
-def load_dataframe(obj: list[dict[str, Any]]) -> pl.DataFrame:
-    """Use polars to load a json for analysis"""
-    pass
-
-
-@mcp.tool
-def load_visualization_tool():
-    """Uses seaborn to aid visualization"""
-    pass
-
-@mcp.tool
-def extract_fixture():
-    """Seperates stats and data """
+Season = Annotated[str, Field(pattern=r"^\d{4}[_]\d{4}$")]
 
 ####RESOURCES
-@mcp.resource("data://{season}/")
-def season_data(season:str):
-    """
-        Exposes all stats for an available seasons.
-    """
-    client = storage.Client(use_auth_w_custom_endpoint=False)
-    bucket = client.get_bucket(season)
-    blobs = bucket.list_blobs()
-    blobs = [blob.download_as_text() for blob in blobs]
-    return blobs
 
-@mcp.resource("data://{season}/{gameweek}.json")
-def gameweek_data(season:str, gameweek:str) -> tuple[dict[str, Any], dict[str,Any]]:
+
+@mcp.resource("fpl://{season}/{gameweek}.json")
+def gameweek_data(season: Season, gameweek:str) -> tuple[dict[str, Any], dict[str,Any]]:
     """
         Exposes statistics for available specific gameweek, and specific fixture as a Tuple of text strings.
 
@@ -53,16 +32,51 @@ def gameweek_data(season:str, gameweek:str) -> tuple[dict[str, Any], dict[str,An
     stats = bucket.get_blob(f"{gameweek}.json").download_as_text()
     fixture = bucket.get_blob(f"{gameweek}_fixture.json").download_as_text()
 
-    return stats, fixture
+    return json.loads(stats), json.loads(fixture)
 
 
 ####PROMPTS
-@mcp.prompt
+@mcp.prompt("player recommendation")
 def best_all_time_player():
     """
         Retrieves the best all-time player
     """
 
-    return "VV"
+    return "Suggest to me the recommmended player for next season given next week's fixture"
+
+
+###TOOLS
+@mcp.tool
+async def read_resource(uri: str):
+    """
+        Read a resource from the MCP server by URI.
+        
+        Available resources are : 
+        - "fpl://{season}/",
+        - "fpl://{season}/{gameweek}.json"
+        
+    """
+
+    content = await mcp.read_resource(uri)
+    return content
+
+@mcp.tool
+def get_curr_event():
+    pass
+
+
+@mcp.tool
+def get_live_data():
+    pass
+
+
+@mcp.tool
+def load_dataframe(obj: list[dict[str, Any]]) -> pl.DataFrame:
+    """Use polars to load a json for analysis"""
+    df = pl.read_json(obj)
+    return df
+
+
+mcp.mount(create_proxy("https://mcp.pola.rs/mcp"), namespace="polars")
 
 app = mcp.http_app(path="/mcp")
