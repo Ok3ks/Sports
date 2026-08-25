@@ -11,12 +11,12 @@ from src.db.db import (
     get_season_stats,
     get_teams_id,
     get_fixtures,
+    SEASON
 )
-SEASON = "2026_2027"
 
 def parse_fixture(to_dict=True, upload=False, path: str = ""):
     """Parse Fixtures from DB."""
-    fixture = get_fixtures()
+    fixture = get_fixtures(season=SEASON)
 
     fixture_df = pd.DataFrame(fixture)
     fixture_df = fixture_df.rename(
@@ -115,7 +115,7 @@ def parse_stats(
     if upload:
         from src.utils import bucket_client
 
-        bucket = bucket_client(bucket_name="2025_2026")  # parameter
+        bucket = bucket_client(bucket_name=SEASON)  # parameter
         blob = bucket.blob(filename)
         blob.upload_from_filename(output_path / filename)
 

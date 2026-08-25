@@ -22,7 +22,7 @@ import os
 import math
 # from update_gameweek_score import PlayerGameweekScores #decide which to remove on refactor
 
-SEASON = os.environ.get("CURRENT_SEASON")
+SEASON = "2026_2027"
 
 class Base(DeclarativeBase):
     def to_dict(self):

@@ -12,6 +12,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import DeclarativeBase
 import pandas as pd
 from src.utils import async_client
+from src.db import SEASON
 
 
 class Base(DeclarativeBase):
@@ -19,7 +20,7 @@ class Base(DeclarativeBase):
 
 
 class Fixture(Base):
-    __tablename__ = "2025_2026_FIXTURES"
+    __tablename__ = f"{SEASON}_FIXTURES"
 
     code: Mapped[int] = mapped_column(Integer, primary_key=True)
     gameweek: Mapped[int] = mapped_column(Integer)
@@ -37,7 +38,7 @@ class Fixture(Base):
             {self.away}. Date {self.date}"""
 
 
-async def update_season_fixture(engine=None, table_name="2025_2026_FIXTURES"):
+async def update_season_fixture(engine=None, table_name=f"{SEASON}_FIXTURES"):
     """This function retrieves current information of players
     from the API"""
 
