@@ -36,7 +36,9 @@ jobs:
           which python
           python -m venv venv
           source venv/bin/activate
-          pip install -r LiveProject/requirements.txt
+          pipx install poetry
+          cd LiveProject
+          poetry install --no-root
           which python
 
       - id: 'auth'
