@@ -382,7 +382,7 @@ def get_season_stats(session=session, season=SEASON):
 
 def get_fixtures(session=session, season=SEASON):
     """Return all fixtures."""
-    stmt = text(f'SELECT  * FROM {season}_FIXTURES ')
+    stmt = text(f'SELECT * FROM "{season}_FIXTURES"')
     with session() as session:
         c = session.execute(stmt).all()
     return c
@@ -392,7 +392,7 @@ def get_fixtures(session=session, season=SEASON):
 def get_fixture_gameweek(team: str, gw, session=session, season=SEASON):
     """Return fixture for a gameweek"""
     stmt = text(
-        f'SELECT * from {season}_FIXTURES where gameweek={gw} and (home="{team}" OR away="{team}")'
+        f'SELECT * from "{season}_FIXTURES" where gameweek={gw} and (home="{team}" OR away="{team}")'
     )
     with session() as session:
         c = session.execute(
