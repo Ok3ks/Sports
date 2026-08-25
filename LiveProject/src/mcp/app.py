@@ -9,7 +9,6 @@ from typing import Any
 import polars as pl
 from fastmcp.server import create_proxy
 
-from pydantic_ai import RunContext
 from .base import mcp
 from google.cloud import storage
 from typing import Annotated
@@ -18,8 +17,6 @@ from pydantic import Field
 Season = Annotated[str, Field(pattern=r"^\d{4}[_]\d{4}$")]
 
 ####RESOURCES
-
-
 @mcp.resource("fpl://{season}/{gameweek}.json")
 def gameweek_data(season: Season, gameweek:str) -> tuple[dict[str, Any], dict[str,Any]]:
     """
@@ -33,16 +30,6 @@ def gameweek_data(season: Season, gameweek:str) -> tuple[dict[str, Any], dict[st
     fixture = bucket.get_blob(f"{gameweek}_fixture.json").download_as_text()
 
     return json.loads(stats), json.loads(fixture)
-
-
-####PROMPTS
-@mcp.prompt("player recommendation")
-def best_all_time_player():
-    """
-        Retrieves the best all-time player
-    """
-
-    return "Suggest to me the recommmended player for next season given next week's fixture"
 
 
 ###TOOLS
