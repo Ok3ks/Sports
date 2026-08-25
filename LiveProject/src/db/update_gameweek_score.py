@@ -10,7 +10,7 @@ from src.db.db import GameweekScore
 from src.utils import async_client
 from src.urls import GW_URL
 import logging
-from .db import SEASON
+from src.db.db import SEASON
 
 LOGGER = logging.getLogger(__name__)
 
