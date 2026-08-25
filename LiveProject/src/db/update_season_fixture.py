@@ -12,7 +12,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import DeclarativeBase
 import pandas as pd
 from src.utils import async_client
-from src.db import SEASON
+from src.db.db import SEASON
 
 
 class Base(DeclarativeBase):
