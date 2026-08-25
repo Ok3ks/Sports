@@ -69,7 +69,7 @@ jobs:
           create_credentials_file: true
           workload_identity_provider: '${{secrets.WORKLOAD_IDENTITY_PROVIDERS }}'
           service_account: '${{ secrets.AUTH_SERVICE_ACCOUNT }}'
-          run: gsutil cors set cors.json gs://2024_2025 gs://2025_2026
+          run: gsutil cors set cors.json gs://2024_2025 gs://2025_2026 gs://2026_2027
 
       - name: 'Docker auth'
         run: |

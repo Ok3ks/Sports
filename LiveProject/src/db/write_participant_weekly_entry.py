@@ -6,7 +6,7 @@ from sqlalchemy import text
 from src.utils import get_participant_entry
 import logging
 import gevent
-from src.db.participant_info_table import league_participant_info
+from src.db.db import SEASON
 import pandas as pd
 from src.utils import bucket_client
 from sqlalchemy.orm import sessionmaker
@@ -41,13 +41,13 @@ def create_gameweek_entries_table(conn="", table_name=""):
     return conn
 
 
-bucket = bucket_client(bucket_name="2025_2026_participants_entry")
+bucket = bucket_client(bucket_name=f"{SEASON}_participants_entry")
 
 
 def participant_weekly_entry(entry_id: list[int] | int, to_json=False, upload=True):
     """Downloads weekly entry for a list of entry Id"""
-    YEAR = "2025_2026"
-    new_directory = f"data/{YEAR}/participant/{args.gameweek_id}"
+
+    new_directory = f"data/{SEASON}/participant/{args.gameweek_id}"
     if type(entry_id) is list:
         START = 0
         for n in range(0, len(entry_id), 100):

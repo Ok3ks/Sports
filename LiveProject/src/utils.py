@@ -8,6 +8,7 @@ import pandas as pd
 import json
 import numpy as np
 from google.cloud import storage
+import google
 from src.db.db import get_fixtures
 from functools import lru_cache
 from anyio import create_task_group
@@ -179,7 +180,10 @@ async def get_all_gw_transfers(alist: List[int], client=async_client):
 
 def bucket_client(bucket_name="wrapped_participants_entry"):
     client = storage.Client()
-    bucket = client.get_bucket(bucket_name)
+    try:
+        bucket = client.get_bucket(bucket_name)
+    except google.cloud.exceptions.NotFound: 
+        bucket = client.create_bucket(bucket_name)
     return bucket
 
 
