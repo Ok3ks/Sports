@@ -177,6 +177,7 @@ async def get_all_gw_transfers(alist: List[int], client=async_client):
 
 ## versioning API -- API v2
 
+
 def bucket_client(bucket_name="wrapped_participants_entry"):
     client = storage.Client()
     try:
