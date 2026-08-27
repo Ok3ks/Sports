@@ -1,41 +1,47 @@
-- Tools, Prompt, Resources 
 
-- Interact with sqlite database on this one
+## Assurance - Backend
+- write/update tests
+- Test with locust -- t
+- profile before and after (with free-threaded python). Bump up to 3.13
+
+### AI features
+- Add logging/monitoring layer, i.e logfire for AI layer  -- done
+- Tools, Prompt, Resources  -- Turns out, all i need are tools but prohibitive cost of claude means self hosting models 
+- Interact with sqlite database on this one -- I called the json directly from the storage bucket
+
 
 - Expose with Daphne on the frontend
+- Evaluate prompts 
+- expose mcp to resolvers, maybe not necessary?? can plugin to frontend typescript, experiment with
 
-- Need to push async into the repo
 
-- expose mcp to resolvers
+### DevOps
+- deploy backend - move to uvicorn
+- Deploy open-weight model for mcp feature (maybe use a cluster)
+- Logfire for other monitoring aspectS? --- I already have cloud logs
 
-- write tests
 
-- Evaluate prompts
+### Authorization & Authentication
+- rate limit participant report endpoint
+- authorize league report endpoint
+- only io blocking task in leagueweeklyreport is get_data, split methods to worker threads, to gain speedup, i.e map reduce?
 
-- Add logging/monitoring layer, i.e logfire
-## Done
 
+
+### Nice to haves
 - use async connection engine for database
-- parameterize async client
 - wrap async functions in task groups
     - async functions within report class
-- Test async client works 
+- Django is overkill, can replace only with fastAPI
 - write tests, use task groups where appropriate (league, )
 
 
-- Test with locust
-- profile before and after (with free-threaded python)
-- deploy - move to uvicorn
 
-- rate limit participant report endpoint
-- authorize league report endpoint
-- parameterize season as an enum or rather an env variable?
-- only io blocking task in leagueweeklyreport is get_data, split methods to worker threads, to gain speedup, i.e map reduce?
+### Done 
+- parameterize async client --- Done
+- Test async client works 
+
 
 Limitations.
 - Unable to use Django user model because of embedded database which is replaced on redeploy
-
 - Try out pgembed/aiosqlite as embedded database, and for concurrent async connections
-
-Features
-- Live Table which updates
