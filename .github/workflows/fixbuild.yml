@@ -1,5 +1,10 @@
-name: Fixtures
+name: Fixtures & Gameweek
 on:
+  schedule:
+    - cron: "0/10 20-22 * * 5"
+    - cron: "0/10 12-20 * * 6"
+    - cron: "0/10 14-20 * * 0"
+        
   push:
     paths:
       - '.github/workflows/fixbuild.yml' 
@@ -58,3 +63,14 @@ jobs:
             echo updating fixtures
             python src/db/update_season_fixture.py
             python src/gameview.py -f True -u True
+            
+      - name: 'Create Gameweek Report'
+        run: |
+            source venv/bin/activate
+            source init_env.sh
+            cd LiveProject
+            echo ${{ env.GW }} report
+            python src/db/update_player_information.py -ha 1
+            python src/db/update_player_information.py -ha 2
+            python src/db/update_gameweek_score.py -g ${{ secrets.GW }}
+            python src/gameview.py -g ${{ secrets.GW }} -u True
