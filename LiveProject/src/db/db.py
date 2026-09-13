@@ -443,7 +443,7 @@ def get_gameweek_scores(gameweek: int, session=session):
 
 def delete_gameweek_scores(gameweek: int, session=session, table_name=""):
     with session() as session:
-        stmt = text(f"DELETE FROM {table_name} where gameweek = {gameweek}")
+        stmt = text(f'DELETE FROM "{table_name}" where gameweek = {gameweek}')
         session.execute(stmt)
         session.commit()
 

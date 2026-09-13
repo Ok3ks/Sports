@@ -37,7 +37,7 @@ async def update_db_gameweek_score(conn, gw):
     df.to_sql(f"{SEASON}_Player_gameweek_score", conn, if_exists="append", method="multi")
 
     if get_gameweek_scores(gw) > 0:
-        # print(delete_gameweek_scores(gw, table_name=GameweekScore.__tablename__))
+        print(delete_gameweek_scores(gw, table_name=GameweekScore.__tablename__))
         df.to_sql(f"{SEASON}_Player_gameweek_score", conn, if_exists="append", method="multi")
         LOGGER.info("Data insert successful")
     else:
@@ -67,11 +67,7 @@ async def main():
         gameweek = gameweek[0]
         LOGGER.info(gameweek)
 
-    try:
-        await update_db_gameweek_score(connection, gameweek)
-    except ValueError:
-        LOGGER.info("Gameweek Endpoint is unavailable")
-    pass
+    await update_db_gameweek_score(connection, gameweek)
 
 if __name__ == "__main__":
     anyio.run(main)
