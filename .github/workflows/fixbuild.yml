@@ -73,10 +73,10 @@ jobs:
             source init_env.sh
             cd LiveProject
             echo updating fixtures
+            python -u src/db/update_gameweek_score.py
             python src/db/update_season_fixture.py
             python src/db/update_player_information.py -ha 1
             python src/db/update_player_information.py -ha 2
-            python src/db/update_gameweek_score.py
 
       - name: 'Upload Gameweek Report and Fixture'
         run: |
