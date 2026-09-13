@@ -58,31 +58,22 @@ jobs:
           service_account: '${{ secrets.AUTH_SERVICE_ACCOUNT }}'
           process_gcloudignore: false
     
-      - name: Obtain current gameweek script
-        run: |
-            source venv/bin/activate
-            source init_env.sh
-            cd LiveProject
-            echo getting current gameweek
-            python -m src.utils | tee q
-            
-
-      - name: 'Update scripts'
+      - name: 'Upload Fixtures'
         run: |
             source venv/bin/activate
             source init_env.sh
             cd LiveProject
             echo updating fixtures
-            python -u src/db/update_gameweek_score.py
             python src/db/update_season_fixture.py
-            python src/db/update_player_information.py -ha 1
-            python src/db/update_player_information.py -ha 2
-
-      - name: 'Upload Gameweek Report and Fixture'
+            python src/gameview.py -f True -u True
+            
+      - name: 'Create Gameweek Report'
         run: |
             source venv/bin/activate
             source init_env.sh
             cd LiveProject
             echo ${{ env.GW }} report
-            python src/gameview.py -f True -u True
-            python src/gameview.py -u True
+            python src/db/update_player_information.py -ha 1
+            python src/db/update_player_information.py -ha 2
+            python src/db/update_gameweek_score.py -g ${{ secrets.GW }}
+            python src/gameview.py -g ${{ secrets.GW }} -u True
