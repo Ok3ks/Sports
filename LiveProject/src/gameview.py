@@ -99,6 +99,16 @@ def parse_stats(
     full_df: pd.DataFrame = pd.DataFrame(stats)
     full_df = full_df[full_df["gameweek"] == filter["gameweek"]]
 
+    full_df = full_df.drop_duplicates(['index', 'player_id', 'minutes', 'goals_scored', 'assists',
+       'clean_sheets', 'goals_conceded', 'own_goals', 'penalties_saved',
+       'penalties_missed', 'yellow_cards', 'red_cards', 'saves', 'bonus',
+       'bps', 'influence', 'creativity', 'threat', 'ict_index',
+       'clearances_blocks_interceptions', 'recoveries', 'tackles',
+       'defensive_contribution', 'starts', 'expected_goals',
+       'expected_assists', 'expected_goal_involvements',
+       'expected_goals_conceded', 'total_points', 'in_dreamteam', 'played',
+       'gameweek'])
+
     full_df["player_name"] = full_df["player_id"].map(lambda x: player_name_mapping[x])
     full_df["team"] = full_df["player_id"].map(lambda x: player_team_mapping[x])
     full_df["position"] = full_df["player_id"].map(lambda x: player_position_mapping[x])
