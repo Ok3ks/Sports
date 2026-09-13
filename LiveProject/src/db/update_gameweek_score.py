@@ -1,3 +1,4 @@
+import sys
 import anyio
 import pandas as pd
 from src.db.db import (
@@ -7,13 +8,18 @@ from src.db.db import (
 )
 
 from src.db.db import GameweekScore
-from src.utils import async_client
+from src.utils import async_client, get_curr_event
 from src.urls import GW_URL
 import logging
 from src.db.db import SEASON
 
 LOGGER = logging.getLogger(__name__)
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    handlers=[logging.StreamHandler(sys.stdout)],
+)
 
 async def update_db_gameweek_score(conn, gw):
     """This function retrieves current information of players
@@ -39,8 +45,7 @@ async def update_db_gameweek_score(conn, gw):
         df.to_sql(f"{SEASON}_Player_gameweek_score", conn, if_exists="append", method="multi")
         LOGGER.info("Data insert successful")
 
-
-if __name__ == "__main__":
+async def main():
     import argparse
 
     parser = argparse.ArgumentParser(
@@ -55,8 +60,18 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     connection = create_connection_engine()  # Add database directory as constant
+    if args.gameweek_id:
+        gameweek = args.gameweek_id
+    else:
+        gameweek = await get_curr_event()
+        gameweek = gameweek[0]
+        LOGGER.info(gameweek)
 
     try:
-        anyio.run(update_db_gameweek_score, connection, args.gameweek_id)
+        await update_db_gameweek_score(connection, gameweek)
     except ValueError:
-        LOGGER.info("Gameweek is unavailable")
+        LOGGER.info("Gameweek Endpoint is unavailable")
+    pass
+
+if __name__ == "__main__":
+    anyio.run(main)

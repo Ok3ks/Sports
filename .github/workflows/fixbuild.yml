@@ -64,22 +64,18 @@ jobs:
             source init_env.sh
             cd LiveProject
             echo getting current gameweek
-            python -m src.utils > q
-            GW=$(tail -n 1 q | awk -F'GW:' '{print $2}')
-            echo "GW=$GW" >> "$GITHUB_ENV"
+            python -m src.utils | tee q
             
       - name: 'Create Gameweek Report'
         run: |
             source venv/bin/activate
             source init_env.sh
             cd LiveProject
-            python -m src.utils > q
-            GW=$(tail -n 1 q | awk -F'GW:' '{print $2}')
-            echo $GW report
+            echo ${{ env.GW }} report
             python src/db/update_player_information.py -ha 1
             python src/db/update_player_information.py -ha 2
-            python src/db/update_gameweek_score.py -g $GW
-            python src/gameview.py -g $GW -u True
+            python src/db/update_gameweek_score.py
+            python src/gameview.py -u True
 
       - name: 'Upload Fixtures'
         run: |

@@ -4,12 +4,12 @@ from typing import List, Any
 import pandas as pd
 import pathlib
 import anyio
+from src.utils import get_curr_event
 from src.db.db import (
     get_player_name_map,
     get_player_position_map,
     get_player_team_map,
     get_season_stats,
-    get_teams_id,
     get_fixtures,
     SEASON
 )
@@ -165,8 +165,13 @@ async def main():
     if args.fixture:
         parse_fixture(to_dict=True, upload=args.upload)
     else:
+        if args.gameweek_id:
+            gameweek = args.gameweek_id
+        else:
+            gameweek = await get_curr_event()
+            gameweek = gameweek[0]
         parse_stats(
-            filter={"gameweek": args.gameweek_id},
+            filter={"gameweek": gameweek},
             to_dict=True,
             path=args.path,
             upload=args.upload,
