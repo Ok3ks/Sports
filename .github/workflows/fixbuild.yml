@@ -64,7 +64,7 @@ jobs:
             source init_env.sh
             cd LiveProject
             echo getting current gameweek
-            GW=$(python -m src.utils)
+            export GW=$(python -m src.utils)
             echo "GW=$GW" >> "$GITHUB_ENV"
 
       - name: 'Upload Fixtures'
