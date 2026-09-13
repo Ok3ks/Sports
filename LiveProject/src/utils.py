@@ -28,9 +28,16 @@ from .db.db import (
 from typing import Any, List, Union
 import logging
 import ssl
+import sys
 import polars as pl
 
 LOGGER = logging.getLogger(__name__)
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    handlers=[logging.StreamHandler(sys.stdout)],
+)
 
 context = ssl.create_default_context()
 context.minimum_version = ssl.TLSVersion.TLSv1_2
@@ -988,8 +995,7 @@ async def main():
         prog="weeklyreport", description="Obtain current gameweek"
     )
     curr_gw = await get_curr_event()
-    LOGGER.info(curr_gw[0])
-    print(curr_gw[0])
+    LOGGER.info(f"GW:{curr_gw[0]}")
 
 
 if __name__ == "__main__":

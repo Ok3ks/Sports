@@ -64,8 +64,9 @@ jobs:
             source init_env.sh
             cd LiveProject
             echo getting current gameweek
-            export GW=$(python -m src.utils)
-            echo "GW:$GW" >> "$GITHUB_ENV"
+            python -u -m src.utils > q 2>&1
+            GW=$(tail -n 1 q | awk -F'GW:' '{print $2}')
+            echo "GW=$GW" >> "$GITHUB_ENV"
             
       - name: 'Create Gameweek Report'
         run: |
