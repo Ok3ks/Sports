@@ -58,6 +58,11 @@ jobs:
           service_account: '${{ secrets.AUTH_SERVICE_ACCOUNT }}'
           process_gcloudignore: false
     
+      - name: Obtain current gameweek script
+        run: |
+            GW=$(python -m src.utils)
+            echo "GW=$GW" >> "$GITHUB_ENV"
+
       - name: 'Upload Fixtures'
         run: |
             source venv/bin/activate
@@ -75,5 +80,5 @@ jobs:
             echo ${{ env.GW }} report
             python src/db/update_player_information.py -ha 1
             python src/db/update_player_information.py -ha 2
-            python src/db/update_gameweek_score.py -g ${{ secrets.GW }}
-            python src/gameview.py -g ${{ secrets.GW }} -u True
+            python src/db/update_gameweek_score.py -g ${{ env.GW }}
+            python src/gameview.py -g ${{ env.GW }} -u True

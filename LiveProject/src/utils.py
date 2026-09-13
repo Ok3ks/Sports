@@ -269,11 +269,12 @@ async def get_curr_event() -> list:
 
     curr_event = []
     r = r.json()
+
     for event in r["events"]:
-        if not event["is_current"]:
-            return curr_event
-        curr_event.append(event["id"])
-        curr_event.append((event["finished"], event["data_checked"]))
+        if event["is_current"]:
+            curr_event.append(event["id"])
+            curr_event.append((event["finished"], event["data_checked"]))
+    
     return curr_event
 
 
@@ -980,22 +981,19 @@ def enrich_player_cols(
     return t_df
 
 
-if __name__ == "__main__":
+async def main():
     import argparse
 
     parser = argparse.ArgumentParser(
-        prog="weeklyreport", description="Provide Gameweek ID and League ID"
+        prog="weeklyreport", description="Obtain current gameweek"
     )
+    curr_gw = await get_curr_event()
+    LOGGER.info(curr_gw[0])
+    print(curr_gw[0])
 
-    parser.add_argument(
-        "-g",
-        "--gameweek_id",
-        type=int,
-        help="Gameweek you are trying to get a report of",
-    )
-    parser.add_argument(
-        "-l", "--league_id", type=int, help="Gameweek you are trying to get a report of"
-    )
-    parser.add_argument("-t", "--thread", type=int)
 
-    args = parser.parse_args()
+if __name__ == "__main__":
+
+    import anyio
+
+    anyio.run(main)
