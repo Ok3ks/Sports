@@ -57,8 +57,17 @@ jobs:
           workload_identity_provider: '${{secrets.WORKLOAD_IDENTITY_PROVIDERS }}'
           service_account: '${{ secrets.AUTH_SERVICE_ACCOUNT }}'
           process_gcloudignore: false
+    
+      - name: Obtain current gameweek script
+        run: |
+            source venv/bin/activate
+            source init_env.sh
+            cd LiveProject
+            echo getting current gameweek
+            GW=$(python -m src.utils)
+            echo "GW=$GW" >> "$GITHUB_ENV"
 
-      - name: 'Upload Fixtures and obtain current gameeweek'
+      - name: 'Upload Fixtures'
         run: |
             source venv/bin/activate
             source init_env.sh
@@ -66,9 +75,6 @@ jobs:
             echo updating fixtures
             python src/db/update_season_fixture.py
             python src/gameview.py -f True -u True
-            echo extracting current gameweek
-            GW=$(python -m src.utils)
-            echo "GW=$GW" >> "$GITHUB_ENV"
             
       - name: 'Create Gameweek Report'
         run: |
