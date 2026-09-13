@@ -67,22 +67,22 @@ jobs:
             python -m src.utils | tee q
             
 
-      - name: 'Upload Fixtures'
+      - name: 'Update scripts'
         run: |
             source venv/bin/activate
             source init_env.sh
             cd LiveProject
             echo updating fixtures
             python src/db/update_season_fixture.py
-            python src/gameview.py -f True -u True
+            python src/db/update_player_information.py -ha 1
+            python src/db/update_player_information.py -ha 2
+            python src/db/update_gameweek_score.py
 
-      - name: 'Create Gameweek Report'
+      - name: 'Upload Gameweek Report and Fixture'
         run: |
             source venv/bin/activate
             source init_env.sh
             cd LiveProject
             echo ${{ env.GW }} report
-            python src/db/update_player_information.py -ha 1
-            python src/db/update_player_information.py -ha 2
-            python src/db/update_gameweek_score.py
+            python src/gameview.py -f True -u True
             python src/gameview.py -u True
