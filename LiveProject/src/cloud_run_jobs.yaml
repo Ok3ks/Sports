@@ -1,0 +1,67 @@
+apiVersion: run.googleapis.com/v1
+kind: Job
+metadata:
+  name: fixtures-scores-2
+  namespace: 987818742353
+  selfLink: /apis/run.googleapis.com/v1/namespaces/987818742353/jobs/fixtures-scores-2
+  uid: 05d34ebd-eb40-4494-9d3b-db0befc76f03
+  resourceVersion: AAZb1oFChSE
+  generation: 4
+  creationTimestamp: "2026-09-19T13:22:13.262032Z"
+  labels:
+    run.googleapis.com/satisfiesPzs: "true"
+    cloud.googleapis.com/location: europe-west9
+    run.googleapis.com/lastUpdatedTime: "2026-09-19T13:59:31.391685Z"
+  annotations:
+    run.googleapis.com/creator: freelanceokeks@gmail.com
+    run.googleapis.com/lastModifier: freelanceokeks@gmail.com
+    run.googleapis.com/client-name: cloud-console
+    run.googleapis.com/operation-id: 34324faa-6307-4da7-a599-62dda800f7a8
+spec:
+  template:
+    metadata:
+      annotations:
+        run.googleapis.com/client-name: cloud-console
+        run.googleapis.com/execution-environment: gen2
+    spec:
+      taskCount: 1
+      template:
+        spec:
+          containers:
+          - name: fpl-backend-1
+            image: europe-west2-docker.pkg.dev/fpl-analysis-tool/fpl/fpl-backend@sha256:b00eaf787c081fd9c0a7f7733bb7e07e7c0ed446f76353df277156212349c8c0
+            command:
+            - poetry
+            args:
+            - run
+            - python
+            - src/gameview.py
+            - -u
+            - "True"
+            - -f
+            - "True"
+            env:
+            - name: DJANGO_SECRET_KEY
+              value: projects/987818742353/secrets/DJANGO_SECRET_KEY
+            - name: IS_SQLITE
+              value: "True"
+            - name: DEVELOP
+              value: "False"
+            resources:
+              limits:
+                cpu: 2000m
+                memory: 8Gi
+          maxRetries: 1
+          timeoutSeconds: 600
+          serviceAccountName: 987818742353-compute@developer.gserviceaccount.com
+      delayExecution: false
+status:
+  observedGeneration: 4
+  conditions:
+  - type: Ready
+    status: "True"
+  executionCount: 6
+  latestCreatedExecution:
+    name: fixtures-scores-2-g69zm
+    creationTimestamp: "2026-09-19T14:05:04.294888Z"
+    completionStatus: EXECUTION_RUNNING
