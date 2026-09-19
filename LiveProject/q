@@ -1,0 +1,3 @@
+2026-09-13 12:54:39,396 INFO httpx: HTTP Request: GET https://fantasy.premierleague.com/api/bootstrap-static/ "HTTP/1.1 200 OK"
+2026-09-13 12:54:39,465 INFO __main__: 200
+2026-09-13 12:54:39,499 INFO __main__: GW:4

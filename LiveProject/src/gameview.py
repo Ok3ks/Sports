@@ -174,12 +174,12 @@ async def main():
 
     if args.fixture:
         parse_fixture(to_dict=True, upload=args.upload)
+
+    if args.gameweek_id:
+        gameweek = args.gameweek_id
     else:
-        if args.gameweek_id:
-            gameweek = args.gameweek_id
-        else:
-            gameweek = await get_curr_event()
-            gameweek = gameweek[0]
+        gameweek = await get_curr_event()
+        gameweek = gameweek[0]
         parse_stats(
             filter={"gameweek": gameweek},
             to_dict=True,
