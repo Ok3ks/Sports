@@ -12,7 +12,7 @@ env:
   PROJECT_NAME: fpl-analysis-tool
   ARTIFACT_REPO_NAME: fpl
   IMAGE_NAME: fpl-backend
-  REVISION: poetry-dep
+  REVISION: cloud-scheduler
   REGION: europe-west2
   SERVICE_NAME: redeployed-backend
 
