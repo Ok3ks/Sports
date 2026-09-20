@@ -1,9 +1,11 @@
 import json
-import os
-from typing import List, Any
+from typing import Any
 import pandas as pd
 import pathlib
 import anyio
+from src.db.update_gameweek_score import update_db_gameweek_score
+from src.db.update_season_fixture import update_season_fixture
+from src.db.db import create_connection_engine
 from src.utils import get_curr_event
 from src.db.db import (
     get_player_name_map,
@@ -171,8 +173,10 @@ async def main():
     )
 
     args = parser.parse_args()
+    engine = create_connection_engine()
 
     if args.fixture:
+        await update_season_fixture()  # update embedded database
         parse_fixture(to_dict=True, upload=args.upload)
 
     if args.gameweek_id:
@@ -180,12 +184,14 @@ async def main():
     else:
         gameweek = await get_curr_event()
         gameweek = gameweek[0]
-        parse_stats(
-            filter={"gameweek": gameweek},
-            to_dict=True,
-            path=args.path,
-            upload=args.upload,
-        )
+
+    await update_db_gameweek_score(engine, gameweek)
+    parse_stats(
+        filter={"gameweek": gameweek},
+        to_dict=True,
+        path=args.path,
+        upload=args.upload,
+    )
 
 
 if __name__ == "__main__":
